@@ -22,6 +22,19 @@ The artifacts have not been submitted to Maven Central yet. To include Molecular
 xmlns:mol="http://ipb-halle.de/nwc"
 ```
 
+#### Configuring resources via web.xml
+
+MolecularFaces tries to include as much resources (JavaScript, CSS, images) of the third-party plugins in its jar as possible and loads them when required. Alternatively, you can configure the URL of the resources (relative to the application's context root) via a `context-param` in your project's web.xml.
+
+Example:
+
+```xml
+<context-param>
+  <param-name>de.ipb-halle.molecularfaces.OPENCHEMLIBJS_URL</param-name>
+  <param-value>openchemlib-full.js</param-value>
+</context-param>
+```
+
 ### Components
 
 #### Chemical structure editor and viewer

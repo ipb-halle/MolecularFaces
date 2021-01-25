@@ -37,6 +37,7 @@ import javax.faces.render.Renderer;
 @FacesRenderer(rendererType = OpenChemLibJSRenderer.RENDERER_TYPE, componentFamily = UIMolPlugin.COMPONENT_FAMILY)
 public class OpenChemLibJSRenderer extends Renderer implements AddResourceRenderer {
 	public static final String RENDERER_TYPE = "molecularfaces.OpenChemLibJSRenderer";
+	public static final String WEBXML_CUSTOM_RESOURCE_URL = "de.ipb-halle.molecularfaces.OPENCHEMLIBJS_URL";
 
 	@Override
 	public void decode(FacesContext context, UIComponent component) {
@@ -63,11 +64,23 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 
 		ResponseWriter writer = context.getResponseWriter();
 
+		if (useCustomResourceUrl(context)) {
+			encodeIncludeCustomResourceUrl(writer, context, plugin);
+		}
+
 		if (plugin.isReadonly()) {
 			encodeViewer(writer, plugin);
 		} else {
 			encodeEditor(writer, plugin);
 		}
+	}
+
+	private void encodeIncludeCustomResourceUrl(ResponseWriter writer, FacesContext context, UIMolPlugin plugin)
+			throws IOException {
+		writer.startElement("script", plugin);
+		writer.writeAttribute("type", "text/javascript", null);
+		writer.writeAttribute("src", context.getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL), null);
+		writer.endElement("script");
 	}
 
 	private void encodeViewer(ResponseWriter writer, UIMolPlugin plugin) throws IOException {
@@ -237,11 +250,22 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 
 	@Override
 	public void addResources(FacesContext context) {
-		UIOutput js = new UIOutput();
-		js.setRendererType("javax.faces.resource.Script");
-		js.getAttributes().put("library", "molecularfaces");
-		js.getAttributes().put("name", "js/openchemlib-full.js");
+		if (!useCustomResourceUrl(context)) {
+			UIOutput js = new UIOutput();
+			js.setRendererType("javax.faces.resource.Script");
+			js.getAttributes().put("library", "molecularfaces");
+			js.getAttributes().put("name", "js/openchemlib-full.js");
 
-		context.getViewRoot().addComponentResource(context, js, "head");
+			context.getViewRoot().addComponentResource(context, js, "head");
+		}
+	}
+
+	private boolean useCustomResourceUrl(FacesContext context) {
+		String resourceUrl = context.getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL);
+		if ((resourceUrl != null) && (!resourceUrl.isEmpty())) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
