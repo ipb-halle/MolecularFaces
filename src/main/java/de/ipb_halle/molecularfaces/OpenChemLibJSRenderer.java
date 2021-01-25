@@ -1,0 +1,247 @@
+/*
+ * MolecularFaces
+ * Copyright 2021 Leibniz-Institut für Pflanzenbiochemie
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ */
+package de.ipb_halle.molecularfaces;
+
+import java.io.IOException;
+import java.util.Map;
+
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIOutput;
+import javax.faces.context.FacesContext;
+import javax.faces.context.ResponseWriter;
+import javax.faces.render.FacesRenderer;
+import javax.faces.render.Renderer;
+
+/**
+ * This renderer renders a chemical structure editor or viewer using the
+ * <a href="https://github.com/cheminfo/openchemlib-js">OpenChemLib JS</a>
+ * Javascript plugin.
+ * 
+ * @author flange
+ */
+@FacesRenderer(rendererType = OpenChemLibJSRenderer.RENDERER_TYPE, componentFamily = UIMolPlugin.COMPONENT_FAMILY)
+public class OpenChemLibJSRenderer extends Renderer implements AddResourceRenderer {
+	public static final String RENDERER_TYPE = "molecularfaces.OpenChemLibJSRenderer";
+
+	@Override
+	public void decode(FacesContext context, UIComponent component) {
+		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
+		UIMolPlugin plugin = (UIMolPlugin) component;
+
+		if (!plugin.isReadonly()) {
+			String clientId = plugin.getClientId(context);
+
+			String value = requestMap.get(clientId);
+
+			plugin.setSubmittedValue(value);
+			plugin.setValid(true);
+		}
+	}
+
+	@Override
+	public void encodeBegin(FacesContext context, UIComponent component) throws IOException {
+		UIMolPlugin plugin = (UIMolPlugin) component;
+
+		if (!plugin.isRendered()) {
+			return;
+		}
+
+		ResponseWriter writer = context.getResponseWriter();
+
+		if (plugin.isReadonly()) {
+			encodeViewer(writer, plugin);
+		} else {
+			encodeEditor(writer, plugin);
+		}
+	}
+
+	private void encodeViewer(ResponseWriter writer, UIMolPlugin plugin) throws IOException {
+		String divId = plugin.getClientId() + "_OpenChemLibJSViewer";
+
+		encodeViewerHTML(writer, plugin, divId);
+		encodeViewerJS(writer, plugin, divId);
+	}
+
+	/**
+	 * Encodes the HTML part of the plugin viewer into the writer. It consists of a
+	 * &lt;div&gt; element that the Javascript plugin uses as rendering target,
+	 * which is embedded into a &lt;div&gt; with the component's clientId as
+	 * <code>id</code> attribute.
+	 * 
+	 * @param writer
+	 * @param plugin
+	 * @param divId  DOM id of the embedded &lt;div&gt; element
+	 */
+	private void encodeViewerHTML(ResponseWriter writer, UIMolPlugin plugin, String divId) throws IOException {
+		// surrounding <div>
+		writer.startElement("div", plugin);
+		writer.writeAttribute("id", plugin.getClientId(), null);
+
+		// inner <div> is used for the plugin's rendering (aka the Javascript target)
+		writer.startElement("div", plugin);
+		writer.writeAttribute("id", divId, null);
+		writer.writeAttribute("style", generateDivStyle(plugin), null);
+		writer.endElement("div");
+
+		// end of surrounding <div>
+		writer.endElement("div");
+	}
+
+	/**
+	 * Encodes the Javascript part of the plugin viewer into the writer.
+	 * 
+	 * @param writer
+	 * @param plugin
+	 * @param divId  DOM id of the &lt;div&gt; element
+	 */
+	private void encodeViewerJS(ResponseWriter writer, UIMolPlugin plugin, String divId) throws IOException {
+		writer.startElement("script", plugin);
+		writer.writeAttribute("type", "text/javascript", null);
+
+		// create molecule from the plugin's value
+		writer.writeText(
+				"var molecule = window.OCL.Molecule.fromMolfile(\"" + escape((String) plugin.getValue()) + "\");",
+				null);
+
+		// draw the molecule in the <div> container
+		writer.writeText("document.getElementById(\"" + divId + "\").innerHTML = molecule.toSVG(" + plugin.getWidth()
+				+ "," + plugin.getHeight() + ");", null);
+
+		writer.endElement("script");
+	}
+
+	private void encodeEditor(ResponseWriter writer, UIMolPlugin plugin) throws IOException {
+		String clientId = plugin.getClientId();
+		String hiddenInputId = clientId + "_Input";
+		String divId = clientId + "_OpenChemLibJSEditor";
+
+		encodeEditorHTML(writer, plugin, divId, hiddenInputId);
+		encodeEditorJS(writer, plugin, divId, hiddenInputId);
+	}
+
+	/**
+	 * Encodes the HTML part of the plugin editor into the writer. It consists of a
+	 * &lt;div&gt; and a hidden &lt;input&gt; element embedded into a &lt;div&gt;
+	 * with the component's clientId as <code>id</code> attribute.
+	 * 
+	 * @param writer
+	 * @param plugin
+	 * @param divId         DOM id of the embedded &lt;div&gt; element
+	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
+	 */
+	private void encodeEditorHTML(ResponseWriter writer, UIMolPlugin plugin, String divId, String hiddenInputId)
+			throws IOException {
+		// surrounding <div>
+		writer.startElement("div", plugin);
+		writer.writeAttribute("id", plugin.getClientId(), null);
+
+		// inner <div> used for the plugin's rendering (aka the Javascript target)
+		writer.startElement("div", plugin);
+		writer.writeAttribute("id", divId, null);
+		writer.writeAttribute("style", generateDivStyle(plugin), null);
+		writer.endElement("div");
+
+		// hidden <input>
+		writer.startElement("input", plugin);
+		writer.writeAttribute("type", "hidden", null);
+		writer.writeAttribute("id", hiddenInputId, null);
+		writer.writeAttribute("name", plugin.getClientId(), null);
+		writer.writeAttribute("value", plugin.getValue(), "value");
+		writer.endElement("input");
+
+		// end of surrounding <div>
+		writer.endElement("div");
+	}
+
+	/**
+	 * Encodes the Javascript part of the plugin editor into the writer.
+	 * <p>
+	 * Note: Different components of this plugin type will use one and the same
+	 * Javascript variable, which will be overwritten in case it already exists.
+	 * 
+	 * @param writer
+	 * @param plugin
+	 * @param divId         DOM id of the &lt;div&gt; element
+	 * @param hiddenInputId DOM id of the hidden &lt;input&gt; element
+	 */
+	private void encodeEditorJS(ResponseWriter writer, UIMolPlugin plugin, String divId, String hiddenInputId)
+			throws IOException {
+		String jsVariableName = "openChemLibJSEditor";
+
+		writer.startElement("script", plugin);
+		writer.writeAttribute("type", "text/javascript", null);
+
+		StringBuilder sb = new StringBuilder(512);
+		// start editor and set the molecule from the hidden <input> element's value
+		sb.append("var ").append(jsVariableName).append(" = window.OCL.StructureEditor.createSVGEditor(\"")
+				.append(divId).append("\", 1);");
+		sb.append(jsVariableName).append(".setMolFile(document.getElementById(\"").append(hiddenInputId)
+				.append("\").getAttribute(\"value\"));");
+
+		// register an on-change callback to fill the value of the hidden <input>
+		// element
+		sb.append(jsVariableName).append(".setChangeListenerCallback(");
+		sb.append("function (idcode, molecule) { document.getElementById(\"").append(hiddenInputId)
+				.append("\").setAttribute(\"value\", molecule.toMolfile()); }");
+		sb.append(");");
+
+		writer.writeText(sb, null);
+		writer.endElement("script");
+	}
+
+	private String generateDivStyle(UIMolPlugin plugin) {
+		StringBuilder sb = new StringBuilder(128);
+
+		// width attribute
+		sb.append("width:").append(plugin.getWidth()).append("px;");
+
+		// height attribute
+		sb.append("height:").append(plugin.getHeight()).append("px;");
+
+		// border attribute
+		if (plugin.isBorder()) {
+			sb.append("border:solid;border-width:1px;");
+		}
+
+		return sb.toString();
+	}
+
+	/**
+	 * Escape string for HTML / XML. Used mainly for molecules in MDL MOL format.
+	 * 
+	 * @param s string to escape
+	 * @return escaped string
+	 */
+	private String escape(String s) {
+		if (s == null) {
+			return "";
+		}
+
+		return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "");
+	}
+
+	@Override
+	public void addResources(FacesContext context) {
+		UIOutput js = new UIOutput();
+		js.setRendererType("javax.faces.resource.Script");
+		js.getAttributes().put("library", "molecularfaces");
+		js.getAttributes().put("name", "js/openchemlib-full.js");
+
+		context.getViewRoot().addComponentResource(context, js, "head");
+	}
+}
