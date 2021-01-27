@@ -44,6 +44,7 @@ Example:
 Plugin | Version | License | Editor | Viewer
 ------ | ------- | ------- | ------ | ------
 [OpenChemLib JS](https://github.com/cheminfo/openchemlib-js) | [v7.2.3](https://github.com/cheminfo/openchemlib-js/releases/tag/v7.2.3) | BSD-3-Clause | [x] | [x]
+[Marvin JS](https://chemaxon.com/products/marvin-js) | 21.1.0 | proprietary | [x] | [x]
 
 ##### Usage example
 
@@ -66,3 +67,11 @@ private String structure = "";
 ...
 }
 ```
+
+##### OpenChemLib JS
+
+All resource dependencies (openchemlib-full.js) are included in the jar build pipeline. Alternatively, the location of openchemlib-full.js can be configured via the `context-param` "de.ipb-halle.molecularfaces.OPENCHEMLIBJS_URL".
+
+##### Marvin JS
+
+The resource dependencies are not part of the jar build pipeline. It is necessary to download the platform independent core archive (e.g. marvinjs-21.1.0-core.zip) from [ChemAxon's website](https://chemaxon.com/products/marvin-js/download), extract it and supply its location via the `context-param` "de.ipb-halle.molecularfaces.MARVINJS_BASE_URL".
