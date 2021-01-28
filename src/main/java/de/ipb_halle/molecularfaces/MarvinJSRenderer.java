@@ -37,9 +37,10 @@ import javax.faces.render.Renderer;
 public class MarvinJSRenderer extends Renderer {
 	public static final String RENDERER_TYPE = "molecularfaces.MarvinJSRenderer";
 	/**
-	 * The location of the extracted Marvin JS archive (marvinjs-<version>-all.zip).
+	 * The location of the extracted Marvin JS archive
+	 * (marvinjs-<version>-core.zip).
 	 */
-	public static final String WEBXML_CUSTOM_RESOURCE_URL = "de.ipb-halle.molecularfaces.MARVINJS_BASE_URL";
+	public static final String WEBXML_CUSTOM_RESOURCE_URL = "de.ipb_halle.molecularfaces.MARVINJS_BASE_URL";
 
 	@Override
 	public void decode(FacesContext context, UIComponent component) {
@@ -66,6 +67,11 @@ public class MarvinJSRenderer extends Renderer {
 
 		ResponseWriter writer = context.getResponseWriter();
 
+		// surrounding <div>
+		writer.startElement("div", plugin);
+		writer.writeAttribute("id", plugin.getClientId(), null);
+		writer.writeAttribute("style", generateDivStyle(plugin), null);
+
 		/*
 		 * Always include Marvin JS via external resources defined by
 		 * WEBXML_CUSTOM_RESOURCE_URL.
@@ -77,6 +83,9 @@ public class MarvinJSRenderer extends Renderer {
 		} else {
 			encodeEditor(context, writer, plugin);
 		}
+
+		// end of surrounding <div>
+		writer.endElement("div");
 	}
 
 	private void encodeIncludeCustomResourceUrl(ResponseWriter writer, FacesContext context, UIMolPlugin plugin)
@@ -106,10 +115,9 @@ public class MarvinJSRenderer extends Renderer {
 
 	/**
 	 * Encodes the HTML part of the plugin viewer into the writer. It consists of a
-	 * hidden &lt;iframe&gt; element that the JavaScript plugin uses as target,
-	 * which is embedded into a &lt;div&gt; with the component's clientId as
-	 * <code>id</code> attribute. The JavaScript execution dynamically attaches SVG
-	 * content to this &lt;div&gt;.
+	 * hidden &lt;iframe&gt; element that the JavaScript plugin uses as target. The
+	 * JavaScript execution dynamically attaches SVG content to the surrounding
+	 * &lt;div&gt;.
 	 * 
 	 * @param context
 	 * @param writer
@@ -118,11 +126,6 @@ public class MarvinJSRenderer extends Renderer {
 	 */
 	private void encodeViewerHTML(FacesContext context, ResponseWriter writer, UIMolPlugin plugin, String iframeId)
 			throws IOException {
-		// surrounding <div>
-		writer.startElement("div", plugin);
-		writer.writeAttribute("id", plugin.getClientId(), null);
-		writer.writeAttribute("style", generateDivStyle(plugin), null);
-
 		// inner <iframe> is used for the plugin's rendering (aka the JavaScript target)
 		writer.startElement("iframe", plugin);
 		writer.writeAttribute("id", iframeId, null);
@@ -132,9 +135,6 @@ public class MarvinJSRenderer extends Renderer {
 		writer.writeAttribute("style", "width:0;height:0;display:initial;position:absolute;left:0;"
 				+ "top:0;margin:0;padding:0;border:0;border:none;", null);
 		writer.endElement("iframe");
-
-		// end of surrounding <div>
-		writer.endElement("div");
 	}
 
 	/**
@@ -182,8 +182,16 @@ public class MarvinJSRenderer extends Renderer {
 				.append(plugin.getHeight()).append(",").append("'zoomMode':\"autoshrink\"").append("};");
 
 		// create SVG data from the plugin's value
-		sb.append("var imgData = ").append(jsVariableName).append(".ImageExporter.molToDataUrl(\"")
-				.append(escape((String) plugin.getValue())).append("\", \"image/svg\", settings);");
+		sb.append("var imgData = ").append(jsVariableName).append(".ImageExporter.molToDataUrl(");
+
+		String value = (String) plugin.getValue();
+		if (value.isEmpty()) {
+			sb.append("null");
+		} else {
+			sb.append("\"").append(escape(value)).append("\"");
+		}
+
+		sb.append(", \"image/svg\", settings);");
 
 		// add SVG data as html element to the outer <div>
 		sb.append("document.getElementById(\"").append(plugin.getClientId())
@@ -212,8 +220,7 @@ public class MarvinJSRenderer extends Renderer {
 
 	/**
 	 * Encodes the HTML part of the plugin editor into the writer. It consists of an
-	 * &lt;iframe&gt; and a hidden &lt;input&gt; element embedded into a &lt;div&gt;
-	 * with the component's clientId as <code>id</code> attribute.
+	 * &lt;iframe&gt; and a hidden &lt;input&gt; element.
 	 * 
 	 * @param context
 	 * @param writer
@@ -223,16 +230,12 @@ public class MarvinJSRenderer extends Renderer {
 	 */
 	private void encodeEditorHTML(FacesContext context, ResponseWriter writer, UIMolPlugin plugin, String iframeId,
 			String hiddenInputId) throws IOException {
-		// surrounding <div>
-		writer.startElement("div", plugin);
-		writer.writeAttribute("id", plugin.getClientId(), null);
-
 		// inner <iframe> used for the plugin's rendering (aka the JavaScript target)
 		writer.startElement("iframe", plugin);
 		writer.writeAttribute("id", iframeId, null);
 		writer.writeAttribute("src",
 				context.getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL) + "/editor.html", null);
-		writer.writeAttribute("style", generateDivStyle(plugin), null);
+		writer.writeAttribute("style", "height:" + plugin.getHeight() + "px;width:" + plugin.getWidth() + "px;", null);
 		writer.endElement("iframe");
 
 		// hidden <input>
@@ -242,9 +245,6 @@ public class MarvinJSRenderer extends Renderer {
 		writer.writeAttribute("name", plugin.getClientId(), null);
 		writer.writeAttribute("value", plugin.getValue(), "value");
 		writer.endElement("input");
-
-		// end of surrounding <div>
-		writer.endElement("div");
 	}
 
 	/**
@@ -280,9 +280,14 @@ public class MarvinJSRenderer extends Renderer {
 		// set JS variable
 		sb.append(jsVariableName).append(" = sketcherInstance;");
 
-		// set the molecule from the hidden <input> element's value
-		sb.append(jsVariableName).append(".importStructure(\"mol\", document.getElementById(\"").append(hiddenInputId)
-				.append("\").getAttribute(\"value\"))" + ".catch(function(error) {" + "alert(error);" + "});");
+		// check if value from hidden <input> element is empty
+		sb.append("var value = document.getElementById(\"").append(hiddenInputId)
+				.append("\").getAttribute(\"value\");");
+		sb.append("if (value === \"\") { value = null; }");
+
+		// set the molecule
+		sb.append(jsVariableName)
+				.append(".importStructure(\"mol\", value)" + ".catch(function(error) {" + "alert(error);" + "});");
 
 		/*
 		 * Register an on-change callback to fill the value of the hidden <input>
@@ -292,8 +297,8 @@ public class MarvinJSRenderer extends Renderer {
 				.append(hiddenInputId).append("\").setAttribute(\"value\", ").append(jsVariableName)
 				.append(".exportAsMol())});");
 
-		sb.append("},function (error) {" + "alert(\"Cannot retrieve MarvinJS sketcher instance from iframe:\"+error);" + "});"
-				+ "});");
+		sb.append("},function (error) {" + "alert(\"Cannot retrieve MarvinJS sketcher instance from iframe:\"+error);"
+				+ "});" + "});");
 
 		writer.writeText(sb, null);
 		writer.endElement("script");

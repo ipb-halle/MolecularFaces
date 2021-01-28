@@ -24,17 +24,20 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.ListenerFor;
+import javax.faces.event.ListenersFor;
 import javax.faces.event.PostAddToViewEvent;
+import javax.faces.event.PreRenderComponentEvent;
 import javax.faces.render.Renderer;
 
 /**
- * This {@link javax.faces.component.UIComponent} renders a chemical structure editor or viewer.
- * Rendering is delegated to different {@link Renderer}s depending on the choice
- * of the <code>pluginType</code> property.
+ * This {@link javax.faces.component.UIComponent} renders a chemical structure
+ * editor or viewer. Rendering is delegated to different {@link Renderer}s
+ * depending on the choice of the <code>pluginType</code> property.
  * 
  * @author flange
  */
-@ListenerFor(systemEventClass = PostAddToViewEvent.class)
+@ListenersFor({ @ListenerFor(systemEventClass = PostAddToViewEvent.class),
+		@ListenerFor(systemEventClass = PreRenderComponentEvent.class) })
 @FacesComponent(UIMolPlugin.COMPONENT_TYPE)
 public class UIMolPlugin extends UIInput implements ComponentSystemEventListener {
 	public static final String COMPONENT_TYPE = "molecularfaces.UIMolPlugin";
@@ -96,11 +99,8 @@ public class UIMolPlugin extends UIInput implements ComponentSystemEventListener
 	// public static final String[] FORMATS = { "molFile", "molFileV3", "smiles" };
 
 	/*
-	 * Return the value of the <code>format</code> property.
-	 * <p>
-	 * Controls the chemical file format to be used in the <code>value</code>
-	 * property.
-	 * <p>
+	 * Return the value of the <code>format</code> property. <p> Controls the
+	 * chemical file format to be used in the <code>value</code> property. <p>
 	 * Possible values: "molFile" (MDL Molfile V2000), "molFileV3" (MDL Molfile
 	 * V3000) and "smiles" (SMILES).
 	 * 
@@ -167,17 +167,6 @@ public class UIMolPlugin extends UIInput implements ComponentSystemEventListener
 	 */
 	public void setPluginType(String pluginType) {
 		getStateHelper().put(PropertyKeys.pluginType, pluginType);
-
-		switch (pluginType) {
-		case "OpenChemLibJS":
-			setRendererType(OpenChemLibJSRenderer.RENDERER_TYPE);
-			break;
-		case "MarvinJS":
-			setRendererType(MarvinJSRenderer.RENDERER_TYPE);
-			break;
-		default:
-			throw new IllegalArgumentException("Unknown plugin type: " + pluginType);
-		}
 	}
 
 	/**
@@ -225,21 +214,22 @@ public class UIMolPlugin extends UIInput implements ComponentSystemEventListener
 		getStateHelper().put(PropertyKeys.width, width);
 	}
 
-	/*
-	 * We would like to load resources programmatically (not via
-	 * the @ResourceDependencies annotation). This has to be done before the render
-	 * response, so an event listener for PostAddToViewEvent is registered
-	 * via @ListenerFor to this component, which is processed here. The actual logic
-	 * that adds resources is implemented in the renderer.
-	 * 
-	 * Note: It seems that renderers are not able to catch events, which is why this
-	 * implementation resides here.
-	 * 
-	 * See: https://stackoverflow.com/a/12451778
-	 */
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
 		if (event.getClass().equals(PostAddToViewEvent.class)) {
+			/*
+			 * We would like to load resources programmatically (not via
+			 * the @ResourceDependencies annotation). This has to be done before the render
+			 * response, so an event listener for PostAddToViewEvent is registered
+			 * via @ListenerFor to this component, which is processed here. The actual logic
+			 * that adds resources is implemented in the renderer.
+			 * 
+			 * Note: It seems that renderers are not able to catch events, which is why this
+			 * implementation resides here.
+			 * 
+			 * See: https://stackoverflow.com/a/12451778
+			 */
+
 			FacesContext context = FacesContext.getCurrentInstance();
 
 			/*
@@ -250,7 +240,29 @@ public class UIMolPlugin extends UIInput implements ComponentSystemEventListener
 			if (renderer instanceof AddResourceRenderer) {
 				((AddResourceRenderer) renderer).addResources(context);
 			}
+		} else if (event.getClass().equals(PreRenderComponentEvent.class)) {
+			/*
+			 * It is not sufficient to track changes of the attribute "pluginType" via its
+			 * setter, because this setter is not called if an EL value expression is
+			 * involved. Thus, the renderer delegation depending on the plugin type is set
+			 * up in an PreRenderComponentEvent.
+			 */
+
+			updateRenderer();
 		}
 		super.processEvent(event);
+	}
+
+	private void updateRenderer() {
+		switch (getPluginType()) {
+		case "OpenChemLibJS":
+			setRendererType(OpenChemLibJSRenderer.RENDERER_TYPE);
+			break;
+		case "MarvinJS":
+			setRendererType(MarvinJSRenderer.RENDERER_TYPE);
+			break;
+		default:
+			throw new IllegalArgumentException("Unknown plugin type: " + getPluginType());
+		}
 	}
 }

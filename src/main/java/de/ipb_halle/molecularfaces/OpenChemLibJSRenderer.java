@@ -37,7 +37,7 @@ import javax.faces.render.Renderer;
 @FacesRenderer(rendererType = OpenChemLibJSRenderer.RENDERER_TYPE, componentFamily = UIMolPlugin.COMPONENT_FAMILY)
 public class OpenChemLibJSRenderer extends Renderer implements AddResourceRenderer {
 	public static final String RENDERER_TYPE = "molecularfaces.OpenChemLibJSRenderer";
-	public static final String WEBXML_CUSTOM_RESOURCE_URL = "de.ipb-halle.molecularfaces.OPENCHEMLIBJS_URL";
+	public static final String WEBXML_CUSTOM_RESOURCE_URL = "de.ipb_halle.molecularfaces.OPENCHEMLIBJS_URL";
 
 	@Override
 	public void decode(FacesContext context, UIComponent component) {
@@ -64,6 +64,10 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 
 		ResponseWriter writer = context.getResponseWriter();
 
+		// surrounding <div>
+		writer.startElement("div", plugin);
+		writer.writeAttribute("id", plugin.getClientId(), null);
+		
 		if (useCustomResourceUrl(context)) {
 			encodeIncludeCustomResourceUrl(writer, context, plugin);
 		}
@@ -73,6 +77,9 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 		} else {
 			encodeEditor(writer, plugin);
 		}
+		
+		// end of surrounding <div>
+		writer.endElement("div");
 	}
 
 	private void encodeIncludeCustomResourceUrl(ResponseWriter writer, FacesContext context, UIMolPlugin plugin)
@@ -92,26 +99,17 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 
 	/**
 	 * Encodes the HTML part of the plugin viewer into the writer. It consists of a
-	 * &lt;div&gt; element that the Javascript plugin uses as rendering target,
-	 * which is embedded into a &lt;div&gt; with the component's clientId as
-	 * <code>id</code> attribute.
+	 * &lt;div&gt; element that the Javascript plugin uses as rendering target.
 	 * 
 	 * @param writer
 	 * @param plugin
 	 * @param divId  DOM id of the embedded &lt;div&gt; element
 	 */
 	private void encodeViewerHTML(ResponseWriter writer, UIMolPlugin plugin, String divId) throws IOException {
-		// surrounding <div>
-		writer.startElement("div", plugin);
-		writer.writeAttribute("id", plugin.getClientId(), null);
-
 		// inner <div> is used for the plugin's rendering (aka the Javascript target)
 		writer.startElement("div", plugin);
 		writer.writeAttribute("id", divId, null);
 		writer.writeAttribute("style", generateDivStyle(plugin), null);
-		writer.endElement("div");
-
-		// end of surrounding <div>
 		writer.endElement("div");
 	}
 
@@ -149,8 +147,7 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 
 	/**
 	 * Encodes the HTML part of the plugin editor into the writer. It consists of a
-	 * &lt;div&gt; and a hidden &lt;input&gt; element embedded into a &lt;div&gt;
-	 * with the component's clientId as <code>id</code> attribute.
+	 * &lt;div&gt; and a hidden &lt;input&gt; element.
 	 * 
 	 * @param writer
 	 * @param plugin
@@ -159,10 +156,6 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 	 */
 	private void encodeEditorHTML(ResponseWriter writer, UIMolPlugin plugin, String divId, String hiddenInputId)
 			throws IOException {
-		// surrounding <div>
-		writer.startElement("div", plugin);
-		writer.writeAttribute("id", plugin.getClientId(), null);
-
 		// inner <div> used for the plugin's rendering (aka the Javascript target)
 		writer.startElement("div", plugin);
 		writer.writeAttribute("id", divId, null);
@@ -176,9 +169,6 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 		writer.writeAttribute("name", plugin.getClientId(), null);
 		writer.writeAttribute("value", plugin.getValue(), "value");
 		writer.endElement("input");
-
-		// end of surrounding <div>
-		writer.endElement("div");
 	}
 
 	/**
