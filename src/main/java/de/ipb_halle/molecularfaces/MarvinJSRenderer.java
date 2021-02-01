@@ -37,10 +37,15 @@ import javax.faces.render.Renderer;
 public class MarvinJSRenderer extends Renderer {
 	public static final String RENDERER_TYPE = "molecularfaces.MarvinJSRenderer";
 	/**
-	 * The location of the extracted Marvin JS archive
-	 * (marvinjs-<version>-core.zip).
+	 * Location of the extracted Marvin JS archive (marvinjs-version-core.zip).
 	 */
-	public static final String WEBXML_CUSTOM_RESOURCE_URL = "de.ipb_halle.molecularfaces.MARVINJS_BASE_URL";
+	public static final String WEBXML_MARVINJS_BASE_URL = "de.ipb_halle.molecularfaces.MARVINJS_BASE_URL";
+
+	/**
+	 * Location of Marvin JS' license file (marvin4js-license.cxl) relative to
+	 * WEBXML_MARVINJS_BASE_URL.
+	 */
+	public static final String WEBXML_MARVINJS_LICENSE_URL = "de.ipb_halle.molecularfaces.MARVINJS_LICENSE_URL";
 
 	@Override
 	public void decode(FacesContext context, UIComponent component) {
@@ -74,7 +79,7 @@ public class MarvinJSRenderer extends Renderer {
 
 		/*
 		 * Always include Marvin JS via external resources defined by
-		 * WEBXML_CUSTOM_RESOURCE_URL.
+		 * WEBXML_MARVINJS_BASE_URL.
 		 */
 		encodeIncludeCustomResourceUrl(writer, context, plugin);
 
@@ -90,19 +95,18 @@ public class MarvinJSRenderer extends Renderer {
 
 	private void encodeIncludeCustomResourceUrl(ResponseWriter writer, FacesContext context, UIMolPlugin plugin)
 			throws IOException {
+		String baseDir = context.getExternalContext().getInitParameter(WEBXML_MARVINJS_BASE_URL);
+
 		// include gui/lib/promise-1.0.0.min.js
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
-		writer.writeAttribute("src", context.getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL)
-				+ "/gui/lib/promise-1.0.0.min.js", null);
+		writer.writeAttribute("src", baseDir + "/gui/lib/promise-1.0.0.min.js", null);
 		writer.endElement("script");
 
 		// include js/marvinjslauncher.js
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
-		writer.writeAttribute("src",
-				context.getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL) + "/js/marvinjslauncher.js",
-				null);
+		writer.writeAttribute("src", baseDir + "/js/marvinjslauncher.js", null);
 		writer.endElement("script");
 	}
 
@@ -130,7 +134,7 @@ public class MarvinJSRenderer extends Renderer {
 		writer.startElement("iframe", plugin);
 		writer.writeAttribute("id", iframeId, null);
 		writer.writeAttribute("src",
-				context.getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL) + "/marvinpack.html", null);
+				context.getExternalContext().getInitParameter(WEBXML_MARVINJS_BASE_URL) + "/marvinpack.html", null);
 		// hide the <iframe>
 		writer.writeAttribute("style", "width:0;height:0;display:initial;position:absolute;left:0;"
 				+ "top:0;margin:0;padding:0;border:0;border:none;", null);
@@ -214,7 +218,7 @@ public class MarvinJSRenderer extends Renderer {
 		String hiddenInputId = clientId + "_Input";
 		String iframeId = clientId + "_MarvinJSEditor";
 
-		encodeEditorJS(writer, plugin, iframeId, hiddenInputId);
+		encodeEditorJS(context, writer, plugin, iframeId, hiddenInputId);
 		encodeEditorHTML(context, writer, plugin, iframeId, hiddenInputId);
 	}
 
@@ -234,7 +238,7 @@ public class MarvinJSRenderer extends Renderer {
 		writer.startElement("iframe", plugin);
 		writer.writeAttribute("id", iframeId, null);
 		writer.writeAttribute("src",
-				context.getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL) + "/editor.html", null);
+				context.getExternalContext().getInitParameter(WEBXML_MARVINJS_BASE_URL) + "/editor.html", null);
 		writer.writeAttribute("style", "height:" + plugin.getHeight() + "px;width:" + plugin.getWidth() + "px;", null);
 		writer.endElement("iframe");
 
@@ -253,13 +257,14 @@ public class MarvinJSRenderer extends Renderer {
 	 * Note: Different components of this plugin type will use one and the same
 	 * JavaScript variable, which will be overwritten in case it already exists.
 	 * 
+	 * @param context
 	 * @param writer
 	 * @param plugin
 	 * @param iframeId      DOM id of the &lt;iframe&gt; element
 	 * @param hiddenInputId DOM id of the hidden &lt;input&gt; element
 	 */
-	private void encodeEditorJS(ResponseWriter writer, UIMolPlugin plugin, String iframeId, String hiddenInputId)
-			throws IOException {
+	private void encodeEditorJS(FacesContext context, ResponseWriter writer, UIMolPlugin plugin, String iframeId,
+			String hiddenInputId) throws IOException {
 		String jsVariableName = "marvinJSEditor";
 
 		writer.startElement("script", plugin);
@@ -270,12 +275,21 @@ public class MarvinJSRenderer extends Renderer {
 		sb.append(jsOnDocumentReady());
 		sb.append("var ").append(jsVariableName).append(";");
 
+		sb.append("onDocumentReady(function (e) {");
+
+		// set location of the license file
+		sb.append("MarvinJSUtil.getPackage(\"#").append(iframeId).append("\").then(function (marvinNameSpace) {");
+		sb.append("marvinNameSpace.onReady(function() {");
+		sb.append("marvinNameSpace.Sketch.license(\"")
+				.append(context.getExternalContext().getInitParameter(WEBXML_MARVINJS_LICENSE_URL)).append("\");");
+		sb.append("});").append("},function (error) {")
+				.append("alert(\"Cannot retrieve Marvin JS instance from iframe:\"+error);").append("});");
+
 		/*
 		 * This is mostly JavaScripe code from
 		 * https://marvinjs-demo.chemaxon.com/latest/examples/example-setmol.html
 		 */
-		sb.append("onDocumentReady(function (e) {" + "MarvinJSUtil.getEditor(\"#").append(iframeId)
-				.append("\").then(function (sketcherInstance) {");
+		sb.append("MarvinJSUtil.getEditor(\"#").append(iframeId).append("\").then(function (sketcherInstance) {");
 
 		// set JS variable
 		sb.append(jsVariableName).append(" = sketcherInstance;");

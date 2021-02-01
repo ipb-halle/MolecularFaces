@@ -51,7 +51,20 @@ Plugin | Version | License | Editor | Viewer
 JSF view:
 
 ```xml
-<mol:molecule value="#{myBean.structure}" pluginType="OpenChemLibJS" />
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:mol="http://ipb-halle.de/nwc">
+  <h:head>
+    <title>MolecularFaces</title>
+  </h:head>
+  <h:body>
+    <h:form>
+      <mol:molecule value="#{myBean.structure}" pluginType="OpenChemLibJS" />
+    </h:form>
+  </h:body>
+</html>
 ```
 
 JSF backing bean:
@@ -70,8 +83,15 @@ private String structure = "";
 
 ##### OpenChemLib JS
 
-All resource dependencies (openchemlib-full.js) are included in the jar build pipeline. Alternatively, the location of openchemlib-full.js can be configured via the `context-param` "de.ipb-halle.molecularfaces.OPENCHEMLIBJS_URL".
+All resource dependencies (openchemlib-full.js) are included in the jar build pipeline.
+
+Context-params:
+* `de.ipb_halle.molecularfaces.OPENCHEMLIBJS_URL` (optional): location of openchemlib-full.js relative to the application's context root
 
 ##### Marvin JS
 
-The resource dependencies are not part of the jar build pipeline. It is necessary to download the platform independent core archive (e.g. marvinjs-21.1.0-core.zip) from [ChemAxon's website](https://chemaxon.com/products/marvin-js/download), extract it and supply its location via the `context-param` "de.ipb-halle.molecularfaces.MARVINJS_BASE_URL".
+The resource dependencies are not part of the jar build pipeline. It is necessary to download the platform independent core archive (e.g. marvinjs-21.1.0-core.zip) from [ChemAxon's website](https://chemaxon.com/products/marvin-js/download), extract it and supply its location via a context-param in web.xml.
+
+Context-params:
+* `de.ipb_halle.molecularfaces.MARVINJS_BASE_URL` (required): location of the extracted Marvin JS core archive
+* `de.ipb_halle.molecularfaces.MARVINJS_LICENSE_URL` (required): location of Marvin JS' license file (marvin4js-license.cxl) relative to `de.ipb_halle.molecularfaces.MARVINJS_BASE_URL`
