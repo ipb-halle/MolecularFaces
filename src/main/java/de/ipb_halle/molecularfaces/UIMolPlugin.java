@@ -24,10 +24,11 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.ListenerFor;
-import javax.faces.event.ListenersFor;
+import javax.faces.event.PhaseId;
 import javax.faces.event.PostAddToViewEvent;
-import javax.faces.event.PreRenderComponentEvent;
 import javax.faces.render.Renderer;
+
+import org.omnifaces.util.Events;
 
 /**
  * This {@link javax.faces.component.UIComponent} renders a chemical structure
@@ -36,8 +37,7 @@ import javax.faces.render.Renderer;
  * 
  * @author flange
  */
-@ListenersFor({ @ListenerFor(systemEventClass = PostAddToViewEvent.class),
-		@ListenerFor(systemEventClass = PreRenderComponentEvent.class) })
+@ListenerFor(systemEventClass = PostAddToViewEvent.class)
 @FacesComponent(UIMolPlugin.COMPONENT_TYPE)
 public class UIMolPlugin extends UIInput implements ComponentSystemEventListener {
 	public static final String COMPONENT_TYPE = "molecularfaces.UIMolPlugin";
@@ -47,6 +47,11 @@ public class UIMolPlugin extends UIInput implements ComponentSystemEventListener
 	public UIMolPlugin() {
 		super();
 		setRendererType(DEFAULT_RENDERER_TYPE);
+
+		Events.subscribeToViewBeforePhase(PhaseId.RENDER_RESPONSE, () -> {
+			updateRenderer();
+			addResources();
+		});
 	}
 
 	@Override
@@ -216,43 +221,45 @@ public class UIMolPlugin extends UIInput implements ComponentSystemEventListener
 
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		if (event.getClass().equals(PostAddToViewEvent.class)) {
-			/*
-			 * We would like to load resources programmatically (not via
-			 * the @ResourceDependencies annotation). This has to be done before the render
-			 * response, so an event listener for PostAddToViewEvent is registered
-			 * via @ListenerFor to this component, which is processed here. The actual logic
-			 * that adds resources is implemented in the renderer.
-			 * 
-			 * Note: It seems that renderers are not able to catch events, which is why this
-			 * implementation resides here.
-			 * 
-			 * See: https://stackoverflow.com/a/12451778
-			 */
-
-			FacesContext context = FacesContext.getCurrentInstance();
-
-			/*
-			 * Our Renderer should implement the AddResourceRenderer interface. Adding the
-			 * resources is delegated there.
-			 */
-			Renderer renderer = getRenderer(context);
-			if (renderer instanceof AddResourceRenderer) {
-				((AddResourceRenderer) renderer).addResources(context);
-			}
-		} else if (event.getClass().equals(PreRenderComponentEvent.class)) {
-			/*
-			 * It is not sufficient to track changes of the attribute "pluginType" via its
-			 * setter, because this setter is not called if an EL value expression is
-			 * involved. Thus, the renderer delegation depending on the plugin type is set
-			 * up in an PreRenderComponentEvent.
-			 */
-
-			updateRenderer();
+		if (event instanceof PostAddToViewEvent) {
+			addResources();
 		}
 		super.processEvent(event);
 	}
 
+	/*
+	 * We would like to load resources programmatically (not via
+	 * the @ResourceDependencies annotation). This has to be done before the render
+	 * response by calling this method in the following events:
+	 * 
+	 * (1) in the PostAddToViewEvent of this component (see BalusC's comment in
+	 * https://stackoverflow.com/a/12451778),
+	 * 
+	 * (2) before the "Render Response" phase with the help of an OmniFaces hook.
+	 * This solves issues when an EL value expression is used for the "pluginType"
+	 * attribute (see comment of {@link updateRenderer}).
+	 * 
+	 * The actual logic that adds resources is implemented in the specific renderer.
+	 */
+	private void addResources() {
+		FacesContext context = getFacesContext();
+
+		/*
+		 * Our Renderer should implement the AddResourceRenderer interface. Adding the
+		 * resources is delegated there.
+		 */
+		Renderer renderer = getRenderer(context);
+		if (renderer instanceof AddResourceRenderer) {
+			((AddResourceRenderer) renderer).addResources(context);
+		}
+	}
+
+	/*
+	 * It is not sufficient to track changes of the attribute "pluginType" via its
+	 * setter, because this method is not called if an EL value expression is
+	 * involved. Thus, the renderer delegation depending on the plugin type is set
+	 * up before the "Render Response" phase using an OmniFaces hook.
+	 */
 	private void updateRenderer() {
 		switch (getPluginType()) {
 		case "OpenChemLibJS":
