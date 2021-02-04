@@ -43,7 +43,8 @@ Example:
 
 Plugin | Version | License | Editor | Viewer
 ------ | ------- | ------- | ------ | ------
-[OpenChemLib JS](https://github.com/cheminfo/openchemlib-js) | [v7.2.3](https://github.com/cheminfo/openchemlib-js/releases/tag/v7.2.3) | BSD-3-Clause | [x] | [x]
+[OpenChemLib JS](https://github.com/cheminfo/openchemlib-js) | [v7.2.3](https://github.com/cheminfo/openchemlib-js/releases/tag/v7.2.3) | [BSD-3-Clause](https://github.com/cheminfo/openchemlib-js/blob/master/LICENSE) | [x] | [x]
+[MolPaintJS](https://github.com/ipb-halle/MolPaintJS) | | [Apache License 2.0](https://github.com/ipb-halle/MolPaintJS/blob/master/LICENSE) | [x] | [x]
 [Marvin JS](https://chemaxon.com/products/marvin-js) | 21.1.0 | proprietary | [x] | [x]
 
 ##### Usage example
@@ -87,6 +88,13 @@ All resource dependencies (openchemlib-full.js) are included in the jar build pi
 
 Context-params:
 * `de.ipb_halle.molecularfaces.OPENCHEMLIBJS_URL` (optional): location of openchemlib-full.js relative to the application's context root
+
+##### MolPaintJS
+
+The resource dependencies are not yet part of the jar build pipeline. It is necessary to install MolPaintJS according to its [documentation](https://github.com/ipb-halle/MolPaintJS) and supply the plugin location via a context-param in web.xml.
+
+Context-params:
+* `de.ipb_halle.molecularfaces.MOLPAINTJS_URL` (required): location of the MolPaintJS installation (the content of its `docs/` directory)
 
 ##### Marvin JS
 

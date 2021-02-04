@@ -150,14 +150,14 @@ public class UIMolPlugin extends UIInput implements ComponentSystemEventListener
 	/**
 	 * Possible values for the <code>pluginType</code> property.
 	 */
-	public static final String[] PLUGIN_TYPES = { "OpenChemLibJS", "MarvinJS" };
+	public static final String[] PLUGIN_TYPES = { "OpenChemLibJS", "MarvinJS", "MolPaintJS" };
 
 	/**
 	 * Return the value of the <code>pluginType</code> property.
 	 * <p>
 	 * Controls the type of the structure editor plugin.
 	 * <p>
-	 * Possible values: "OpenChemLibJS", "MarvinJS"
+	 * Possible values: "OpenChemLibJS", "MarvinJS", "MolPaintJS"
 	 * 
 	 * @return Returns the value of the attribute.
 	 */
@@ -267,6 +267,9 @@ public class UIMolPlugin extends UIInput implements ComponentSystemEventListener
 			break;
 		case "MarvinJS":
 			setRendererType(MarvinJSRenderer.RENDERER_TYPE);
+			break;
+		case "MolPaintJS":
+			setRendererType(MolPaintJSRenderer.RENDERER_TYPE);
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown plugin type: " + getPluginType());
