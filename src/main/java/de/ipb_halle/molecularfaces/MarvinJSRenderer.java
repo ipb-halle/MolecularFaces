@@ -27,30 +27,20 @@ import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
 /**
- * This renderer renders a chemical structure editor or viewer using the
- * <a href="https://chemaxon.com/products/marvin-js">Marvin JS</a> Javascript
- * plugin.
+ * This {@link javax.faces.render.Renderer} renders a chemical structure editor
+ * or viewer using the <a href="https://chemaxon.com/products/marvin-js">Marvin
+ * JS</a> Javascript plugin.
  * 
  * @author flange
  */
-@FacesRenderer(rendererType = MarvinJSRenderer.RENDERER_TYPE, componentFamily = UIMolPlugin.COMPONENT_FAMILY)
+@FacesRenderer(rendererType = MarvinJSRenderer.RENDERER_TYPE, componentFamily = MolPluginCore.COMPONENT_FAMILY)
 public class MarvinJSRenderer extends Renderer {
 	public static final String RENDERER_TYPE = "molecularfaces.MarvinJSRenderer";
-	/**
-	 * Location of the extracted Marvin JS archive (marvinjs-version-core.zip).
-	 */
-	public static final String WEBXML_MARVINJS_BASE_URL = "de.ipb_halle.molecularfaces.MARVINJS_BASE_URL";
-
-	/**
-	 * Location of Marvin JS' license file (marvin4js-license.cxl) relative to
-	 * WEBXML_MARVINJS_BASE_URL.
-	 */
-	public static final String WEBXML_MARVINJS_LICENSE_URL = "de.ipb_halle.molecularfaces.MARVINJS_LICENSE_URL";
 
 	@Override
 	public void decode(FacesContext context, UIComponent component) {
 		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
-		UIMolPlugin plugin = (UIMolPlugin) component;
+		MolPluginCore plugin = (MolPluginCore) component;
 
 		if (!plugin.isReadonly()) {
 			String clientId = plugin.getClientId(context);
@@ -58,13 +48,12 @@ public class MarvinJSRenderer extends Renderer {
 			String value = requestMap.get(clientId);
 
 			plugin.setSubmittedValue(value);
-			plugin.setValid(true);
 		}
 	}
 
 	@Override
 	public void encodeBegin(FacesContext context, UIComponent component) throws IOException {
-		UIMolPlugin plugin = (UIMolPlugin) component;
+		MolPluginCore plugin = (MolPluginCore) component;
 
 		if (!plugin.isRendered()) {
 			return;
@@ -77,12 +66,6 @@ public class MarvinJSRenderer extends Renderer {
 		writer.writeAttribute("id", plugin.getClientId(), null);
 		writer.writeAttribute("style", generateDivStyle(plugin), null);
 
-		/*
-		 * Always include Marvin JS via external resources defined by
-		 * WEBXML_MARVINJS_BASE_URL.
-		 */
-		encodeIncludeCustomResourceUrl(writer, context, plugin);
-
 		if (plugin.isReadonly()) {
 			encodeViewer(context, writer, plugin);
 		} else {
@@ -93,24 +76,7 @@ public class MarvinJSRenderer extends Renderer {
 		writer.endElement("div");
 	}
 
-	private void encodeIncludeCustomResourceUrl(ResponseWriter writer, FacesContext context, UIMolPlugin plugin)
-			throws IOException {
-		String baseDir = context.getExternalContext().getInitParameter(WEBXML_MARVINJS_BASE_URL);
-
-		// include gui/lib/promise-1.0.0.min.js
-		writer.startElement("script", plugin);
-		writer.writeAttribute("type", "text/javascript", null);
-		writer.writeAttribute("src", baseDir + "/gui/lib/promise-1.0.0.min.js", null);
-		writer.endElement("script");
-
-		// include js/marvinjslauncher.js
-		writer.startElement("script", plugin);
-		writer.writeAttribute("type", "text/javascript", null);
-		writer.writeAttribute("src", baseDir + "/js/marvinjslauncher.js", null);
-		writer.endElement("script");
-	}
-
-	private void encodeViewer(FacesContext context, ResponseWriter writer, UIMolPlugin plugin) throws IOException {
+	private void encodeViewer(FacesContext context, ResponseWriter writer, MolPluginCore plugin) throws IOException {
 		String iframeId = plugin.getClientId() + "_MarvinJSViewer";
 
 		encodeViewerJS(writer, plugin, iframeId);
@@ -128,13 +94,15 @@ public class MarvinJSRenderer extends Renderer {
 	 * @param plugin
 	 * @param iframeId DOM id of the embedded &lt;iframe&gt; element
 	 */
-	private void encodeViewerHTML(FacesContext context, ResponseWriter writer, UIMolPlugin plugin, String iframeId)
+	private void encodeViewerHTML(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String iframeId)
 			throws IOException {
 		// inner <iframe> is used for the plugin's rendering (aka the JavaScript target)
 		writer.startElement("iframe", plugin);
 		writer.writeAttribute("id", iframeId, null);
 		writer.writeAttribute("src",
-				context.getExternalContext().getInitParameter(WEBXML_MARVINJS_BASE_URL) + "/marvinpack.html", null);
+				context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL)
+						+ "/marvinpack.html",
+				null);
 		// hide the <iframe>
 		writer.writeAttribute("style", "width:0;height:0;display:initial;position:absolute;left:0;"
 				+ "top:0;margin:0;padding:0;border:0;border:none;", null);
@@ -151,7 +119,7 @@ public class MarvinJSRenderer extends Renderer {
 	 * @param plugin
 	 * @param iframeId DOM id of the &lt;iframe&gt; element
 	 */
-	private void encodeViewerJS(ResponseWriter writer, UIMolPlugin plugin, String iframeId) throws IOException {
+	private void encodeViewerJS(ResponseWriter writer, MolPluginCore plugin, String iframeId) throws IOException {
 		String jsVariableName = "marvinJSViewer";
 
 		writer.startElement("script", plugin);
@@ -213,7 +181,7 @@ public class MarvinJSRenderer extends Renderer {
 				+ "}";
 	}
 
-	private void encodeEditor(FacesContext context, ResponseWriter writer, UIMolPlugin plugin) throws IOException {
+	private void encodeEditor(FacesContext context, ResponseWriter writer, MolPluginCore plugin) throws IOException {
 		String clientId = plugin.getClientId();
 		String hiddenInputId = clientId + "_Input";
 		String iframeId = clientId + "_MarvinJSEditor";
@@ -232,13 +200,15 @@ public class MarvinJSRenderer extends Renderer {
 	 * @param iframeId      DOM id of the embedded &lt;iframe&gt; element
 	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
 	 */
-	private void encodeEditorHTML(FacesContext context, ResponseWriter writer, UIMolPlugin plugin, String iframeId,
+	private void encodeEditorHTML(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String iframeId,
 			String hiddenInputId) throws IOException {
 		// inner <iframe> used for the plugin's rendering (aka the JavaScript target)
 		writer.startElement("iframe", plugin);
 		writer.writeAttribute("id", iframeId, null);
 		writer.writeAttribute("src",
-				context.getExternalContext().getInitParameter(WEBXML_MARVINJS_BASE_URL) + "/editor.html", null);
+				context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL)
+						+ "/editor.html",
+				null);
 		writer.writeAttribute("style", "height:" + plugin.getHeight() + "px;width:" + plugin.getWidth() + "px;", null);
 		writer.endElement("iframe");
 
@@ -263,7 +233,7 @@ public class MarvinJSRenderer extends Renderer {
 	 * @param iframeId      DOM id of the &lt;iframe&gt; element
 	 * @param hiddenInputId DOM id of the hidden &lt;input&gt; element
 	 */
-	private void encodeEditorJS(FacesContext context, ResponseWriter writer, UIMolPlugin plugin, String iframeId,
+	private void encodeEditorJS(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String iframeId,
 			String hiddenInputId) throws IOException {
 		String jsVariableName = "marvinJSEditor";
 
@@ -281,7 +251,8 @@ public class MarvinJSRenderer extends Renderer {
 		sb.append("MarvinJSUtil.getPackage(\"#").append(iframeId).append("\").then(function (marvinNameSpace) {");
 		sb.append("marvinNameSpace.onReady(function() {");
 		sb.append("marvinNameSpace.Sketch.license(\"")
-				.append(context.getExternalContext().getInitParameter(WEBXML_MARVINJS_LICENSE_URL)).append("\");");
+				.append(context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_LICENSE_URL))
+				.append("\");");
 		sb.append("});").append("},function (error) {")
 				.append("alert(\"Cannot retrieve Marvin JS instance from iframe:\"+error);").append("});");
 
@@ -318,7 +289,7 @@ public class MarvinJSRenderer extends Renderer {
 		writer.endElement("script");
 	}
 
-	private String generateDivStyle(UIMolPlugin plugin) {
+	private String generateDivStyle(MolPluginCore plugin) {
 		StringBuilder sb = new StringBuilder(128);
 
 		// width attribute

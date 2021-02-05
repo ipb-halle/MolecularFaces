@@ -21,28 +21,27 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
 /**
- * This renderer renders a chemical structure editor or viewer using the
+ * This {@link javax.faces.render.Renderer} renders a chemical structure editor
+ * or viewer using the
  * <a href="https://github.com/cheminfo/openchemlib-js">OpenChemLib JS</a>
  * Javascript plugin.
  * 
  * @author flange
  */
-@FacesRenderer(rendererType = OpenChemLibJSRenderer.RENDERER_TYPE, componentFamily = UIMolPlugin.COMPONENT_FAMILY)
-public class OpenChemLibJSRenderer extends Renderer implements AddResourceRenderer {
+@FacesRenderer(rendererType = OpenChemLibJSRenderer.RENDERER_TYPE, componentFamily = MolPluginCore.COMPONENT_FAMILY)
+public class OpenChemLibJSRenderer extends Renderer {
 	public static final String RENDERER_TYPE = "molecularfaces.OpenChemLibJSRenderer";
-	public static final String WEBXML_CUSTOM_RESOURCE_URL = "de.ipb_halle.molecularfaces.OPENCHEMLIBJS_URL";
 
 	@Override
 	public void decode(FacesContext context, UIComponent component) {
 		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
-		UIMolPlugin plugin = (UIMolPlugin) component;
+		MolPluginCore plugin = (MolPluginCore) component;
 
 		if (!plugin.isReadonly()) {
 			String clientId = plugin.getClientId(context);
@@ -50,13 +49,12 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 			String value = requestMap.get(clientId);
 
 			plugin.setSubmittedValue(value);
-			plugin.setValid(true);
 		}
 	}
 
 	@Override
 	public void encodeBegin(FacesContext context, UIComponent component) throws IOException {
-		UIMolPlugin plugin = (UIMolPlugin) component;
+		MolPluginCore plugin = (MolPluginCore) component;
 
 		if (!plugin.isRendered()) {
 			return;
@@ -67,30 +65,18 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 		// surrounding <div>
 		writer.startElement("div", plugin);
 		writer.writeAttribute("id", plugin.getClientId(), null);
-		
-		if (useCustomResourceUrl(context)) {
-			encodeIncludeCustomResourceUrl(writer, context, plugin);
-		}
 
 		if (plugin.isReadonly()) {
 			encodeViewer(writer, plugin);
 		} else {
 			encodeEditor(writer, plugin);
 		}
-		
+
 		// end of surrounding <div>
 		writer.endElement("div");
 	}
 
-	private void encodeIncludeCustomResourceUrl(ResponseWriter writer, FacesContext context, UIMolPlugin plugin)
-			throws IOException {
-		writer.startElement("script", plugin);
-		writer.writeAttribute("type", "text/javascript", null);
-		writer.writeAttribute("src", context.getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL), null);
-		writer.endElement("script");
-	}
-
-	private void encodeViewer(ResponseWriter writer, UIMolPlugin plugin) throws IOException {
+	private void encodeViewer(ResponseWriter writer, MolPluginCore plugin) throws IOException {
 		String divId = plugin.getClientId() + "_OpenChemLibJSViewer";
 
 		encodeViewerHTML(writer, plugin, divId);
@@ -105,7 +91,7 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 	 * @param plugin
 	 * @param divId  DOM id of the embedded &lt;div&gt; element
 	 */
-	private void encodeViewerHTML(ResponseWriter writer, UIMolPlugin plugin, String divId) throws IOException {
+	private void encodeViewerHTML(ResponseWriter writer, MolPluginCore plugin, String divId) throws IOException {
 		// inner <div> is used for the plugin's rendering (aka the Javascript target)
 		writer.startElement("div", plugin);
 		writer.writeAttribute("id", divId, null);
@@ -120,7 +106,7 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 	 * @param plugin
 	 * @param divId  DOM id of the &lt;div&gt; element
 	 */
-	private void encodeViewerJS(ResponseWriter writer, UIMolPlugin plugin, String divId) throws IOException {
+	private void encodeViewerJS(ResponseWriter writer, MolPluginCore plugin, String divId) throws IOException {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
@@ -136,7 +122,7 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 		writer.endElement("script");
 	}
 
-	private void encodeEditor(ResponseWriter writer, UIMolPlugin plugin) throws IOException {
+	private void encodeEditor(ResponseWriter writer, MolPluginCore plugin) throws IOException {
 		String clientId = plugin.getClientId();
 		String hiddenInputId = clientId + "_Input";
 		String divId = clientId + "_OpenChemLibJSEditor";
@@ -154,7 +140,7 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 	 * @param divId         DOM id of the embedded &lt;div&gt; element
 	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
 	 */
-	private void encodeEditorHTML(ResponseWriter writer, UIMolPlugin plugin, String divId, String hiddenInputId)
+	private void encodeEditorHTML(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
 			throws IOException {
 		// inner <div> used for the plugin's rendering (aka the Javascript target)
 		writer.startElement("div", plugin);
@@ -182,7 +168,7 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 	 * @param divId         DOM id of the &lt;div&gt; element
 	 * @param hiddenInputId DOM id of the hidden &lt;input&gt; element
 	 */
-	private void encodeEditorJS(ResponseWriter writer, UIMolPlugin plugin, String divId, String hiddenInputId)
+	private void encodeEditorJS(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
 			throws IOException {
 		String jsVariableName = "openChemLibJSEditor";
 
@@ -207,7 +193,7 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 		writer.endElement("script");
 	}
 
-	private String generateDivStyle(UIMolPlugin plugin) {
+	private String generateDivStyle(MolPluginCore plugin) {
 		StringBuilder sb = new StringBuilder(128);
 
 		// width attribute
@@ -236,26 +222,5 @@ public class OpenChemLibJSRenderer extends Renderer implements AddResourceRender
 		}
 
 		return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "");
-	}
-
-	@Override
-	public void addResources(FacesContext context) {
-		if (!useCustomResourceUrl(context)) {
-			UIOutput js = new UIOutput();
-			js.setRendererType("javax.faces.resource.Script");
-			js.getAttributes().put("library", "molecularfaces");
-			js.getAttributes().put("name", "js/openchemlib-full.js");
-
-			context.getViewRoot().addComponentResource(context, js, "head");
-		}
-	}
-
-	private boolean useCustomResourceUrl(FacesContext context) {
-		String resourceUrl = context.getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL);
-		if ((resourceUrl != null) && (!resourceUrl.isEmpty())) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 }

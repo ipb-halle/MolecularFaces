@@ -24,43 +24,61 @@
 	<tag>
 		<tag-name>molecule</tag-name>
 		<component>
-			<component-type>molecularfaces.UIMolPlugin</component-type>
+			<resource-id>molecularfaces/molecule.xhtml</resource-id>
 		</component>
 		<attribute>
-		  <description><![CDATA[TODO.]]></description>
-		  <name>border</name>
-		  <required>false</required>
-		  <type>java.lang.Boolean</type>
+			<description><![CDATA[TODO.]]></description>
+			<name>border</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<!--<attribute>
-		  <description><![CDATA[TODO.]]></description>
-		  <name>format</name>
-		  <required>false</required>
-		  <type>java.lang.String</type>
+			<description><![CDATA[TODO.]]></description>
+			<name>format</name>
+			<required>false</required>
+			<type>java.lang.String</type>
 		</attribute>-->
 		<attribute>
-		  <description><![CDATA[TODO.]]></description>
-		  <name>height</name>
-		  <required>false</required>
-		  <type>java.lang.Integer</type>
+			<description><![CDATA[TODO.]]></description>
+			<name>height</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
 		</attribute>
 		<attribute>
-		  <description><![CDATA[TODO.]]></description>
-		  <name>pluginType</name>
-		  <required>false</required>
-		  <type>java.lang.String</type>
+			<description><![CDATA[TODO.]]></description>
+			<name>pluginType</name>
+			<required>false</required>
+			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
-		  <description><![CDATA[TODO.]]></description>
-		  <name>readonly</name>
-		  <required>false</required>
-		  <type>java.lang.Boolean</type>
+			<description><![CDATA[TODO.]]></description>
+			<name>readonly</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
-		  <description><![CDATA[TODO.]]></description>
-		  <name>width</name>
-		  <required>false</required>
-		  <type>java.lang.Integer</type>
+			<description><![CDATA[TODO.]]></description>
+			<name>width</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
 		</attribute>
+	</tag>
+	<tag>
+		<tag-name>openChemLibJSPlugin</tag-name>
+		<component>
+			<component-type>molecularfaces.OpenChemLibJS</component-type>
+		</component>
+	</tag>
+	<tag>
+		<tag-name>molPaintJSPlugin</tag-name>
+		<component>
+			<component-type>molecularfaces.MolPaintJS</component-type>
+		</component>
+	</tag>
+	<tag>
+		<tag-name>marvinJSPlugin</tag-name>
+		<component>
+			<component-type>molecularfaces.MarvinJS</component-type>
+		</component>
 	</tag>
 </facelet-taglib>
