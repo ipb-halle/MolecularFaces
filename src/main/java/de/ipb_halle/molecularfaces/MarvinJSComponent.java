@@ -19,6 +19,8 @@ package de.ipb_halle.molecularfaces;
 
 import javax.faces.component.FacesComponent;
 
+import de.ipb_halle.molecularfaces.resource.AddResourcesListener;
+
 /**
  * This {@link javax.faces.component.UIComponent} renders a chemical structure
  * editor or viewer using the
