@@ -8,12 +8,12 @@
 <h:head />
 <h:body>
 	<composite:interface>
-		<composite:attribute name="pluginType" />
+		<composite:attribute name="pluginType" default="OpenChemLibJS" />
 		<composite:attribute name="value" required="true" />
-		<composite:attribute name="border" />
-		<composite:attribute name="height" />
-		<composite:attribute name="readonly" />
-		<composite:attribute name="width" />
+		<composite:attribute name="border" default="false" />
+		<composite:attribute name="height" default="400" />
+		<composite:attribute name="readonly" default="false" />
+		<composite:attribute name="width" default="400" />
 	</composite:interface>
 
 	<composite:implementation>

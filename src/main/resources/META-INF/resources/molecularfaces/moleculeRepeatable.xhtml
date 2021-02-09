@@ -2,34 +2,38 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 	xmlns:mol="http://ipb-halle.de/nwc">
-<composite:interface>
-	<composite:attribute name="pluginType" />
-	<composite:attribute name="value" required="true" />
-	<composite:attribute name="border" />
-	<composite:attribute name="height" />
-	<composite:attribute name="readonly" />
-	<composite:attribute name="width" />
-</composite:interface>
+<h:head />
+<h:body>
+	<composite:interface>
+		<composite:attribute name="pluginType" default="OpenChemLibJS" />
+		<composite:attribute name="value" required="true" />
+		<composite:attribute name="border" default="false" />
+		<composite:attribute name="height" default="400" />
+		<composite:attribute name="readonly" default="false" />
+		<composite:attribute name="width" default="400" />
+	</composite:interface>
 
-<composite:implementation>
-	<div id="#{cc.clientId}">
-		<ui:fragment rendered="#{cc.attrs.pluginType eq 'OpenChemLibJS'}">
-			<mol:openChemLibJSPlugin value="#{cc.attrs.value}"
-				border="#{cc.attrs.border}" height="#{cc.attrs.height}"
-				readonly="#{cc.attrs.readonly}" width="#{cc.attrs.width}" />
-		</ui:fragment>
-		<ui:fragment rendered="#{cc.attrs.pluginType eq 'MolPaintJS'}">
-			<mol:molPaintJSPlugin value="#{cc.attrs.value}"
-				border="#{cc.attrs.border}" height="#{cc.attrs.height}"
-				readonly="#{cc.attrs.readonly}" width="#{cc.attrs.width}" />
-		</ui:fragment>
-		<ui:fragment rendered="#{cc.attrs.pluginType eq 'MarvinJS'}">
-			<mol:marvinJSPlugin value="#{cc.attrs.value}"
-				border="#{cc.attrs.border}" height="#{cc.attrs.height}"
-				readonly="#{cc.attrs.readonly}" width="#{cc.attrs.width}" />
-		</ui:fragment>
-	</div>
-</composite:implementation>
+	<composite:implementation>
+		<div id="#{cc.clientId}">
+			<ui:fragment rendered="#{cc.attrs.pluginType eq 'OpenChemLibJS'}">
+				<mol:openChemLibJSPlugin value="#{cc.attrs.value}"
+					border="#{cc.attrs.border}" height="#{cc.attrs.height}"
+					readonly="#{cc.attrs.readonly}" width="#{cc.attrs.width}" />
+			</ui:fragment>
+			<ui:fragment rendered="#{cc.attrs.pluginType eq 'MolPaintJS'}">
+				<mol:molPaintJSPlugin value="#{cc.attrs.value}"
+					border="#{cc.attrs.border}" height="#{cc.attrs.height}"
+					readonly="#{cc.attrs.readonly}" width="#{cc.attrs.width}" />
+			</ui:fragment>
+			<ui:fragment rendered="#{cc.attrs.pluginType eq 'MarvinJS'}">
+				<mol:marvinJSPlugin value="#{cc.attrs.value}"
+					border="#{cc.attrs.border}" height="#{cc.attrs.height}"
+					readonly="#{cc.attrs.readonly}" width="#{cc.attrs.width}" />
+			</ui:fragment>
+		</div>
+	</composite:implementation>
+</h:body>
 </html>
