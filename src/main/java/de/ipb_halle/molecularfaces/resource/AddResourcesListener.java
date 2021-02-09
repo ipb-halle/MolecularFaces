@@ -60,7 +60,7 @@ import javax.faces.event.SystemEventListener;
 public class AddResourcesListener implements SystemEventListener {
 	private static final String LIBRARY_NAME = "molecularfaces";
 
-	// These Strings are used keys in the view map.
+	// These Strings are used as keys in the view map.
 	private static final String SCRIPT_RESOURCE_KEY = "de.ipb_halle.molecularfaces.AddResourcesListener.ScriptResource";
 	private static final String SCRIPT_RESOURCE_ADDED_KEY = "de.ipb_halle.molecularfaces.AddResourcesListener.ScriptResourceAdded";
 

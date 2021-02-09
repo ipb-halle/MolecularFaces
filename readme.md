@@ -71,6 +71,7 @@ JSF view:
 JSF backing bean:
 
 ```Java
+@Named
 @RequestScoped
 public class MyBean implements Serializable {
 
@@ -81,6 +82,10 @@ private String structure = "";
 ...
 }
 ```
+
+##### Use in iterations
+
+The component `<mol:molecule>` uses the JSTL tag `<c:if test="...">` internally for switching the plugin type. Thus, it shall [not be used inside iterating JSF components](https://stackoverflow.com/a/3343681) like `<h:dataTable>` or `<ui:repeat>` if they iterate the `pluginType` attribute. The functionally identical component `<mol:moleculeRepeatable>` is available for this case, which uses `<ui:fragment rendered="...">` internally. Note: This component adds all possible plugins to the component tree (including JS and CSS resources), but renders only one of them.
 
 ##### OpenChemLib JS
 

@@ -32,12 +32,8 @@
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>
-		<!--<attribute>
-			<description><![CDATA[TODO.]]></description>
-			<name>format</name>
-			<required>false</required>
-			<type>java.lang.String</type>
-		</attribute>-->
+		<!--<attribute> <description><![CDATA[TODO.]]></description> <name>format</name> 
+			<required>false</required> <type>java.lang.String</type> </attribute> -->
 		<attribute>
 			<description><![CDATA[TODO.]]></description>
 			<name>height</name>
@@ -62,6 +58,12 @@
 			<required>false</required>
 			<type>java.lang.Integer</type>
 		</attribute>
+	</tag>
+	<tag>
+		<tag-name>moleculeRepeatable</tag-name>
+		<component>
+			<resource-id>molecularfaces/moleculeRepeatable.xhtml</resource-id>
+		</component>
 	</tag>
 	<tag>
 		<tag-name>openChemLibJSPlugin</tag-name>
