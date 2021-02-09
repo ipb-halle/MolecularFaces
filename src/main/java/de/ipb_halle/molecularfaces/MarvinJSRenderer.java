@@ -250,9 +250,14 @@ public class MarvinJSRenderer extends Renderer {
 		// set location of the license file
 		sb.append("MarvinJSUtil.getPackage(\"#").append(iframeId).append("\").then(function (marvinNameSpace) {");
 		sb.append("marvinNameSpace.onReady(function() {");
-		sb.append("marvinNameSpace.Sketch.license(\"")
-				.append(context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_LICENSE_URL))
-				.append("\");");
+		sb.append("marvinNameSpace.Sketch.license(\"");
+
+		String license = context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_LICENSE_URL);
+		if (license != null) {
+			sb.append(license);
+		}
+		
+		sb.append("\");");
 		sb.append("});").append("},function (error) {")
 				.append("alert(\"Cannot retrieve Marvin JS instance from iframe:\"+error);").append("});");
 
