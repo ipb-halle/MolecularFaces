@@ -24,7 +24,7 @@
 	<tag>
 		<tag-name>molecule</tag-name>
 		<component>
-			<resource-id>molecularfaces/molecule.xhtml</resource-id>
+			<resource-id>molecularfaces/components/molecule.xhtml</resource-id>
 		</component>
 		<attribute>
 			<description><![CDATA[TODO.]]></description>
@@ -62,7 +62,7 @@
 	<tag>
 		<tag-name>moleculeRepeatable</tag-name>
 		<component>
-			<resource-id>molecularfaces/moleculeRepeatable.xhtml</resource-id>
+			<resource-id>molecularfaces/components/moleculeRepeatable.xhtml</resource-id>
 		</component>
 	</tag>
 	<tag>
