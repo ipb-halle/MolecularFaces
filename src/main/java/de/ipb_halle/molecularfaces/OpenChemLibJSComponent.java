@@ -49,6 +49,7 @@ public class OpenChemLibJSComponent extends MolPluginCore {
 		} else {
 			AddResourcesListener.addScriptResource("js/openchemlib-full.js");
 		}
+		AddResourcesListener.addScriptResource("js/StructurePlugins.js");
 
 		setRendererType(DEFAULT_RENDERER);
 	}

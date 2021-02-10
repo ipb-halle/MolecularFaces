@@ -110,15 +110,11 @@ public class OpenChemLibJSRenderer extends Renderer {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		// create molecule from the plugin's value
-		writer.writeText(
-				"var molecule = window.OCL.Molecule.fromMolfile(\"" + escape((String) plugin.getValue()) + "\");",
-				null);
+		StringBuilder sb = new StringBuilder(128);
+		sb.append("new OpenChemLibJSViewer(\"").append(divId).append("\",\"").append(escape((String) plugin.getValue()))
+				.append("\",").append(plugin.getHeight()).append(",").append(plugin.getWidth()).append(");");
 
-		// draw the molecule in the <div> container
-		writer.writeText("document.getElementById(\"" + divId + "\").innerHTML = molecule.toSVG(" + plugin.getWidth()
-				+ "," + plugin.getHeight() + ");", null);
-
+		writer.writeText(sb, null);
 		writer.endElement("script");
 	}
 
@@ -170,24 +166,21 @@ public class OpenChemLibJSRenderer extends Renderer {
 	 */
 	private void encodeEditorJS(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
 			throws IOException {
-		String jsVariableName = "openChemLibJSEditor";
-
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
 		StringBuilder sb = new StringBuilder(512);
-		// start editor and set the molecule from the hidden <input> element's value
-		sb.append("var ").append(jsVariableName).append(" = window.OCL.StructureEditor.createSVGEditor(\"")
-				.append(divId).append("\", 1);");
-		sb.append(jsVariableName).append(".setMolFile(document.getElementById(\"").append(hiddenInputId)
-				.append("\").getAttribute(\"value\"));");
 
-		// register an on-change callback to fill the value of the hidden <input>
-		// element
-		sb.append(jsVariableName).append(".setChangeListenerCallback(");
-		sb.append("function (idcode, molecule) { document.getElementById(\"").append(hiddenInputId)
-				.append("\").setAttribute(\"value\", molecule.toMolfile()); }");
-		sb.append(");");
+		// Start editor and set the molecule from the hidden <input> element's value.
+		sb.append("new OpenChemLibJSEditor(\"").append(divId).append("\").setMol(document.getElementById(\"")
+				.append(hiddenInputId).append("\").getAttribute(\"value\"))");
+
+		/*
+		 * Register an on-change callback to fill the value of the hidden <input>
+		 * element.
+		 */
+		sb.append(".addChangeListener(function(mol) { document.getElementById(\"").append(hiddenInputId)
+				.append("\").setAttribute(\"value\", mol); });");
 
 		writer.writeText(sb, null);
 		writer.endElement("script");
