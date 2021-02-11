@@ -50,6 +50,7 @@ public class MolPaintJSComponent extends MolPluginCore {
 		} else {
 			// not yet implemented!
 		}
+		AddResourcesListener.addScriptResource("js/StructurePlugins.js");
 
 		setRendererType(DEFAULT_RENDERER);
 	}

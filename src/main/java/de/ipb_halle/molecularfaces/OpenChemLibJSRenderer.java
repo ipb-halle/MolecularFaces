@@ -18,6 +18,7 @@
 package de.ipb_halle.molecularfaces;
 
 import java.io.IOException;
+import java.util.Formatter;
 import java.util.Map;
 
 import javax.faces.component.UIComponent;
@@ -110,11 +111,10 @@ public class OpenChemLibJSRenderer extends Renderer {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		StringBuilder sb = new StringBuilder(128);
-		sb.append("new molecularfaces.OpenChemLibJSViewer(\"").append(divId).append("\",\"").append(escape((String) plugin.getValue()))
-				.append("\",").append(plugin.getHeight()).append(",").append(plugin.getWidth()).append(");");
+		String js = String.format("new molecularfaces.OpenChemLibJSViewer(\"%s\", \"%s\", %d, %d);", divId,
+				escape((String) plugin.getValue()), plugin.getHeight(), plugin.getWidth());
 
-		writer.writeText(sb, null);
+		writer.writeText(js, null);
 		writer.endElement("script");
 	}
 
@@ -170,18 +170,22 @@ public class OpenChemLibJSRenderer extends Renderer {
 		writer.writeAttribute("type", "text/javascript", null);
 
 		StringBuilder sb = new StringBuilder(512);
+		Formatter fmt = new Formatter(sb);
 
 		// Start editor and set the molecule from the hidden <input> element's value.
-		sb.append("new molecularfaces.OpenChemLibJSEditor(\"").append(divId).append("\").setMol(document.getElementById(\"")
-				.append(hiddenInputId).append("\").getAttribute(\"value\"))");
+		fmt.format(
+				"new molecularfaces.OpenChemLibJSEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"))",
+				divId, hiddenInputId);
 
 		/*
 		 * Register an on-change callback to fill the value of the hidden <input>
 		 * element.
 		 */
-		sb.append(".addChangeListener(function(mol) { document.getElementById(\"").append(hiddenInputId)
-				.append("\").setAttribute(\"value\", mol); });");
+		fmt.format(
+				".addChangeListener(function(mol) { document.getElementById(\"%s\").setAttribute(\"value\", mol); });",
+				hiddenInputId);
 
+		fmt.close();
 		writer.writeText(sb, null);
 		writer.endElement("script");
 	}

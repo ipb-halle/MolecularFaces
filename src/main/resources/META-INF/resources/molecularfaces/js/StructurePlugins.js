@@ -142,7 +142,7 @@ molecularfaces.StructureEditor = class extends molecularfaces.StructurePlugin {
 
 /**
  * This class implements the OpenChemLibJS editor plugin. The editor is attached 
- * to a <div> container. 
+ * to a <div> container. The size of the plugin is defined by the surrounding <div>.
  */
 molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEditor {
 	/**
@@ -224,8 +224,8 @@ molecularfaces.OpenChemLibJSViewer = class extends molecularfaces.StructurePlugi
 	}
 
 	_init() {
-		this._svg = window.OCL.Molecule.fromMolfile(this._molecule).toSVG(this._width, this._height, null);
-		document.getElementById(this._divId).innerHTML = this._svg;
+		let svg = window.OCL.Molecule.fromMolfile(this._molecule).toSVG(this._width, this._height, null);
+		document.getElementById(this._divId).innerHTML = svg;
 	}
 
 	getMDLv2000() {
@@ -237,6 +237,144 @@ molecularfaces.OpenChemLibJSViewer = class extends molecularfaces.StructurePlugi
 			this._molecule = molecule;
 
 			this._init();
+		}
+
+		return this;
+	}
+}
+
+/**
+ * Global variable that stores the common MolPaintJS plugin registry. It is 
+ * initialized lazily. 
+ */
+molecularfaces.molPaintJSContext = null;
+
+/**
+ * This class implements the MolPaintJS editor plugin. The editor is attached 
+ * to a <div> container. 
+ */
+molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
+	/**
+	 * Initializes the MolPaintJS editor in a <div> container with the id given 
+	 * by the parameter "divId" and sets its molecule according to the "molecule" 
+	 * parameter. The plugin resource location needs to be defined by the parameter 
+	 * "installPath". The "height" and "width" parameters should not exceed the 
+	 * size of the surrounding <div>.
+	 */
+	constructor(divId, molecule, installPath, height, width) {
+		super();
+
+		this._divId = divId;
+		this._molecule = molecule;
+		this._installPath = installPath;
+		this._height = height;
+		this._width = width;
+		this._editor = null;
+
+		this._init();
+	}
+
+	_init() {
+		// Try to initialize the plugin registry.
+		if (molecularfaces.molPaintJSContext == null) {
+			molecularfaces.molPaintJSContext = new MolPaintJS();
+		}
+
+		this._editor = molecularfaces.molPaintJSContext.newContext(this._divId, {
+			installPath: this._installPath,
+			iconSize: 32,
+			sizeX: this._width,
+			sizeY: this._height
+		});
+		this._editor.setMolecule(this._molecule);
+
+		let obj = this;
+		this._editor.setChangeListener(function() {
+			/*
+			  * The object 'this' is not available in this scope, because the 
+			  * callback is executed in the future. The let construct above solves 
+			  * this issue.
+			  */
+
+			let mol = obj.getMDLv2000();
+
+			obj._molecule = mol;
+			obj.notifyChange(mol);
+		});
+
+		this._editor.init();
+	}
+
+	getMDLv2000() {
+		return molecularfaces.molPaintJSContext.getMDLv2000(this._divId);
+		//return this._molecule;
+	}
+
+	setMDLv2000(molecule) {
+		if (typeof molecule !== "undefined") {
+			this._molecule = molecule;
+
+			this._editor.setMolecule(molecule);
+		}
+
+		return this;
+	}
+
+	getEditorObj() {
+		return this._editor;
+	}
+}
+
+/**
+ * This class implements the MolPaintJS viewer plugin. The molecule viewer is 
+ * attached to a <div> container.
+ */
+molecularfaces.MolPaintJSViewer = class extends molecularfaces.StructurePlugin {
+	/**
+	 * Initializes the MolPaintJS viewer in a <div> container with the id given 
+	 * by the parameter "divId" and sets its molecule according to the "molecule" 
+	 * parameter. The plugin resource location needs to be defined by the parameter 
+	 * "installPath". The "height" and "width" parameters should not exceed the 
+	 * size of the surrounding <div>.
+	 */
+	constructor(divId, molecule, installPath, height, width) {
+		super();
+
+		this._divId = divId;
+		this._molecule = molecule;
+		this._installPath = installPath;
+		this._height = height;
+		this._width = width;
+		this._viewer = null;
+
+		this._init();
+	}
+
+	_init() {
+		// Try to initialize the plugin registry.
+		if (molecularfaces.molPaintJSContext == null) {
+			molecularfaces.molPaintJSContext = new MolPaintJS();
+		}
+
+		this._viewer = molecularfaces.molPaintJSContext.newContext(this._divId, {
+			installPath: this._installPath,
+			iconSize: 32,
+			sizeX: this._width,
+			sizeY: this._height,
+			viewer: 1
+		});
+		this._viewer.setMolecule(this._molecule);
+		this._viewer.init();
+	}
+
+	getMDLv2000() {
+		return this._molecule;
+	}
+
+	setMDLv2000(molecule) {
+		if (typeof molecule !== "undefined") {
+			this._molecule = molecule;
+			this._viewer.setMolecule(molecule);
 		}
 
 		return this;

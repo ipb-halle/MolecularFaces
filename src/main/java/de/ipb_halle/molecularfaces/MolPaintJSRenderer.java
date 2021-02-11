@@ -18,6 +18,7 @@
 package de.ipb_halle.molecularfaces;
 
 import java.io.IOException;
+import java.util.Formatter;
 import java.util.Map;
 
 import javax.faces.component.UIComponent;
@@ -112,20 +113,14 @@ public class MolPaintJSRenderer extends Renderer {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		StringBuilder sb = new StringBuilder(512);
+		String installPath = context.getExternalContext()
+				.getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL);
 
-		sb.append("new MolPaintJS()").append(".newContext(\"").append(divId).append("\", {installPath:\"")
-				.append(context.getExternalContext().getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL))
-				.append("/\" ,iconSize: 32, sizeX:").append(plugin.getWidth()).append(", sizeY:")
-				.append(plugin.getHeight()).append(", viewer:1})");
+		String js = String.format("new molecularfaces.MolPaintJSViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId,
+				escape((String) plugin.getValue()), installPath.endsWith("/") ? installPath : installPath + "/",
+				plugin.getHeight(), plugin.getWidth());
 
-		// set the molecule
-		sb.append(".setMolecule(\"").append(escape((String) plugin.getValue())).append("\")");
-
-		// draw the plugin
-		sb.append(".init();");
-
-		writer.writeText(sb, null);
+		writer.writeText(js, null);
 		writer.endElement("script");
 	}
 
@@ -178,38 +173,30 @@ public class MolPaintJSRenderer extends Renderer {
 	 */
 	private void encodeEditorJS(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String divId,
 			String hiddenInputId) throws IOException {
-		String jsPluginVariableName = "molPaintJSPlugin";
-		String jsEditorVariableName = "molPaintJSEditor";
-
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		StringBuilder sb = new StringBuilder(1024);
+		StringBuilder sb = new StringBuilder(512);
+		Formatter fmt = new Formatter(sb);
 
-		// plugin and editor variables
-		sb.append("var ").append(jsPluginVariableName).append(" = new MolPaintJS();");
-		sb.append("var ").append(jsEditorVariableName).append(" = ").append(jsPluginVariableName)
-				.append(".newContext(\"").append(divId).append("\", {installPath:\"")
-				.append(context.getExternalContext().getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL))
-				.append("/\" ,iconSize: 32, sizeX:").append(plugin.getWidth()).append(", sizeY:")
-				.append(plugin.getHeight()).append("})");
+		String installPath = context.getExternalContext()
+				.getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL);
 
-		// set the molecule from the hidden <input> element's value
-		sb.append(".setMolecule(document.getElementById(\"").append(hiddenInputId)
-				.append("\").getAttribute(\"value\"));");
+		// Start editor and set the molecule from the hidden <input> element's value.
+		fmt.format(
+				"new molecularfaces.MolPaintJSEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", %d, %d)",
+				divId, hiddenInputId, installPath.endsWith("/") ? installPath : installPath + "/", plugin.getHeight(),
+				plugin.getWidth());
 
 		/*
 		 * Register an on-change callback to fill the value of the hidden <input>
 		 * element.
 		 */
-		sb.append("var changeListener = function () { document.getElementById(\"").append(hiddenInputId)
-				.append("\").setAttribute(\"value\", ").append(jsPluginVariableName).append(".getMDLv2000(\"")
-				.append(divId).append("\")); };");
-		sb.append(jsEditorVariableName).append(".setChangeListener(changeListener)");
+		fmt.format(
+				".addChangeListener(function(mol) { document.getElementById(\"%s\").setAttribute(\"value\", mol); });",
+				hiddenInputId);
 
-		// finally, draw the plugin
-		sb.append(".init();");
-
+		fmt.close();
 		writer.writeText(sb, null);
 		writer.endElement("script");
 	}
@@ -218,10 +205,10 @@ public class MolPaintJSRenderer extends Renderer {
 		StringBuilder sb = new StringBuilder(128);
 
 		// width attribute
-		// sb.append("width:").append(plugin.getWidth()).append("px;");
+		sb.append("width:").append(plugin.getWidth()).append("px;");
 
 		// height attribute
-		// sb.append("height:").append(plugin.getHeight()).append("px;");
+		sb.append("height:").append(plugin.getHeight()).append("px;");
 
 		// border attribute
 		if (plugin.isBorder()) {
