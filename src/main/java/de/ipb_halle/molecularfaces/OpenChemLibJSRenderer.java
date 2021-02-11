@@ -111,7 +111,7 @@ public class OpenChemLibJSRenderer extends Renderer {
 		writer.writeAttribute("type", "text/javascript", null);
 
 		StringBuilder sb = new StringBuilder(128);
-		sb.append("new OpenChemLibJSViewer(\"").append(divId).append("\",\"").append(escape((String) plugin.getValue()))
+		sb.append("new molecularfaces.OpenChemLibJSViewer(\"").append(divId).append("\",\"").append(escape((String) plugin.getValue()))
 				.append("\",").append(plugin.getHeight()).append(",").append(plugin.getWidth()).append(");");
 
 		writer.writeText(sb, null);
@@ -172,7 +172,7 @@ public class OpenChemLibJSRenderer extends Renderer {
 		StringBuilder sb = new StringBuilder(512);
 
 		// Start editor and set the molecule from the hidden <input> element's value.
-		sb.append("new OpenChemLibJSEditor(\"").append(divId).append("\").setMol(document.getElementById(\"")
+		sb.append("new molecularfaces.OpenChemLibJSEditor(\"").append(divId).append("\").setMol(document.getElementById(\"")
 				.append(hiddenInputId).append("\").getAttribute(\"value\"))");
 
 		/*
