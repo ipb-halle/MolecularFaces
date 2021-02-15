@@ -13,6 +13,7 @@
 		<composite:attribute name="border" default="false" />
 		<composite:attribute name="height" default="400" />
 		<composite:attribute name="readonly" default="false" />
+		<composite:attribute name="widgetVar" />
 		<composite:attribute name="width" default="400" />
 	</composite:interface>
 
@@ -21,17 +22,20 @@
 			<ui:fragment rendered="#{cc.attrs.pluginType eq 'OpenChemLibJS'}">
 				<mol:openChemLibJSPlugin value="#{cc.attrs.value}"
 					border="#{cc.attrs.border}" height="#{cc.attrs.height}"
-					readonly="#{cc.attrs.readonly}" width="#{cc.attrs.width}" />
+					readonly="#{cc.attrs.readonly}" widgetVar="#{cc.attrs.widgetVar}"
+					width="#{cc.attrs.width}" />
 			</ui:fragment>
 			<ui:fragment rendered="#{cc.attrs.pluginType eq 'MolPaintJS'}">
 				<mol:molPaintJSPlugin value="#{cc.attrs.value}"
 					border="#{cc.attrs.border}" height="#{cc.attrs.height}"
-					readonly="#{cc.attrs.readonly}" width="#{cc.attrs.width}" />
+					readonly="#{cc.attrs.readonly}" widgetVar="#{cc.attrs.widgetVar}"
+					width="#{cc.attrs.width}" />
 			</ui:fragment>
 			<ui:fragment rendered="#{cc.attrs.pluginType eq 'MarvinJS'}">
 				<mol:marvinJSPlugin value="#{cc.attrs.value}"
 					border="#{cc.attrs.border}" height="#{cc.attrs.height}"
-					readonly="#{cc.attrs.readonly}" width="#{cc.attrs.width}" />
+					readonly="#{cc.attrs.readonly}" widgetVar="#{cc.attrs.widgetVar}"
+					width="#{cc.attrs.width}" />
 			</ui:fragment>
 		</div>
 	</composite:implementation>

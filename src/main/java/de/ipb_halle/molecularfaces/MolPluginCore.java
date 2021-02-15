@@ -28,7 +28,7 @@ public abstract class MolPluginCore extends UIInput {
 	public static final String COMPONENT_FAMILY = "molecularfaces.MolPluginFamily";
 
 	protected enum PropertyKeys {
-		border, /* format, */ height, readonly, width;
+		border, /* format, */ height, readonly, widgetVar, width;
 	}
 
 	/**
@@ -122,6 +122,26 @@ public abstract class MolPluginCore extends UIInput {
 	 */
 	public void setReadonly(boolean readonly) {
 		getStateHelper().put(PropertyKeys.readonly, readonly);
+	}
+
+	/**
+	 * Return the value of the <code>widgetVar</code> property.
+	 * <p>
+	 * The client-side JavaScript variable of the plugin.
+	 * 
+	 * @return Returns the value of the attribute.
+	 */
+	public String getWidgetVar() {
+		return (String) getStateHelper().eval(PropertyKeys.widgetVar);
+	}
+
+	/**
+	 * Set the value of the <code>widgetVar</code> property.
+	 * 
+	 * @param widgetVar
+	 */
+	public void setWidgetVar(String widgetVar) {
+		getStateHelper().put(PropertyKeys.widgetVar, widgetVar);
 	}
 
 	public static final int DEFAULT_WIDTH = 400;

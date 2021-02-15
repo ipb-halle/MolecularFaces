@@ -115,12 +115,22 @@ public class MolPaintJSRenderer extends Renderer {
 
 		String installPath = context.getExternalContext()
 				.getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL);
+		String escapedMolecule = escape((String) plugin.getValue());
 
-		String js = String.format("new molecularfaces.MolPaintJSViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId,
-				escape((String) plugin.getValue()), installPath.endsWith("/") ? installPath : installPath + "/",
-				plugin.getHeight(), plugin.getWidth());
+		StringBuilder sb = new StringBuilder(256 + installPath.length() + escapedMolecule.length());
+		Formatter fmt = new Formatter(sb);
 
-		writer.writeText(js, null);
+		// Register a JS variable if required.
+		String widgetVar = plugin.getWidgetVar();
+		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
+			fmt.format("var %s = ", widgetVar);
+		}
+
+		fmt.format("new molecularfaces.MolPaintJSViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
+				installPath.endsWith("/") ? installPath : installPath + "/", plugin.getHeight(), plugin.getWidth());
+
+		fmt.close();
+		writer.writeText(sb, null);
 		writer.endElement("script");
 	}
 
@@ -176,11 +186,17 @@ public class MolPaintJSRenderer extends Renderer {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		StringBuilder sb = new StringBuilder(512);
-		Formatter fmt = new Formatter(sb);
-
 		String installPath = context.getExternalContext()
 				.getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL);
+
+		StringBuilder sb = new StringBuilder(512 + installPath.length());
+		Formatter fmt = new Formatter(sb);
+
+		// Register a JS variable if required.
+		String widgetVar = plugin.getWidgetVar();
+		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
+			fmt.format("var %s = ", widgetVar);
+		}
 
 		// Start editor and set the molecule from the hidden <input> element's value.
 		fmt.format(

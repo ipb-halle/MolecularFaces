@@ -32,8 +32,12 @@
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>
-		<!--<attribute> <description><![CDATA[TODO.]]></description> <name>format</name> 
-			<required>false</required> <type>java.lang.String</type> </attribute> -->
+		<!--<attribute> 
+			<description><![CDATA[TODO.]]></description>
+			<name>format</name> 
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>-->
 		<attribute>
 			<description><![CDATA[TODO.]]></description>
 			<name>height</name>
@@ -51,6 +55,12 @@
 			<name>readonly</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description><![CDATA[TODO.]]></description>
+			<name>widgetVar</name>
+			<required>false</required>
+			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
 			<description><![CDATA[TODO.]]></description>

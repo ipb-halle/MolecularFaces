@@ -114,11 +114,22 @@ public class MarvinJSRenderer extends Renderer {
 		writer.writeAttribute("type", "text/javascript", null);
 
 		String installPath = context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL);
+		String escapedMolecule = escape((String) plugin.getValue());
 
-		String js = String.format("new molecularfaces.MarvinJSViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId,
-				escape((String) plugin.getValue()), installPath, plugin.getHeight(), plugin.getWidth());
+		StringBuilder sb = new StringBuilder(256 + installPath.length() + escapedMolecule.length());
+		Formatter fmt = new Formatter(sb);
 
-		writer.writeText(js, null);
+		// Register a JS variable if required.
+		String widgetVar = plugin.getWidgetVar();
+		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
+			fmt.format("var %s = ", widgetVar);
+		}
+
+		fmt.format("new molecularfaces.MarvinJSViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
+				installPath, plugin.getHeight(), plugin.getWidth());
+
+		fmt.close();
+		writer.writeText(sb, null);
 		writer.endElement("script");
 	}
 
@@ -179,11 +190,17 @@ public class MarvinJSRenderer extends Renderer {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		StringBuilder sb = new StringBuilder(512);
-		Formatter fmt = new Formatter(sb);
-
 		String installPath = context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL);
 		String license = context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_LICENSE_URL);
+
+		StringBuilder sb = new StringBuilder(512 + installPath.length() + license.length());
+		Formatter fmt = new Formatter(sb);
+
+		// Register a JS variable if required.
+		String widgetVar = plugin.getWidgetVar();
+		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
+			fmt.format("var %s = ", widgetVar);
+		}
 
 		// Start editor and set the molecule from the hidden <input> element's value.
 		fmt.format(

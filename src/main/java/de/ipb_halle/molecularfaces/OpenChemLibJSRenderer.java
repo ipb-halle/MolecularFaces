@@ -111,10 +111,22 @@ public class OpenChemLibJSRenderer extends Renderer {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		String js = String.format("new molecularfaces.OpenChemLibJSViewer(\"%s\", \"%s\", %d, %d);", divId,
-				escape((String) plugin.getValue()), plugin.getHeight(), plugin.getWidth());
+		String escapedMolecule = escape((String) plugin.getValue());
 
-		writer.writeText(js, null);
+		StringBuilder sb = new StringBuilder(256 + escapedMolecule.length());
+		Formatter fmt = new Formatter(sb);
+
+		// Register a JS variable if required.
+		String widgetVar = plugin.getWidgetVar();
+		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
+			fmt.format("var %s = ", widgetVar);
+		}
+
+		fmt.format("new molecularfaces.OpenChemLibJSViewer(\"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
+				plugin.getHeight(), plugin.getWidth());
+
+		fmt.close();
+		writer.writeText(sb, null);
 		writer.endElement("script");
 	}
 
@@ -171,6 +183,12 @@ public class OpenChemLibJSRenderer extends Renderer {
 
 		StringBuilder sb = new StringBuilder(512);
 		Formatter fmt = new Formatter(sb);
+
+		// Register a JS variable if required.
+		String widgetVar = plugin.getWidgetVar();
+		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
+			fmt.format("var %s = ", widgetVar);
+		}
 
 		// Start editor and set the molecule from the hidden <input> element's value.
 		fmt.format(

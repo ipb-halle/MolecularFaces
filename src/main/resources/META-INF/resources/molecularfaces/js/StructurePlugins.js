@@ -33,6 +33,17 @@ molecularfaces.StructurePlugin = class {
 	}
 
 	/**
+	 * Abstract method
+	 * 
+	 * This method shall be used for reinitialization of the plugin.
+	 * 
+	 * To support method chaining, this method should return this object.
+	 */
+	init() {
+		throw new Error("This method is abstract and must be implemented by the subclass.");
+	}
+
+	/**
 	 * Returns the stored molecule in the MDL Molfile v2000 format.
 	 */
 	getMol() {
@@ -158,10 +169,10 @@ molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEdito
 		this._molecule = molecule;
 		this._editor = null;
 
-		this._init();
+		this.init();
 	}
 
-	_init() {
+	init() {
 		this._editor = window.OCL.StructureEditor.createSVGEditor(this._divId, 1);
 
 		this.setMDLv2000(this._molecule);
@@ -221,10 +232,10 @@ molecularfaces.OpenChemLibJSViewer = class extends molecularfaces.StructurePlugi
 		this._height = height;
 		this._width = width;
 
-		this._init();
+		this.init();
 	}
 
-	_init() {
+	init() {
 		let svg = window.OCL.Molecule.fromMolfile(this._molecule).toSVG(this._width, this._height, null);
 		document.getElementById(this._divId).innerHTML = svg;
 	}
@@ -246,7 +257,8 @@ molecularfaces.OpenChemLibJSViewer = class extends molecularfaces.StructurePlugi
 
 /**
  * Global variable that stores the common MolPaintJS plugin registry. It is 
- * initialized lazily. 
+ * initialized lazily by the classes molecularfaces.MolPaintJSEditor and 
+ * molecularfaces.MolPaintJSViewer.
  */
 molecularfaces._molPaintJSRegistry = null;
 
@@ -272,10 +284,10 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 		this._width = width;
 		this._editor = null;
 
-		this._init();
+		this.init();
 	}
 
-	_init() {
+	init() {
 		// Try to initialize the plugin registry.
 		if (molecularfaces._molPaintJSRegistry == null) {
 			molecularfaces._molPaintJSRegistry = new MolPaintJS();
@@ -348,10 +360,10 @@ molecularfaces.MolPaintJSViewer = class extends molecularfaces.StructurePlugin {
 		this._width = width;
 		this._viewer = null;
 
-		this._init();
+		this.init();
 	}
 
-	_init() {
+	init() {
 		// Try to initialize the plugin registry.
 		if (molecularfaces._molPaintJSRegistry == null) {
 			molecularfaces._molPaintJSRegistry = new MolPaintJS();
@@ -419,10 +431,10 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 		this._width = width;
 		this._editor = null;
 
-		this._init();
+		this.init();
 	}
 
-	_init() {
+	init() {
 		// MarvinJS has some problems with empty molecule strings.
 		let mol = null;
 		if (this._molecule !== "") {
@@ -478,7 +490,7 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 			if (molecule !== "") {
 				mol = molecule;
 			}
-			this._editor.importStructure("mol", value).catch(function(error) {
+			this._editor.importStructure("mol", mol).catch(function(error) {
 				alert(error);
 			});
 		}
@@ -494,7 +506,7 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 /**
  * This class loads an instance of of the Marvin JS package namespace to be used 
  * for image exports of molecules. It supports the observer-pattern for 
- * notification when the namespace becomes available.
+ * notification as soon as the namespace becomes available.
  */
 molecularfaces.MarvinJSNamespaceLoader = class {
 	/*
@@ -612,10 +624,10 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 		this._height = height;
 		this._width = width;
 
-		this._init();
+		this.init();
 	}
 
-	_init() {
+	init() {
 		// Try to initialize the plugin registry.
 		if (molecularfaces._marvinJSNamespaceLoaderInstance == null) {
 			molecularfaces._marvinJSNamespaceLoaderInstance = new molecularfaces.MarvinJSNamespaceLoader(this._installPath);
@@ -659,7 +671,7 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 		if (typeof molecule !== "undefined") {
 			this._molecule = molecule;
 
-			_init();
+			this._init();
 		}
 
 		return this;

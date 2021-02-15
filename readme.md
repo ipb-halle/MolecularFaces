@@ -87,6 +87,24 @@ private String structure = "";
 
 The component `<mol:molecule>` uses the JSTL tag `<c:if test="...">` internally for switching the plugin type. Thus, it shall [not be used inside iterating JSF components](https://stackoverflow.com/a/3343681) like `<h:dataTable>` or `<ui:repeat>` if they iterate the `pluginType` attribute. The functionally identical component `<mol:moleculeRepeatable>` is available for this case, which uses `<ui:fragment rendered="...">` internally. Note: This component adds all possible plugins to the component tree (including JS and CSS resources), but renders only one of them.
 
+##### Use in modals
+Popular JSF component frameworks like (BootsFaces)[https://github.com/TheCoder4eu/BootsFaces-OSP] and (PrimeFaces)[https://github.com/primefaces/primefaces] offer modal components, which can include MolecularFaces plugin components. It might be necessary to execute the init() method of the JavaScript object provided via the `widgetVar` attribute to reinitialize the plugin.
+
+Example using a BootsFaces modal:
+
+```xml
+<b:container>
+  <b:form>
+    <b:commandButton value="open modal" ajax="true" update="modalform" oncomplete="$('.modalPseudoClass').modal('show');editorInModal.init()" />
+  </b:form>
+</b:container>
+<b:modal styleClass="modalPseudoClass">
+  <b:form id="modalform">
+    <mol:molecule id="editorInModal" value="#{testBean.structure}" pluginType="OpenChemLibJS" widgetVar="editorInModal" />
+  </b:form>
+</b:modal>
+```
+
 ##### OpenChemLib JS
 
 All resource dependencies (openchemlib-full.js) are included in the jar build pipeline.
