@@ -58,6 +58,8 @@ public class MarvinJSComponent extends MolPluginCore {
 		String baseDir = getFacesContext().getExternalContext().getInitParameter(WEBXML_MARVINJS_BASE_URL);
 		AddResourcesListener.addScriptExt(baseDir + "/gui/lib/promise-1.0.0.min.js");
 		AddResourcesListener.addScriptExt(baseDir + "/js/marvinjslauncher.js");
+		
+		AddResourcesListener.addScriptResource("js/StructurePlugins.js");
 
 		setRendererType(DEFAULT_RENDERER);
 	}
