@@ -6,7 +6,7 @@
 
 	<groupId>de.ipb_halle</groupId>
 	<artifactId>molecularfaces</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
 	<scm>
@@ -106,10 +106,5 @@
 			<version>7.0</version>
 			<scope>provided</scope>
 		</dependency>
-		<!--<dependency>
-			<groupId>org.omnifaces</groupId>
-			<artifactId>omnifaces</artifactId>
-			<version>3.10.1</version>
-		</dependency>-->
 	</dependencies>
 </project>
