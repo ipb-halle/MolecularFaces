@@ -190,6 +190,8 @@ molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEdito
 			obj._molecule = mol;
 			obj.notifyChange(mol);
 		});
+
+		return this;
 	}
 
 	getMDLv2000() {
@@ -238,6 +240,8 @@ molecularfaces.OpenChemLibJSViewer = class extends molecularfaces.StructurePlugi
 	init() {
 		let svg = window.OCL.Molecule.fromMolfile(this._molecule).toSVG(this._width, this._height, null);
 		document.getElementById(this._divId).innerHTML = svg;
+
+		return this;
 	}
 
 	getMDLv2000() {
@@ -248,7 +252,7 @@ molecularfaces.OpenChemLibJSViewer = class extends molecularfaces.StructurePlugi
 		if (typeof molecule !== "undefined") {
 			this._molecule = molecule;
 
-			this._init();
+			this.init();
 		}
 
 		return this;
@@ -316,6 +320,8 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 		});
 
 		this._editor.init();
+
+		return this;
 	}
 
 	getMDLv2000() {
@@ -378,6 +384,8 @@ molecularfaces.MolPaintJSViewer = class extends molecularfaces.StructurePlugin {
 		});
 		this._viewer.setMolecule(this._molecule);
 		this._viewer.init();
+
+		return this;
 	}
 
 	getMDLv2000() {
@@ -474,6 +482,8 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 				alert("Cannot retrieve MarvinJS sketcher instance from iframe:" + error);
 			});
 		});
+
+		return this;
 	}
 
 	getMDLv2000() {
@@ -661,6 +671,8 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 			// attach the image
 			div.insertAdjacentHTML('beforeend', imgData);
 		});
+
+		return this;
 	}
 
 	getMDLv2000() {
@@ -671,7 +683,7 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 		if (typeof molecule !== "undefined") {
 			this._molecule = molecule;
 
-			this._init();
+			this.init();
 		}
 
 		return this;

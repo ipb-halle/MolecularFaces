@@ -80,8 +80,8 @@ public class MarvinJSRenderer extends Renderer {
 	private void encodeViewer(FacesContext context, ResponseWriter writer, MolPluginCore plugin) throws IOException {
 		String divId = plugin.getClientId() + "_MarvinJSViewer";
 
-		encodeViewerJS(context, writer, plugin, divId);
 		encodeViewerHTML(writer, plugin, divId);
+		encodeViewerJS(context, writer, plugin, divId);
 	}
 
 	/**
@@ -138,8 +138,8 @@ public class MarvinJSRenderer extends Renderer {
 		String hiddenInputId = clientId + "_Input";
 		String iframeId = clientId + "_MarvinJSEditor";
 
-		encodeEditorJS(context, writer, plugin, iframeId, hiddenInputId);
 		encodeEditorHTML(context, writer, plugin, iframeId, hiddenInputId);
+		encodeEditorJS(context, writer, plugin, iframeId, hiddenInputId);
 	}
 
 	/**
