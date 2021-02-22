@@ -19,7 +19,7 @@ The artifacts have not been submitted to Maven Central yet. To include Molecular
 #### XML Namespace
 
 ```xml
-xmlns:mol="http://ipb-halle.de/nwc"
+xmlns:mol="http://github.com/ipb-halle/MolecularFaces"
 ```
 
 #### Configuring resources via web.xml
@@ -56,7 +56,7 @@ JSF view:
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
   xmlns:h="http://java.sun.com/jsf/html"
-  xmlns:mol="http://ipb-halle.de/nwc">
+  xmlns:mol="http://github.com/ipb-halle/MolecularFaces">
   <h:head>
     <title>MolecularFaces</title>
   </h:head>

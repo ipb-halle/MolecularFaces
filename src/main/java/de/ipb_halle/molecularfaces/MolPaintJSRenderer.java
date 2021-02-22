@@ -115,6 +115,9 @@ public class MolPaintJSRenderer extends Renderer {
 
 		String installPath = context.getExternalContext()
 				.getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL);
+		if (installPath == null) {
+			installPath = "";
+		}
 		String escapedMolecule = escape((String) plugin.getValue());
 
 		StringBuilder sb = new StringBuilder(256 + installPath.length() + escapedMolecule.length());
@@ -188,6 +191,9 @@ public class MolPaintJSRenderer extends Renderer {
 
 		String installPath = context.getExternalContext()
 				.getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL);
+		if (installPath == null) {
+			installPath = "";
+		}
 
 		StringBuilder sb = new StringBuilder(512 + installPath.length());
 		Formatter fmt = new Formatter(sb);

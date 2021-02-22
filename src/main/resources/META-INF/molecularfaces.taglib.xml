@@ -20,7 +20,7 @@
 	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_2.xsd">
-	<namespace>http://ipb-halle.de/nwc</namespace>
+	<namespace>http://github.com/ipb-halle/MolecularFaces</namespace>
 	<tag>
 		<tag-name>molecule</tag-name>
 		<component>

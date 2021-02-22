@@ -114,6 +114,9 @@ public class MarvinJSRenderer extends Renderer {
 		writer.writeAttribute("type", "text/javascript", null);
 
 		String installPath = context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL);
+		if (installPath == null) {
+			installPath = "";
+		}
 		String escapedMolecule = escape((String) plugin.getValue());
 
 		StringBuilder sb = new StringBuilder(256 + installPath.length() + escapedMolecule.length());
@@ -191,7 +194,13 @@ public class MarvinJSRenderer extends Renderer {
 		writer.writeAttribute("type", "text/javascript", null);
 
 		String installPath = context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL);
+		if (installPath == null) {
+			installPath = "";
+		}
 		String license = context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_LICENSE_URL);
+		if (license == null) {
+			license = "";
+		}
 
 		StringBuilder sb = new StringBuilder(512 + installPath.length() + license.length());
 		Formatter fmt = new Formatter(sb);

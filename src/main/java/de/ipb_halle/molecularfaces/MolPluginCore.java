@@ -27,6 +27,15 @@ import javax.faces.component.UIInput;
 public abstract class MolPluginCore extends UIInput {
 	public static final String COMPONENT_FAMILY = "molecularfaces.MolPluginFamily";
 
+	public enum PluginType {
+		OpenChemLibJS, MolPaintJS, MarvinJS;
+
+		@Override
+		public String toString() {
+			return this.name();
+		}
+	}
+
 	protected enum PropertyKeys {
 		border, /* format, */ height, readonly, widgetVar, width;
 	}
