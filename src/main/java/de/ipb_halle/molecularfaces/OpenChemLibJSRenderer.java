@@ -39,6 +39,13 @@ import javax.faces.render.Renderer;
 public class OpenChemLibJSRenderer extends Renderer {
 	public static final String RENDERER_TYPE = "molecularfaces.OpenChemLibJSRenderer";
 
+	/**
+	 * Name of the JavaScript global variable that represents a common
+	 * ResourcesLoader instance for all rendered components of this plugin type.
+	 * This variable is defined in MolecularFaces.js.
+	 */
+	private String loaderJSVar = "molecularfaces.openChemLibJSLoaderInstance";
+
 	@Override
 	public void decode(FacesContext context, UIComponent component) {
 		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
@@ -108,24 +115,35 @@ public class OpenChemLibJSRenderer extends Renderer {
 	 * @param divId  DOM id of the &lt;div&gt; element
 	 */
 	private void encodeViewerJS(ResponseWriter writer, MolPluginCore plugin, String divId) throws IOException {
+		String escapedMolecule = escape((String) plugin.getValue());
+
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		String escapedMolecule = escape((String) plugin.getValue());
+		StringBuilder sb = new StringBuilder(512 + escapedMolecule.length());
+		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
 
-		StringBuilder sb = new StringBuilder(256 + escapedMolecule.length());
 		Formatter fmt = new Formatter(sb);
 
 		// Register a JS variable if required.
 		String widgetVar = plugin.getWidgetVar();
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("var %s = ", widgetVar);
+			fmt.format("var %s = null;", widgetVar);
 		}
 
+		fmt.format("%s.onLoad(function () {", loaderJSVar);
+
+		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
+			fmt.format("%s = ", widgetVar);
+		}
 		fmt.format("new molecularfaces.OpenChemLibJSViewer(\"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
 				plugin.getHeight(), plugin.getWidth());
 
 		fmt.close();
+
+		// end of onLoad
+		sb.append("});");
+
 		writer.writeText(sb, null);
 		writer.endElement("script");
 	}
@@ -182,12 +200,20 @@ public class OpenChemLibJSRenderer extends Renderer {
 		writer.writeAttribute("type", "text/javascript", null);
 
 		StringBuilder sb = new StringBuilder(512);
+		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
+
 		Formatter fmt = new Formatter(sb);
 
 		// Register a JS variable if required.
 		String widgetVar = plugin.getWidgetVar();
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("var %s = ", widgetVar);
+			fmt.format("var %s = null;", widgetVar);
+		}
+
+		fmt.format("%s.onLoad(function () {", loaderJSVar);
+
+		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
+			fmt.format("%s = ", widgetVar);
 		}
 
 		// Start editor and set the molecule from the hidden <input> element's value.
@@ -204,6 +230,10 @@ public class OpenChemLibJSRenderer extends Renderer {
 				hiddenInputId);
 
 		fmt.close();
+
+		// end of onLoad
+		sb.append("});");
+
 		writer.writeText(sb, null);
 		writer.endElement("script");
 	}

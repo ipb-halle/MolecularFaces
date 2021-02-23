@@ -17,14 +17,27 @@
  */
 package de.ipb_halle.molecularfaces;
 
+import java.util.Formatter;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.faces.component.UIInput;
+import javax.faces.component.UIOutput;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.ComponentSystemEvent;
+import javax.faces.event.ComponentSystemEventListener;
+import javax.faces.event.ListenerFor;
+import javax.faces.event.PostAddToViewEvent;
 
 /**
  * This class holds the attribute states of the chemical structure plugins.
  * 
  * @author flange
  */
-public abstract class MolPluginCore extends UIInput {
+@ListenerFor(systemEventClass = PostAddToViewEvent.class)
+public abstract class MolPluginCore extends UIInput implements ComponentSystemEventListener {
+	private static final String RESOURCES_LIBRARY_NAME = "molecularfaces";
+
 	public static final String COMPONENT_FAMILY = "molecularfaces.MolPluginFamily";
 
 	public enum PluginType {
@@ -174,5 +187,80 @@ public abstract class MolPluginCore extends UIInput {
 	 */
 	public void setWidth(int width) {
 		getStateHelper().put(PropertyKeys.width, width);
+	}
+
+	private Set<String> scriptResourcesToLoad = new HashSet<>();
+
+	protected void addScriptResource(String resource) {
+		scriptResourcesToLoad.add(resource);
+	}
+
+	private Set<String> scriptsExtToLoad = new HashSet<>();
+
+	protected void addScriptExt(String src) {
+		scriptsExtToLoad.add(src);
+	}
+
+	private Set<String> cssResourcesToLoad = new HashSet<>();
+
+	protected void addCssResource(String resource) {
+		cssResourcesToLoad.add(resource);
+	}
+
+	private Set<String> cssExtToLoad = new HashSet<>();
+
+	protected void addCssExt(String href) {
+		cssExtToLoad.add(href);
+	}
+
+	@Override
+	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+		if (event instanceof PostAddToViewEvent) {
+			for (String resource : scriptResourcesToLoad) {
+				/*
+				 * Create an UIComponent that includes the file as script from the resource
+				 * library.
+				 */
+				UIOutput jsResource = new UIOutput();
+				jsResource.setRendererType("javax.faces.resource.Script");
+				jsResource.getAttributes().put("library", RESOURCES_LIBRARY_NAME);
+				jsResource.getAttributes().put("name", resource);
+
+				// Add the component to <head>.
+				getFacesContext().getViewRoot().addComponentResource(getFacesContext(), jsResource, "head");
+			}
+
+			for (String resource : cssResourcesToLoad) {
+				/*
+				 * Create an UIComponent that includes the file from the resource library.
+				 */
+				UIOutput cssResource = new UIOutput();
+				cssResource.setRendererType("javax.faces.resource.Stylesheet");
+				cssResource.getAttributes().put("library", RESOURCES_LIBRARY_NAME);
+				cssResource.getAttributes().put("name", resource);
+
+				// Add the component to <head>.
+				getFacesContext().getViewRoot().addComponentResource(getFacesContext(), cssResource, "head");
+			}
+		}
+
+		super.processEvent(event);
+	}
+
+	public StringBuilder encodeLoadExtResources(String loaderJSVar) {
+		StringBuilder sb = new StringBuilder();
+		Formatter fmt = new Formatter(sb);
+
+		sb.append(loaderJSVar);
+		for (String script : scriptsExtToLoad) {
+			fmt.format(".addScriptToHead(\"%s\")", script);
+		}
+		for (String href : cssExtToLoad) {
+			fmt.format(".addCssToHead(\"%s\")", href);
+		}
+		sb.append(".loadResources();");
+
+		fmt.close();
+		return sb;
 	}
 }

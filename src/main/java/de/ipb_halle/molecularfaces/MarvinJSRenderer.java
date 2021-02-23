@@ -38,6 +38,13 @@ import javax.faces.render.Renderer;
 public class MarvinJSRenderer extends Renderer {
 	public static final String RENDERER_TYPE = "molecularfaces.MarvinJSRenderer";
 
+	/**
+	 * Name of the JavaScript global variable that represents a common
+	 * ResourcesLoader instance for all rendered components of this plugin type.
+	 * This variable is defined in MolecularFaces.js.
+	 */
+	private String loaderJSVar = "molecularfaces.marvinJSLoaderInstance";
+
 	@Override
 	public void decode(FacesContext context, UIComponent component) {
 		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
@@ -110,6 +117,8 @@ public class MarvinJSRenderer extends Renderer {
 	 */
 	private void encodeViewerJS(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String divId)
 			throws IOException {
+		String escapedMolecule = escape((String) plugin.getValue());
+
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
@@ -117,21 +126,31 @@ public class MarvinJSRenderer extends Renderer {
 		if (installPath == null) {
 			installPath = "";
 		}
-		String escapedMolecule = escape((String) plugin.getValue());
 
-		StringBuilder sb = new StringBuilder(256 + installPath.length() + escapedMolecule.length());
+		StringBuilder sb = new StringBuilder(512 + installPath.length() + escapedMolecule.length());
+		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
+
 		Formatter fmt = new Formatter(sb);
 
 		// Register a JS variable if required.
 		String widgetVar = plugin.getWidgetVar();
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("var %s = ", widgetVar);
+			fmt.format("var %s = null;", widgetVar);
 		}
 
+		fmt.format("%s.onLoad(function () {", loaderJSVar);
+
+		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
+			fmt.format("%s = ", widgetVar);
+		}
 		fmt.format("new molecularfaces.MarvinJSViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
 				installPath, plugin.getHeight(), plugin.getWidth());
 
 		fmt.close();
+
+		// end of onLoad
+		sb.append("});");
+
 		writer.writeText(sb, null);
 		writer.endElement("script");
 	}
@@ -203,12 +222,20 @@ public class MarvinJSRenderer extends Renderer {
 		}
 
 		StringBuilder sb = new StringBuilder(512 + installPath.length() + license.length());
+		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
+
 		Formatter fmt = new Formatter(sb);
 
 		// Register a JS variable if required.
 		String widgetVar = plugin.getWidgetVar();
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("var %s = ", widgetVar);
+			fmt.format("var %s = null;", widgetVar);
+		}
+
+		fmt.format("%s.onLoad(function () {", loaderJSVar);
+
+		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
+			fmt.format("%s = ", widgetVar);
 		}
 
 		// Start editor and set the molecule from the hidden <input> element's value.
@@ -225,6 +252,10 @@ public class MarvinJSRenderer extends Renderer {
 				hiddenInputId);
 
 		fmt.close();
+
+		// end of onLoad
+		sb.append("});");
+
 		writer.writeText(sb, null);
 		writer.endElement("script");
 	}

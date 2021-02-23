@@ -20,6 +20,100 @@
 // Namespace registration
 var molecularfaces = molecularfaces || {};
 
+molecularfaces.ResourcesLoader = class {
+	constructor() {
+		this._resourcesToLoad = [];
+		this._loadingResources = [];
+		this._loadedResources = [];
+		this._onLoadListeners = [];
+
+		let obj = this;
+		this._onLoadCallback = function(resource) {
+			// Add this resource to the list of loaded resources.
+			obj._loadedResources.push(resource);
+
+			// Remove this resource from the loading resources list.
+			obj._loadingResources.splice(obj._loadingResources.indexOf(resource), 1);
+
+			// Notify the listeners in case all resources are loaded.
+			if (obj._loadingResources.length == 0) {
+				obj._notifyOnLoad();
+			}
+		}
+	}
+
+	addScriptToHead(src) {
+		if (!this._loadingResources.includes(src)
+			&& !this._loadedResources.includes(src)) {
+
+			this._loadingResources.push(src);
+
+			let script = document.createElement("script");
+			script.setAttribute("type", "text/javascript");
+			script.setAttribute("src", src);
+
+			let obj = this;
+			script.onreadystatechange = function() {
+				if (script.readyState == 'complete') {
+					obj._onLoadCallback(src);
+				}
+			}
+			script.onload = function() {
+				obj._onLoadCallback(src);
+			}
+
+			// Enqueue this element to be appended to the DOM tree by loadResources().
+			this._resourcesToLoad.push(script);
+		}
+
+		return this;
+	}
+
+	addCssToHead(href) {
+		if (!this._loadingResources.includes(href)
+			&& !this._loadedResources.includes(href)) {
+
+			this._loadedResources.push(href);
+
+			let link = document.createElement("link");
+			link.setAttribute("rel", "stylesheet");
+			link.setAttribute("type", "text/css");
+			link.setAttribute("href", href);
+
+			// Enqueue this element to be appended to the DOM tree by loadResources().
+			this._resourcesToLoad.push(link);
+		}
+
+		return this;
+	}
+
+	loadResources() {
+		for (let element of this._resourcesToLoad) {
+			document.head.appendChild(element);
+		}
+
+		return this;
+	}
+
+	onLoad(fn) {
+		if (this._loadingResources.length == 0) {
+			// All scripts are already loaded, notify now.
+			fn.call(this);
+		} else {
+			// Notify later.
+			this._onLoadListeners.push(fn);
+		}
+
+		return this;
+	}
+
+	_notifyOnLoad() {
+		for (let fn of this._onLoadListeners) {
+			fn.call(this);
+		}
+	}
+}
+
 /**
  * Abstract class
  * 
@@ -153,6 +247,12 @@ molecularfaces.StructureEditor = class extends molecularfaces.StructurePlugin {
 }
 
 /**
+ * Global variable that stores a ResourcesLoader instance to be commonly used by
+ * all OpenChemLibJS plugin instances.
+ */
+molecularfaces.openChemLibJSLoaderInstance = new molecularfaces.ResourcesLoader();
+
+/**
  * This class implements the OpenChemLibJS editor plugin. The editor is attached 
  * to a <div> container. The size of the plugin is defined by the surrounding <div>.
  */
@@ -258,6 +358,12 @@ molecularfaces.OpenChemLibJSViewer = class extends molecularfaces.StructurePlugi
 		return this;
 	}
 }
+
+/**
+ * Global variable that stores a ResourcesLoader instance to be commonly used by
+ * all MolPaintJS plugin instances.
+ */
+molecularfaces.molPaintJSLoaderInstance = new molecularfaces.ResourcesLoader();
 
 /**
  * Global variable that stores the common MolPaintJS plugin registry. It is 
@@ -413,6 +519,12 @@ molecularfaces._onDocumentReady = function(fn) {
 		document.addEventListener("DOMContentLoaded", fn);
 	}
 }
+
+/**
+ * Global variable that stores a ResourcesLoader instance to be commonly used by
+ * all Marvin JS plugin instances.
+ */
+molecularfaces.marvinJSLoaderInstance = new molecularfaces.ResourcesLoader();
 
 /**
  * This class implements the MarvinJS editor plugin. The editor is rendered inside 

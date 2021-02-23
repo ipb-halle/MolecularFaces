@@ -19,8 +19,6 @@ package de.ipb_halle.molecularfaces;
 
 import javax.faces.component.FacesComponent;
 
-import de.ipb_halle.molecularfaces.resource.AddResourcesListener;
-
 /**
  * This {@link javax.faces.component.UIComponent} renders a chemical structure
  * editor or viewer using the
@@ -45,12 +43,12 @@ public class MolPaintJSComponent extends MolPluginCore {
 
 		String resourceUrl = getFacesContext().getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL);
 		if ((resourceUrl != null) && (!resourceUrl.isEmpty())) {
-			AddResourcesListener.addCssExt(resourceUrl + "/css/styles.css");
-			AddResourcesListener.addScriptExt(resourceUrl + "/js/molpaint.js");
+			addCssExt(resourceUrl + "/css/styles.css");
+			addScriptExt(resourceUrl + "/js/molpaint.js");
 		} else {
 			// not yet implemented!
 		}
-		AddResourcesListener.addScriptResource("js/StructurePlugins.js");
+		addScriptResource("js/MolecularFaces.js");
 
 		setRendererType(DEFAULT_RENDERER);
 	}

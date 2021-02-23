@@ -19,8 +19,6 @@ package de.ipb_halle.molecularfaces;
 
 import javax.faces.component.FacesComponent;
 
-import de.ipb_halle.molecularfaces.resource.AddResourcesListener;
-
 /**
  * This {@link javax.faces.component.UIComponent} renders a chemical structure
  * editor or viewer using the
@@ -56,10 +54,10 @@ public class MarvinJSComponent extends MolPluginCore {
 		 * WEBXML_MARVINJS_BASE_URL.
 		 */
 		String baseDir = getFacesContext().getExternalContext().getInitParameter(WEBXML_MARVINJS_BASE_URL);
-		AddResourcesListener.addScriptExt(baseDir + "/gui/lib/promise-1.0.0.min.js");
-		AddResourcesListener.addScriptExt(baseDir + "/js/marvinjslauncher.js");
-		
-		AddResourcesListener.addScriptResource("js/StructurePlugins.js");
+		addScriptExt(baseDir + "/gui/lib/promise-1.0.0.min.js");
+		addScriptExt(baseDir + "/js/marvinjslauncher.js");
+
+		addScriptResource("js/MolecularFaces.js");
 
 		setRendererType(DEFAULT_RENDERER);
 	}
