@@ -46,7 +46,8 @@ public class MolPaintJSComponent extends MolPluginCore {
 			addCssExt(resourceUrl + "/css/styles.css");
 			addScriptExt(resourceUrl + "/js/molpaint.js");
 		} else {
-			// not yet implemented!
+			addCssResource("plugins/molpaintjs/css/styles.css");
+			addScriptResource("plugins/molpaintjs/js/molpaint.js");
 		}
 		addScriptResource("js/MolecularFaces.js");
 

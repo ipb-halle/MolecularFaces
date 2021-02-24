@@ -44,7 +44,7 @@ Example:
 Plugin | Version | License | Editor | Viewer
 ------ | ------- | ------- | ------ | ------
 [OpenChemLib JS](https://github.com/cheminfo/openchemlib-js) | [v7.2.3](https://github.com/cheminfo/openchemlib-js/releases/tag/v7.2.3) | [BSD-3-Clause](https://github.com/cheminfo/openchemlib-js/blob/master/LICENSE) | [x] | [x]
-[MolPaintJS](https://github.com/ipb-halle/MolPaintJS) | | [Apache License 2.0](https://github.com/ipb-halle/MolPaintJS/blob/master/LICENSE) | [x] | [x]
+[MolPaintJS](https://github.com/ipb-halle/MolPaintJS) | [v0.1.2-alpha](https://github.com/ipb-halle/MolPaintJS/releases/tag/v0.1.2-alpha) | [Apache License 2.0](https://github.com/ipb-halle/MolPaintJS/blob/master/LICENSE) | [x] | [x]
 [Marvin JS](https://chemaxon.com/products/marvin-js) | 21.1.0 | proprietary | [x] | [x]
 
 ##### Usage example

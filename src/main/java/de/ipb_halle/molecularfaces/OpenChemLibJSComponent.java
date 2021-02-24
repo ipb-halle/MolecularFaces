@@ -45,7 +45,7 @@ public class OpenChemLibJSComponent extends MolPluginCore {
 		if ((resourceUrl != null) && (!resourceUrl.isEmpty())) {
 			addScriptExt(resourceUrl);
 		} else {
-			addScriptResource("js/openchemlib-full.js");
+			addScriptResource("plugins/openchemlibjs/openchemlib-full.js");
 		}
 		addScriptResource("js/MolecularFaces.js");
 

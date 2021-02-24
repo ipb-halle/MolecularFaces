@@ -124,7 +124,8 @@ public class MolPaintJSRenderer extends Renderer {
 
 		String installPath = context.getExternalContext()
 				.getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL);
-		if (installPath == null) {
+		if ((installPath == null) || (installPath.isEmpty())) {
+			// TODO: proper resource path when we use JSF's resource mechanism
 			installPath = "";
 		}
 

@@ -24,7 +24,12 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<openchemlib.version>v7.2.3</openchemlib.version>
+
+		<openchemlibjs.version>v7.2.3</openchemlibjs.version>
+		<openchemlibjs.sha256>4c615e20509e3eb6c9a6c6c9591e6f36ad31d7c4f7e7a4c50fe4ceb7dc7cc411</openchemlibjs.sha256>
+
+		<molpaintjs.version>v0.1.2-alpha</molpaintjs.version>
+		<molpaintjs.sha256>bc733dcd170a85868263c376ed52e8f7658a998b97a65a041d0fa8ab90d5484e</molpaintjs.sha256>
 	</properties>
 
 	<build>
@@ -63,13 +68,28 @@
 				<version>1.6.1</version>
 				<executions>
 					<execution>
+						<id>download-openchemlibjs</id>
 						<phase>generate-resources</phase>
 						<goals>
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>https://github.com/cheminfo/openchemlib-js/releases/download/${openchemlib.version}/openchemlib-full.js</url>
-							<outputDirectory>${project.build.directory}/downloaded-resources/js</outputDirectory>
+							<url>https://github.com/cheminfo/openchemlib-js/releases/download/${openchemlibjs.version}/openchemlib-full.js</url>
+							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openchemlibjs/</outputDirectory>
+							<sha256>${openchemlibjs.sha256}</sha256>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-molpaintjs</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://github.com/ipb-halle/MolPaintJS/releases/download/${molpaintjs.version}/molpaintjs.tar.gz</url>
+							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/</outputDirectory>
+							<sha256>${molpaintjs.sha256}</sha256>
+							<unpack>true</unpack>
 						</configuration>
 					</execution>
 				</executions>
