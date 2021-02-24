@@ -128,6 +128,8 @@ public class MarvinJSRenderer extends Renderer {
 		}
 
 		StringBuilder sb = new StringBuilder(512 + installPath.length() + escapedMolecule.length());
+
+		// resource loading
 		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);
@@ -143,6 +145,8 @@ public class MarvinJSRenderer extends Renderer {
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
 			fmt.format("%s = ", widgetVar);
 		}
+
+		// Start viewer and set the molecule value inline.
 		fmt.format("new molecularfaces.MarvinJSViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
 				installPath, plugin.getHeight(), plugin.getWidth());
 
@@ -222,6 +226,8 @@ public class MarvinJSRenderer extends Renderer {
 		}
 
 		StringBuilder sb = new StringBuilder(512 + installPath.length() + license.length());
+
+		// resource loading
 		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);

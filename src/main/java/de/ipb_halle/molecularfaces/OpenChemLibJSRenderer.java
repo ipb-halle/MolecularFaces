@@ -121,6 +121,8 @@ public class OpenChemLibJSRenderer extends Renderer {
 		writer.writeAttribute("type", "text/javascript", null);
 
 		StringBuilder sb = new StringBuilder(512 + escapedMolecule.length());
+
+		// resource loading
 		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);
@@ -136,6 +138,8 @@ public class OpenChemLibJSRenderer extends Renderer {
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
 			fmt.format("%s = ", widgetVar);
 		}
+
+		// Start viewer and set the molecule value inline.
 		fmt.format("new molecularfaces.OpenChemLibJSViewer(\"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
 				plugin.getHeight(), plugin.getWidth());
 
@@ -200,6 +204,8 @@ public class OpenChemLibJSRenderer extends Renderer {
 		writer.writeAttribute("type", "text/javascript", null);
 
 		StringBuilder sb = new StringBuilder(512);
+
+		// resource loading
 		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);

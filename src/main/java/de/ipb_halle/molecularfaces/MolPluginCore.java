@@ -30,7 +30,8 @@ import javax.faces.event.ListenerFor;
 import javax.faces.event.PostAddToViewEvent;
 
 /**
- * This class holds the attribute states of the chemical structure plugins.
+ * This class holds the attribute states of the chemical structure plugins and
+ * provides support for dynamic resource loading.
  * 
  * @author flange
  */
@@ -40,6 +41,11 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 
 	public static final String COMPONENT_FAMILY = "molecularfaces.MolPluginFamily";
 
+	/**
+	 * Supported chemical structure plugin types.
+	 * 
+	 * @author flange
+	 */
 	public enum PluginType {
 		OpenChemLibJS, MolPaintJS, MarvinJS;
 
@@ -191,35 +197,74 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 
 	private Set<String> scriptResourcesToLoad = new HashSet<>();
 
+	/**
+	 * Enqueues loading of a JavaScript resource file. The resource will be added
+	 * via JSF's resource mechanism by the
+	 * {@link processEvent(ComponentSystemEvent)} method in the PostAddToViewEvent
+	 * event.
+	 * 
+	 * @param resource name of the file in the web project's resource library
+	 */
 	protected void addScriptResource(String resource) {
 		scriptResourcesToLoad.add(resource);
 	}
 
 	private Set<String> scriptsExtToLoad = new HashSet<>();
 
+	/**
+	 * Enqueues loading of a JavaScript resource file. The resource will be loaded
+	 * via the JavaScript class {@code molecularfaces.ResourcesLoader}.
+	 * 
+	 * @param src path of the resource file
+	 */
 	protected void addScriptExt(String src) {
 		scriptsExtToLoad.add(src);
 	}
 
 	private Set<String> cssResourcesToLoad = new HashSet<>();
 
+	/**
+	 * Enqueues loading of a stylesheet resource file. The resource will be added
+	 * via JSF's resource mechanism by the
+	 * {@link processEvent(ComponentSystemEvent)} method in the PostAddToViewEvent
+	 * event.
+	 * 
+	 * @param resource name of the file in the web project's resource library
+	 */
 	protected void addCssResource(String resource) {
 		cssResourcesToLoad.add(resource);
 	}
 
 	private Set<String> cssExtToLoad = new HashSet<>();
 
+	/**
+	 * Enqueues loading of a stylesheet resource file. The resource will be loaded
+	 * via the JavaScript class {@code molecularfaces.ResourcesLoader}.
+	 * 
+	 * @param href path of the resource file
+	 */
 	protected void addCssExt(String href) {
 		cssExtToLoad.add(href);
 	}
 
+	/*
+	 * We would like to load resources programmatically (not via
+	 * the @ResourceDependencies annotation). This has to be done before the render
+	 * response, so an event listener for PostAddToViewEvent is registered
+	 * via @ListenerFor to this component class, which is processed here.
+	 * 
+	 * <p> This method loads all resources that have been enqueued via {@link
+	 * addScriptResource(String)} and {@link addCssResource(String)} via JSF's
+	 * resource handling mechanism.
+	 * 
+	 * See: https://stackoverflow.com/a/12451778
+	 */
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
 		if (event instanceof PostAddToViewEvent) {
 			for (String resource : scriptResourcesToLoad) {
 				/*
-				 * Create an UIComponent that includes the file as script from the resource
-				 * library.
+				 * Create an UIComponent that includes the script from the resource library.
 				 */
 				UIOutput jsResource = new UIOutput();
 				jsResource.setRendererType("javax.faces.resource.Script");
@@ -232,7 +277,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 
 			for (String resource : cssResourcesToLoad) {
 				/*
-				 * Create an UIComponent that includes the file from the resource library.
+				 * Create an UIComponent that includes the stylesheet file from the resource
+				 * library.
 				 */
 				UIOutput cssResource = new UIOutput();
 				cssResource.setRendererType("javax.faces.resource.Stylesheet");
@@ -247,8 +293,16 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 		super.processEvent(event);
 	}
 
+	/**
+	 * Creates an inline JavaScript code fragment for loading resources that have
+	 * been enqueued via {@link addScriptExt(String)} and {@link addCssExt(String)}.
+	 * 
+	 * @param loaderJSVar JavaScript variable name of the
+	 *                    {@code molecularfaces.ResourcesLoader} instance
+	 * @return JavaScript code
+	 */
 	public StringBuilder encodeLoadExtResources(String loaderJSVar) {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(256);
 		Formatter fmt = new Formatter(sb);
 
 		sb.append(loaderJSVar);

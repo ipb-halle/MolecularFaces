@@ -129,6 +129,8 @@ public class MolPaintJSRenderer extends Renderer {
 		}
 
 		StringBuilder sb = new StringBuilder(512 + installPath.length() + escapedMolecule.length());
+
+		// resource loading
 		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);
@@ -144,6 +146,8 @@ public class MolPaintJSRenderer extends Renderer {
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
 			fmt.format("%s = ", widgetVar);
 		}
+
+		// Start viewer and set the molecule value inline.
 		fmt.format("new molecularfaces.MolPaintJSViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
 				installPath.endsWith("/") ? installPath : installPath + "/", plugin.getHeight(), plugin.getWidth());
 
@@ -215,6 +219,8 @@ public class MolPaintJSRenderer extends Renderer {
 		}
 
 		StringBuilder sb = new StringBuilder(512 + installPath.length());
+
+		// resource loading
 		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);

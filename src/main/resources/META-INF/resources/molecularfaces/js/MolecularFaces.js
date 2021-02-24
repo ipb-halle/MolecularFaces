@@ -20,6 +20,19 @@
 // Namespace registration
 var molecularfaces = molecularfaces || {};
 
+/**
+ * This class provides support for dynamic resource loading of JavaScript and
+ * stylesheet files.
+ * 
+ * Usage:
+ * - enqueue resources with the addScriptToHead(String) and addCssToHead(String)
+ *   methods
+ * - start attachment of the resources to <head> by calling loadResources()
+ * - register a callback function with onLoad(function) that is called as soon as
+ *   ALL resources are loaded.
+ *
+ * Identical resources may be enqueued several times, but are loaded exactly once.
+ */
 molecularfaces.ResourcesLoader = class {
 	constructor() {
 		this._resourcesToLoad = [];
@@ -42,6 +55,9 @@ molecularfaces.ResourcesLoader = class {
 		}
 	}
 
+	/**
+	 * Enqueues the loading of a JavaScript file.
+	 */
 	addScriptToHead(src) {
 		if (!this._loadingResources.includes(src)
 			&& !this._loadedResources.includes(src)) {
@@ -69,6 +85,9 @@ molecularfaces.ResourcesLoader = class {
 		return this;
 	}
 
+	/**
+	 * Enqueues the loading of a stylesheet file.
+	 */
 	addCssToHead(href) {
 		if (!this._loadingResources.includes(href)
 			&& !this._loadedResources.includes(href)) {
@@ -87,6 +106,9 @@ molecularfaces.ResourcesLoader = class {
 		return this;
 	}
 
+	/**
+	 * Adds all enqueued resources to <head>.
+	 */
 	loadResources() {
 		for (let element of this._resourcesToLoad) {
 			document.head.appendChild(element);
@@ -95,6 +117,10 @@ molecularfaces.ResourcesLoader = class {
 		return this;
 	}
 
+	/**
+	 * Registers an onLoad callback function that is executed as soon as all
+	 * resources are loaded by the browser. This may happen immediately.
+	 */
 	onLoad(fn) {
 		if (this._loadingResources.length == 0) {
 			// All scripts are already loaded, notify now.
@@ -107,6 +133,9 @@ molecularfaces.ResourcesLoader = class {
 		return this;
 	}
 
+	/**
+	 * Notifies all onLoad listeners.
+	 */
 	_notifyOnLoad() {
 		for (let fn of this._onLoadListeners) {
 			fn.call(this);
