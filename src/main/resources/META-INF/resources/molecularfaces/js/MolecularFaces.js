@@ -302,6 +302,9 @@ molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEdito
 	}
 
 	init() {
+		// Clear all previously rendered editors in our <div>.
+		document.getElementById(this._divId).innerHTML = '';
+
 		this._editor = window.OCL.StructureEditor.createSVGEditor(this._divId, 1);
 
 		this.setMDLv2000(this._molecule);
@@ -421,6 +424,7 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 		this._installPath = installPath;
 		this._height = height;
 		this._width = width;
+		this._iconSize = 32;
 		this._editor = null;
 
 		this.init();
@@ -434,9 +438,9 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 
 		this._editor = molecularfaces._molPaintJSRegistry.newContext(this._divId, {
 			installPath: this._installPath,
-			iconSize: 32,
-			sizeX: this._width,
-			sizeY: this._height
+			iconSize: this._iconSize,
+			sizeX: this._width - 2 * this._iconSize - 2,
+			sizeY: this._height - this._iconSize - 7
 		});
 		this._editor.setMolecule(this._molecule);
 
@@ -541,7 +545,7 @@ molecularfaces.MolPaintJSViewer = class extends molecularfaces.StructurePlugin {
  * A vanilla JavaScript on-document-ready execution of function fn. See 
  * https://stackoverflow.com/a/9899701.
  */
-molecularfaces._onDocumentReady = function(fn) {
+molecularfaces.onDocumentReady = function(fn) {
 	if (document.readyState === "complete" || document.readyState === "interactive") {
 		setTimeout(fn, 1);
 	} else {
@@ -591,7 +595,7 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 		}
 
 		let obj = this;
-		molecularfaces._onDocumentReady(function() {
+		molecularfaces.onDocumentReady(function() {
 			// Set the license via the Marvin JS package.
 			if (obj._licensePath != "") {
 				MarvinJSUtil.getPackage("#" + obj._iframeId).then(function(marvinNameSpace) {
@@ -698,7 +702,7 @@ molecularfaces.MarvinJSNamespaceLoader = class {
 
 		let obj = this;
 		// Execute package loading on-document-ready
-		molecularfaces._onDocumentReady(
+		molecularfaces.onDocumentReady(
 			function() {
 				MarvinJSUtil.getPackage("#marvinjspackage-iframe").then(function(marvinNameSpace) {
 					marvinNameSpace.onReady(function() {
