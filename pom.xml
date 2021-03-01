@@ -33,6 +33,15 @@
 	</properties>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/src/main/resources/META-INF/</directory>
+				<excludes>
+					<exclude>js/MolecularFaces.js</exclude>
+				</excludes>
+				<targetPath>${project.build.directory}/classes/META-INF/</targetPath>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -41,7 +50,7 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
-					<encoding>UTF-8</encoding>
+					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -95,11 +104,40 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>com.github.blutorange</groupId>
+				<artifactId>closure-compiler-maven-plugin</artifactId>
+				<version>2.21.0</version>
+				<configuration>
+					<baseSourceDir>${project.basedir}/src/main/resources/META-INF/resources/molecularfaces</baseSourceDir>
+					<baseTargetDir>${project.build.directory}/generated-resources</baseTargetDir>
+				</configuration>
+				<executions>
+					<execution>
+						<id>default-minify</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>minify</goal>
+						</goals>
+						<configuration>
+							<encoding>UTF-8</encoding>
+							<sourceDir>js</sourceDir>
+							<targetDir>js</targetDir>
+							<includes>
+								<include>MolecularFaces.js</include>
+							</includes>
+							<outputFilename>MolecularFaces.js</outputFilename>
+							<skipMerge>false</skipMerge>
+							<closureLanguageOut>ECMASCRIPT5_STRICT</closureLanguageOut>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>3.2.0</version>
 				<executions>
 					<execution>
-						<id>copy-resources</id>
+						<id>copy-downloaded-resources</id>
 						<phase>prepare-package</phase>
 						<goals>
 							<goal>copy-resources</goal>
@@ -108,6 +146,22 @@
 							<resources>
 								<resource>
 									<directory>${project.build.directory}/downloaded-resources</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+							<outputDirectory>${project.build.directory}/classes/META-INF/resources/molecularfaces</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-generated-resources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>${project.build.directory}/generated-resources</directory>
 									<filtering>true</filtering>
 								</resource>
 							</resources>
