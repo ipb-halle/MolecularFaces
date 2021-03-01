@@ -8,9 +8,9 @@ The artifacts have not been submitted to Maven Central yet. To include Molecular
 
 ```xml
 <dependency>
-  <groupId>de.ipb_halle</groupId>
+  <groupId>de.ipb-halle</groupId>
   <artifactId>molecularfaces</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1-SNAPSHOT</version>
 </dependency>
 ```
  
