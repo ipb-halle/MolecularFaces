@@ -37,7 +37,7 @@
 			<resource>
 				<directory>${project.basedir}/src/main/resources/META-INF/</directory>
 				<excludes>
-					<exclude>js/MolecularFaces.js</exclude>
+					<exclude>resources/molecularfaces/js/*.js</exclude>
 				</excludes>
 				<targetPath>${project.build.directory}/classes/META-INF/</targetPath>
 			</resource>
@@ -123,10 +123,19 @@
 							<sourceDir>js</sourceDir>
 							<targetDir>js</targetDir>
 							<includes>
+								<include>ResourcesLoader.js</include>
 								<include>MolecularFaces.js</include>
+								<include>StructurePlugin.js</include>
+								<include>StructureEditor.js</include>
+								<include>OpenChemLibJSEditor.js</include>
+								<include>OpenChemLibJSViewer.js</include>
+								<include>MolPaintJSEditor.js</include>
+								<include>MolPaintJSViewer.js</include>
+								<include>MarvinJSEditor.js</include>
+								<include>MarvinJSNamespaceLoader.js</include>
+								<include>MarvinJSViewer.js</include>
 							</includes>
 							<outputFilename>MolecularFaces.js</outputFilename>
-							<skipMerge>false</skipMerge>
 							<closureLanguageOut>ECMASCRIPT5_STRICT</closureLanguageOut>
 						</configuration>
 					</execution>
