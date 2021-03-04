@@ -130,22 +130,20 @@ public class OpenChemLibJSRenderer extends Renderer {
 		// Register a JS variable if required.
 		String widgetVar = plugin.getWidgetVar();
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("var %s = null;", widgetVar);
+			fmt.format("var %s = ", widgetVar);
 		}
 
-		fmt.format("%s.onLoad(function () {", loaderJSVar);
-
-		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("%s = ", widgetVar);
-		}
-
-		// Start viewer and set the molecule value inline.
-		fmt.format("new molecularfaces.OpenChemLibJSViewer(\"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
-				plugin.getHeight(), plugin.getWidth());
+		/*
+		 * Start viewer, set the molecule value inline and return the viewer object
+		 * embedded in a Promise.
+		 */
+		fmt.format("%s.status().then(() => {", loaderJSVar);
+		fmt.format("return molecularfaces.OpenChemLibJSViewer.newViewer(\"%s\", \"%s\", %d, %d);", divId,
+				escapedMolecule, plugin.getHeight(), plugin.getWidth());
 
 		fmt.close();
 
-		// end of onLoad
+		// end of then()
 		sb.append("});");
 
 		writer.writeText(sb, null);
@@ -213,18 +211,16 @@ public class OpenChemLibJSRenderer extends Renderer {
 		// Register a JS variable if required.
 		String widgetVar = plugin.getWidgetVar();
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("var %s = null;", widgetVar);
+			fmt.format("var %s = ", widgetVar);
 		}
 
-		fmt.format("%s.onLoad(function () {", loaderJSVar);
-
-		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("%s = ", widgetVar);
-		}
-
-		// Start editor and set the molecule from the hidden <input> element's value.
+		/*
+		 * Start editor, set the molecule from the hidden <input> element's value and
+		 * return the editor object embedded in a Promise.
+		 */
+		fmt.format("%s.status().then(() => {", loaderJSVar);
 		fmt.format(
-				"new molecularfaces.OpenChemLibJSEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"))",
+				"return molecularfaces.OpenChemLibJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"))",
 				divId, hiddenInputId);
 
 		/*
@@ -232,12 +228,13 @@ public class OpenChemLibJSRenderer extends Renderer {
 		 * element.
 		 */
 		fmt.format(
-				".addChangeListener(function(mol) { document.getElementById(\"%s\").setAttribute(\"value\", mol); });",
+				".then((editor) => editor.addChangeListener("
+						+ "(mol) => { document.getElementById(\"%s\").setAttribute(\"value\", mol); }));",
 				hiddenInputId);
 
 		fmt.close();
 
-		// end of onLoad
+		// end of then()
 		sb.append("});");
 
 		writer.writeText(sb, null);

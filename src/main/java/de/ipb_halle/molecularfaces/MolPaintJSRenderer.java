@@ -122,14 +122,7 @@ public class MolPaintJSRenderer extends Renderer {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		String installPath = context.getExternalContext()
-				.getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL);
-		if ((installPath == null) || (installPath.isEmpty())) {
-			// TODO: proper resource path when we use JSF's resource mechanism
-			installPath = "";
-		}
-
-		StringBuilder sb = new StringBuilder(512 + installPath.length() + escapedMolecule.length());
+		StringBuilder sb = new StringBuilder(512 + escapedMolecule.length());
 
 		// resource loading
 		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
@@ -139,22 +132,20 @@ public class MolPaintJSRenderer extends Renderer {
 		// Register a JS variable if required.
 		String widgetVar = plugin.getWidgetVar();
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("var %s = null;", widgetVar);
+			fmt.format("var %s = ", widgetVar);
 		}
 
-		fmt.format("%s.onLoad(function () {", loaderJSVar);
-
-		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("%s = ", widgetVar);
-		}
-
-		// Start viewer and set the molecule value inline.
-		fmt.format("new molecularfaces.MolPaintJSViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
-				installPath.endsWith("/") ? installPath : installPath + "/", plugin.getHeight(), plugin.getWidth());
+		/*
+		 * Start viewer, set the molecule value inline and return the viewer object
+		 * embedded in a Promise.
+		 */
+		fmt.format("%s.status().then(() => {", loaderJSVar);
+		fmt.format("return molecularfaces.MolPaintJSViewer.newViewer(\"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
+				plugin.getHeight(), plugin.getWidth());
 
 		fmt.close();
 
-		// end of onLoad
+		// end of then()
 		sb.append("});");
 
 		writer.writeText(sb, null);
@@ -213,13 +204,7 @@ public class MolPaintJSRenderer extends Renderer {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		String installPath = context.getExternalContext()
-				.getInitParameter(MolPaintJSComponent.WEBXML_CUSTOM_RESOURCE_URL);
-		if (installPath == null) {
-			installPath = "";
-		}
-
-		StringBuilder sb = new StringBuilder(512 + installPath.length());
+		StringBuilder sb = new StringBuilder(512);
 
 		// resource loading
 		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
@@ -229,32 +214,30 @@ public class MolPaintJSRenderer extends Renderer {
 		// Register a JS variable if required.
 		String widgetVar = plugin.getWidgetVar();
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("var %s = null;", widgetVar);
+			fmt.format("var %s = ", widgetVar);
 		}
 
-		fmt.format("%s.onLoad(function () {", loaderJSVar);
-
-		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("%s = ", widgetVar);
-		}
-
-		// Start editor and set the molecule from the hidden <input> element's value.
+		/*
+		 * Start editor, set the molecule from the hidden <input> element's value and
+		 * return the editor object embedded in a Promise.
+		 */
+		fmt.format("%s.status().then(() => {", loaderJSVar);
 		fmt.format(
-				"new molecularfaces.MolPaintJSEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", %d, %d)",
-				divId, hiddenInputId, installPath.endsWith("/") ? installPath : installPath + "/", plugin.getHeight(),
-				plugin.getWidth());
+				"return molecularfaces.MolPaintJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), %d, %d)",
+				divId, hiddenInputId, plugin.getHeight(), plugin.getWidth());
 
 		/*
 		 * Register an on-change callback to fill the value of the hidden <input>
 		 * element.
 		 */
 		fmt.format(
-				".addChangeListener(function(mol) { document.getElementById(\"%s\").setAttribute(\"value\", mol); });",
+				".then((editor) => editor.addChangeListener("
+				+ "(mol) => { document.getElementById(\"%s\").setAttribute(\"value\", mol); }));",
 				hiddenInputId);
 
 		fmt.close();
 
-		// end of onLoad
+		// end of then()
 		sb.append("});");
 
 		writer.writeText(sb, null);

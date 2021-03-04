@@ -26,9 +26,8 @@ var molecularfaces = molecularfaces || {};
  */
 molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEditor {
 	/**
-	 * Initializes the OpenChemLibJS editor in a <div> container with the id given 
-	 * by the parameter "divId" and sets its molecule according to the "molecule" 
-	 * parameter.  
+	 * This constructor should not be used directly to receive an instance of
+	 * this class. Use the static factory method "newEditor" instead. 
 	 */
 	constructor(divId, molecule) {
 		super();
@@ -36,49 +35,56 @@ molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEdito
 		this._divId = divId;
 		this._molecule = molecule;
 		this._editor = null;
+	}
 
-		this.init();
+	/**
+	 * Returns an initialized OpenChemLibJS editor instance embedded inside a
+	 * Promise. The editor is rendered in a <div> container with the id given by
+	 * the parameter "divId" and a molecule according to the "molecule" parameter.
+	 */
+	static newEditor(divId, molecule) {
+		return new Promise((resolve, reject) => {
+			let obj = new molecularfaces.OpenChemLibJSEditor(divId, molecule);
+			obj.init().then(resolve(obj));
+		});
 	}
 
 	init() {
-		// Clear all previously rendered editors in our <div>.
-		document.getElementById(this._divId).innerHTML = '';
+		return new Promise((resolve, reject) => {
+			// Clear all previously rendered editors in our <div>.
+			document.getElementById(this._divId).innerHTML = '';
 
-		this._editor = window.OCL.StructureEditor.createSVGEditor(this._divId, 1);
+			this._editor = window.OCL.StructureEditor.createSVGEditor(this._divId, 1);
 
-		this.setMDLv2000(this._molecule);
+			this.setMDLv2000(this._molecule);
 
-		let obj = this;
-		this._editor.setChangeListenerCallback(function(idcode, molecule) {
-			/*
-			  * The object 'this' is not available in this scope, because the 
-			  * callback is executed in the future. The let construct above solves 
-			  * this issue.
-			  */
+			let obj = this;
+			this._editor.setChangeListenerCallback(function(idcode, molecule) {
+				let mol = molecule.toMolfile();
 
-			let mol = molecule.toMolfile();
+				obj._molecule = mol;
+				obj.notifyChange(mol);
+			});
 
-			obj._molecule = mol;
-			obj.notifyChange(mol);
+			resolve(this);
 		});
-
-		return this;
 	}
 
 	getMDLv2000() {
-		return this._editor.getMolFile();
-		//return this._molecule;
+		return this._molecule;
 	}
 
 	setMDLv2000(molecule) {
-		if (typeof molecule !== "undefined") {
-			this._molecule = molecule;
+		return new Promise((resolve, reject) => {
+			if (typeof molecule !== "undefined") {
+				this._molecule = molecule;
 
-			// OCL.StructureEditor's setMolFile() will fire an onChange event.
-			this._editor.setMolFile(molecule);
-		}
+				// OCL.StructureEditor's setMolFile() will fire an onChange event.
+				this._editor.setMolFile(molecule);
+			}
 
-		return this;
+			resolve(this);
+		});
 	}
 
 	getEditorObj() {

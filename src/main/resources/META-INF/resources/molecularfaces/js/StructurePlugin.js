@@ -35,9 +35,8 @@ molecularfaces.StructurePlugin = class {
 	/**
 	 * Abstract method
 	 * 
-	 * This method shall be used for reinitialization of the plugin.
-	 * 
-	 * To support method chaining, this method should return this object.
+	 * This method shall be used for (re-)initialization of the plugin. It returns
+	 * a Promise object that indicates the load status.
 	 */
 	init() {
 		throw new Error("This method is abstract and must be implemented by the subclass.");
@@ -53,12 +52,12 @@ molecularfaces.StructurePlugin = class {
 	/**
 	 * Sets the molecule in the MDL Molfile v2000 format.
 	 * 
-	 * Returns this object to support method chaining.
+	 * Returns this object embedded in a Promise that indicates the status of this
+	 * molecule change process, because some plugin implementations require full
+	 * reinitialization.
 	 */
 	setMol(molecule) {
-		this.setMDLv2000(molecule);
-
-		return this;
+		return this.setMDLv2000(molecule);
 	}
 
 	/**
@@ -74,8 +73,10 @@ molecularfaces.StructurePlugin = class {
 	 * Abstract method
 	 * 
 	 * Sets the molecule in the MDL Molfile v2000 format.
-	 * 
-	 * To support method chaining, this method should return this object.
+	 *
+	 * Returns this object embedded in a Promise that indicates the status of this
+	 * molecule change process, because some plugin implementations require full
+	 * reinitialization.
 	 */
 	setMDLv2000(molecule) {
 		throw new Error("This method is abstract and must be implemented by the subclass.");

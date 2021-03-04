@@ -95,7 +95,7 @@ Example using a BootsFaces modal:
 ```xml
 <b:container>
   <b:form>
-    <b:commandButton value="open modal" ajax="true" update="modalform" oncomplete="$('.modalPseudoClass').modal('show');editorInModal.init()" />
+    <b:commandButton value="open modal" ajax="true" update="modalform" oncomplete="$('.modalPseudoClass').modal('show');editorInModal.then(e => e.init());" />
   </b:form>
 </b:container>
 <b:modal styleClass="modalPseudoClass">
@@ -114,10 +114,10 @@ Context-params:
 
 ##### MolPaintJS
 
-The resource dependencies are not yet part of the jar build pipeline. It is necessary to install MolPaintJS according to its [documentation](https://github.com/ipb-halle/MolPaintJS) and supply the plugin location via a context-param in web.xml.
+All resource dependencies (molpaint.js) are included in the jar build pipeline.
 
 Context-params:
-* `de.ipb_halle.molecularfaces.MOLPAINTJS_URL` (required): location of the MolPaintJS installation (the content of its `docs/` directory)
+* `de.ipb_halle.molecularfaces.MOLPAINTJS_URL` (optional): location of molpaint.js relative to the application's context root
 
 ##### Marvin JS
 

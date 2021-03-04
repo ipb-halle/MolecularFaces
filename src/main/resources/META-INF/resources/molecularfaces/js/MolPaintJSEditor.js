@@ -26,72 +26,70 @@ var molecularfaces = molecularfaces || {};
  */
 molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 	/**
-	 * Initializes the MolPaintJS editor in a <div> container with the id given 
-	 * by the parameter "divId" and sets its molecule according to the "molecule" 
-	 * parameter. The plugin resource location needs to be defined by the parameter 
-	 * "installPath". The "height" and "width" parameters should not exceed the 
-	 * size of the surrounding <div>.
+	 * This constructor should not be used directly to receive an instance of
+	 * this class. Use the static factory method "newEditor" instead. 
 	 */
-	constructor(divId, molecule, installPath, height, width) {
+	constructor(divId, molecule, height, width) {
 		super();
 
 		this._divId = divId;
 		this._molecule = molecule;
-		this._installPath = installPath;
 		this._height = height;
 		this._width = width;
 		this._iconSize = 32;
 		this._editor = null;
+	}
 
-		this.init();
+	/**
+	 * Returns an initialized MolPaintJS editor instance embedded inside a
+	 * Promise. The editor is rendered in a <div> container with the id given by
+	 * the parameter "divId" and a molecule according to the "molecule" parameter.
+	 * The "height" and "width" parameters should not exceed the size of the
+	 * surrounding <div>.
+	 */
+	static newEditor(divId, molecule, height, width) {
+		return new Promise((resolve, reject) => {
+			let obj = new molecularfaces.MolPaintJSEditor(divId, molecule, height, width);
+			obj.init().then(resolve(obj));
+		});
 	}
 
 	init() {
-		// Try to initialize the plugin registry.
-		if (molecularfaces._molPaintJSRegistry == null) {
-			molecularfaces._molPaintJSRegistry = new MolPaintJS();
-		}
+		return new Promise((resolve, reject) => {
+			this._editor = molPaintJS.newContext(this._divId, {
+				iconSize: this._iconSize,
+				sizeX: this._width - 2 * this._iconSize - 2,
+				sizeY: this._height - this._iconSize - 7
+			});
+			this._editor.init();
+			this._editor.setMolecule(this._molecule);
 
-		this._editor = molecularfaces._molPaintJSRegistry.newContext(this._divId, {
-			installPath: this._installPath,
-			iconSize: this._iconSize,
-			sizeX: this._width - 2 * this._iconSize - 2,
-			sizeY: this._height - this._iconSize - 7
+			let obj = this;
+			this._editor.setChangeListener(function() {
+				let mol = molPaintJS.getMDLv2000(obj._divId);
+
+				obj._molecule = mol;
+				obj.notifyChange(mol);
+			});
+
+			resolve(this);
 		});
-		this._editor.setMolecule(this._molecule);
-
-		let obj = this;
-		this._editor.setChangeListener(function() {
-			/*
-			  * The object 'this' is not available in this scope, because the 
-			  * callback is executed in the future. The let construct above solves 
-			  * this issue.
-			  */
-
-			let mol = obj.getMDLv2000();
-
-			obj._molecule = mol;
-			obj.notifyChange(mol);
-		});
-
-		this._editor.init();
-
-		return this;
 	}
 
 	getMDLv2000() {
-		return molecularfaces._molPaintJSRegistry.getMDLv2000(this._divId);
-		//return this._molecule;
+		return this._molecule;
 	}
 
 	setMDLv2000(molecule) {
-		if (typeof molecule !== "undefined") {
-			this._molecule = molecule;
+		return new Promise((resolve, reject) => {
+			if (typeof molecule !== "undefined") {
+				this._molecule = molecule;
 
-			this._editor.setMolecule(molecule);
-		}
+				this._editor.setMolecule(molecule);
+			}
 
-		return this;
+			resolve(this);
+		});
 	}
 
 	getEditorObj() {

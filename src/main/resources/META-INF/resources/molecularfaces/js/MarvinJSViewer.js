@@ -21,16 +21,19 @@
 var molecularfaces = molecularfaces || {};
 
 /**
+ * Singleton instance of molecularfaces.MarvinJSNamespaceLoader. The class 
+ * molecularfaces.MarvinJSViewer needs to ensure its lazy loading.
+ */
+molecularfaces._marvinJSNamespaceLoaderInstance = null;
+
+/**
  * This class implements the Marvin JS viewer plugin. The molecule viewer is 
  * attached to a <div> container.
  */
 molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 	/**
-	 * Initializes the MolPaintJS viewer in a <div> container with the id given 
-	 * by the parameter "divId" and sets its molecule according to the "molecule" 
-	 * parameter. The install location of Marvin JS needs to be defined by the 
-	 * parameter "installPath". The "height" and "width" parameters should not 
-	 * exceed the size of the surrounding <div>.
+	 * This constructor should not be used directly to receive an instance of
+	 * this class. Use the static factory method "newViewer" instead. 
 	 */
 	constructor(divId, molecule, installPath, height, width) {
 		super();
@@ -40,46 +43,60 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 		this._installPath = installPath;
 		this._height = height;
 		this._width = width;
+	}
 
-		this.init();
+	/**
+	 * Returns an initialized MolPaintJS viewer instance embedded inside a 
+	 * Promise. The viewer is rendered in a <div> container with the id given by
+	 * the parameter "divId" and a molecule according to the "molecule" parameter.
+	 * The install location of Marvin JS needs to be defined by the parameter
+	 * "installPath". The "height" and "width" parameters should not exceed the
+	 * size of the surrounding <div>.
+	 */
+	static newViewer(divId, molecule, installPath, height, width) {
+		return new Promise((resolve, reject) => {
+			let obj = new molecularfaces.MarvinJSViewer(divId, molecule, installPath, height, width);
+			obj.init().then(resolve(obj));
+		});
 	}
 
 	init() {
-		// Try to initialize the plugin registry.
-		if (molecularfaces._marvinJSNamespaceLoaderInstance == null) {
-			molecularfaces._marvinJSNamespaceLoaderInstance = new molecularfaces.MarvinJSNamespaceLoader(this._installPath);
-		}
+		return new Promise((resolve, reject) => {
+			// Try to initialize the common Marvin package namespace.
+			if (molecularfaces._marvinJSNamespaceLoaderInstance == null) {
+				molecularfaces._marvinJSNamespaceLoaderInstance = new molecularfaces.MarvinJSNamespaceLoader(this._installPath);
+			}
 
-		// Plot settings
-		let settings = {
-			width: this._width,
-			height: this._height,
-			zoomMode: "autoshrink"
-		};
+			// Plot settings
+			let settings = {
+				width: this._width,
+				height: this._height,
+				zoomMode: "autoshrink"
+			};
 
-		// MarvinJS has some problems with empty molecule strings.
-		let mol = null;
-		if (this._molecule !== "") {
-			mol = this._molecule;
-		}
+			// MarvinJS has some problems with empty molecule strings.
+			let mol = null;
+			if (this._molecule !== "") {
+				mol = this._molecule;
+			}
 
-		// Try to plot the image as soon as we have the Marvin namespace.
-		let obj = this;
-		molecularfaces._marvinJSNamespaceLoaderInstance.addFinishListener(function(namespace) {
-			// Get image of the molecule as SVG.
-			let imgData = namespace.ImageExporter.molToDataUrl(mol, "image/svg", settings);
+			// Try to plot the image as soon as we have the Marvin package namespace.
+			let obj = this;
+			molecularfaces._marvinJSNamespaceLoaderInstance.status().then((namespace) => {
+				// Get image of the molecule as SVG.
+				let imgData = namespace.ImageExporter.molToDataUrl(mol, "image/svg", settings);
 
-			// target <div>
-			let div = document.getElementById(obj._divId);
+				// target <div>
+				let div = document.getElementById(obj._divId);
 
-			// clear everything (might be relevant if setMDLv2000(molecule) is called)
-			div.innerHTML = '';
+				// clear everything (might be relevant if setMDLv2000(molecule) is called)
+				div.innerHTML = '';
 
-			// attach the image
-			div.insertAdjacentHTML('beforeend', imgData);
+				// attach the image
+				div.insertAdjacentHTML('beforeend', imgData);
+				resolve(obj);
+			});
 		});
-
-		return this;
 	}
 
 	getMDLv2000() {
@@ -87,12 +104,14 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 	}
 
 	setMDLv2000(molecule) {
-		if (typeof molecule !== "undefined") {
-			this._molecule = molecule;
+		return new Promise((resolve, reject) => {
+			if (typeof molecule !== "undefined") {
+				this._molecule = molecule;
 
-			this.init();
-		}
-
-		return this;
+				this.init().then(resolve(this));
+			} else {
+				resolve(this);
+			}
+		});
 	}
 }

@@ -26,10 +26,8 @@ var molecularfaces = molecularfaces || {};
  */
 molecularfaces.OpenChemLibJSViewer = class extends molecularfaces.StructurePlugin {
 	/**
-	 * Initializes the OpenChemLibJS viewer in a <div> container with the id given 
-	 * by the parameter "divId" and sets its molecule according to the "molecule" 
-	 * parameter. The "height" and "width" parameters should not exceed the size of 
-	 * the surrounding <div>.
+	 * This constructor should not be used directly to receive an instance of
+	 * this class. Use the static factory method "newViewer" instead. 
 	 */
 	constructor(divId, molecule, height, width) {
 		super();
@@ -38,15 +36,29 @@ molecularfaces.OpenChemLibJSViewer = class extends molecularfaces.StructurePlugi
 		this._molecule = molecule;
 		this._height = height;
 		this._width = width;
+	}
 
-		this.init();
+	/**
+	 * Returns an initialized OpenChemLibJS viewer instance embedded inside a 
+	 * Promise. The viewer is rendered in a <div> container with the id given by
+	 * the parameter "divId" and a molecule according to the "molecule" parameter.
+	 * The "height" and "width" parameters should not exceed the size of the
+	 * surrounding <div>.
+	 */
+	static newViewer(divId, molecule, height, width) {
+		return new Promise((resolve, reject) => {
+			let obj = new molecularfaces.OpenChemLibJSViewer(divId, molecule, height, width);
+			obj.init().then(resolve(obj));
+		});
 	}
 
 	init() {
-		let svg = window.OCL.Molecule.fromMolfile(this._molecule).toSVG(this._width, this._height, null);
-		document.getElementById(this._divId).innerHTML = svg;
+		return new Promise((resolve, reject) => {
+			let svg = window.OCL.Molecule.fromMolfile(this._molecule).toSVG(this._width, this._height, null);
+			document.getElementById(this._divId).innerHTML = svg;
 
-		return this;
+			resolve(this);
+		});
 	}
 
 	getMDLv2000() {
@@ -54,12 +66,14 @@ molecularfaces.OpenChemLibJSViewer = class extends molecularfaces.StructurePlugi
 	}
 
 	setMDLv2000(molecule) {
-		if (typeof molecule !== "undefined") {
-			this._molecule = molecule;
+		return new Promise((resolve, reject) => {
+			if (typeof molecule !== "undefined") {
+				this._molecule = molecule;
 
-			this.init();
-		}
-
-		return this;
+				this.init().then(resolve(this));
+			} else {
+				resolve(this);
+			}
+		});
 	}
 }

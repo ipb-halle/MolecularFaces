@@ -21,44 +21,24 @@
 var molecularfaces = molecularfaces || {};
 
 /**
- * Global variable that stores a ResourcesLoader instance to be commonly used by
- * all OpenChemLibJS plugin instances.
+ * Singleton instances of ResourcesLoader to be commonly used by the specific
+ * plugin type instances.
  */
 molecularfaces.openChemLibJSLoaderInstance = new molecularfaces.ResourcesLoader();
-
-/**
- * Global variable that stores a ResourcesLoader instance to be commonly used by
- * all MolPaintJS plugin instances.
- */
 molecularfaces.molPaintJSLoaderInstance = new molecularfaces.ResourcesLoader();
-
-/**
- * Global variable that stores a ResourcesLoader instance to be commonly used by
- * all Marvin JS plugin instances.
- */
 molecularfaces.marvinJSLoaderInstance = new molecularfaces.ResourcesLoader();
 
 /**
- * Global variable that stores the common MolPaintJS plugin registry. It is 
- * initialized lazily by the classes molecularfaces.MolPaintJSEditor and 
- * molecularfaces.MolPaintJSViewer.
+ * Promise that resolves upon on-document-ready.
  */
-molecularfaces._molPaintJSRegistry = null;
-
-/**
- * Singleton instance of molecularfaces.MarvinJSNamespaceLoader. The class 
- * molecularfaces.MarvinJSViewer needs to ensure its lazy loading.
- */
-molecularfaces._marvinJSNamespaceLoaderInstance = null;
-
-/**
- * A vanilla JavaScript on-document-ready execution of function fn. See 
- * https://stackoverflow.com/a/9899701.
- */
-molecularfaces.onDocumentReady = function(fn) {
+molecularfaces._onDocumentReadyPromise = new Promise((resolve, reject) => {
+	/**
+	  * Vanilla JavaScript on-document-ready.
+	  * See https://stackoverflow.com/a/9899701.
+	  */
 	if (document.readyState === "complete" || document.readyState === "interactive") {
-		setTimeout(fn, 1);
+		setTimeout(resolve(), 1);
 	} else {
-		document.addEventListener("DOMContentLoaded", fn);
+		document.addEventListener("DOMContentLoaded", resolve());
 	}
-}
+});

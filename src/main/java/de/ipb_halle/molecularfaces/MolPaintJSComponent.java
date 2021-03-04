@@ -33,8 +33,8 @@ public class MolPaintJSComponent extends MolPluginCore {
 	public static final String DEFAULT_RENDERER = MolPaintJSRenderer.RENDERER_TYPE;
 
 	/**
-	 * Name of the context-param in web.xml that specifies the location of the
-	 * MolPaintJS installation relative to the application's context root.
+	 * Name of the context-param in web.xml that specifies the location of
+	 * molpaint.js relative to the application's context root.
 	 */
 	public static final String WEBXML_CUSTOM_RESOURCE_URL = "de.ipb_halle.molecularfaces.MOLPAINTJS_URL";
 
@@ -43,11 +43,9 @@ public class MolPaintJSComponent extends MolPluginCore {
 
 		String resourceUrl = getFacesContext().getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL);
 		if ((resourceUrl != null) && (!resourceUrl.isEmpty())) {
-			addCssExt(resourceUrl + "/css/styles.css");
-			addScriptExt(resourceUrl + "/js/molpaint.js");
+			addScriptExt(resourceUrl);
 		} else {
-			addCssResource("plugins/molpaintjs/css/styles.css");
-			addScriptResource("plugins/molpaintjs/js/molpaint.js");
+			addScriptResource("plugins/molpaintjs/molpaint.js");
 		}
 		addScriptResource("js/MolecularFaces.js");
 

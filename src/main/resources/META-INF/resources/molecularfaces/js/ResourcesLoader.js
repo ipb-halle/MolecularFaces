@@ -35,51 +35,28 @@ var molecularfaces = molecularfaces || {};
  */
 molecularfaces.ResourcesLoader = class {
 	constructor() {
-		this._resourcesToLoad = [];
-		this._loadingResources = [];
-		this._loadedResources = [];
-		this._onLoadListeners = [];
-
-		let obj = this;
-		this._onLoadCallback = function(resource) {
-			// Add this resource to the list of loaded resources.
-			obj._loadedResources.push(resource);
-
-			// Remove this resource from the loading resources list.
-			obj._loadingResources.splice(obj._loadingResources.indexOf(resource), 1);
-
-			// Notify the listeners in case all resources are loaded.
-			if (obj._loadingResources.length == 0) {
-				obj._notifyOnLoad();
-			}
-		}
+		this._promises = [];
+		this._resources = [];
 	}
 
 	/**
 	 * Enqueues the loading of a JavaScript file.
 	 */
 	addScriptToHead(src) {
-		if (!this._loadingResources.includes(src)
-			&& !this._loadedResources.includes(src)) {
-
-			this._loadingResources.push(src);
+		if (!this._resources.includes(src)) {
+			this._resources.push(src);
 
 			let script = document.createElement("script");
+
+			this._promises.push(new Promise(function(resolve, reject) {
+				script.onload = () => resolve(script);
+				script.onerror = () => reject(new Error("Load error for script " + src));
+			}));
+
 			script.setAttribute("type", "text/javascript");
 			script.setAttribute("src", src);
 
-			let obj = this;
-			script.onreadystatechange = function() {
-				if (script.readyState == 'complete') {
-					obj._onLoadCallback(src);
-				}
-			}
-			script.onload = function() {
-				obj._onLoadCallback(src);
-			}
-
-			// Enqueue this element to be appended to the DOM tree by loadResources().
-			this._resourcesToLoad.push(script);
+			document.head.appendChild(script);
 		}
 
 		return this;
@@ -89,56 +66,27 @@ molecularfaces.ResourcesLoader = class {
 	 * Enqueues the loading of a stylesheet file.
 	 */
 	addCssToHead(href) {
-		if (!this._loadingResources.includes(href)
-			&& !this._loadedResources.includes(href)) {
-
-			this._loadedResources.push(href);
+		if (!this._resources.includes(href)) {
+			this._resources.push(href);
 
 			let link = document.createElement("link");
+
+			this._promises.push(new Promise(function(resolve, reject) {
+				link.onload = () => resolve(link);
+				link.onerror = () => reject(new Error("Load error for css " + href));
+			}));
+
 			link.setAttribute("rel", "stylesheet");
 			link.setAttribute("type", "text/css");
 			link.setAttribute("href", href);
 
-			// Enqueue this element to be appended to the DOM tree by loadResources().
-			this._resourcesToLoad.push(link);
+			document.head.appendChild(link);
 		}
 
 		return this;
 	}
 
-	/**
-	 * Adds all enqueued resources to <head>.
-	 */
-	loadResources() {
-		for (let element of this._resourcesToLoad) {
-			document.head.appendChild(element);
-		}
-
-		return this;
-	}
-
-	/**
-	 * Registers an onLoad callback function that is executed as soon as all
-	 * resources are loaded by the browser. This may happen immediately.
-	 */
-	onLoad(fn) {
-		if (this._loadingResources.length == 0) {
-			// All scripts are already loaded, notify now.
-			fn.call(this);
-		} else {
-			// Notify later.
-			this._onLoadListeners.push(fn);
-		}
-
-		return this;
-	}
-
-	/**
-	 * Notifies all onLoad listeners.
-	 */
-	_notifyOnLoad() {
-		for (let fn of this._onLoadListeners) {
-			fn.call(this);
-		}
+	status() {
+		return Promise.all(this._promises);
 	}
 }

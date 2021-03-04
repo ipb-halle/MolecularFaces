@@ -21,9 +21,8 @@
 var molecularfaces = molecularfaces || {};
 
 /**
- * This class loads an instance of of the Marvin JS package namespace to be used 
- * for image exports of molecules. It supports the observer-pattern for 
- * notification as soon as the namespace becomes available.
+ * This class loads an instance of the Marvin JS package namespace to be used
+ * for image exports of molecules.
  */
 molecularfaces.MarvinJSNamespaceLoader = class {
 	/*
@@ -32,20 +31,21 @@ molecularfaces.MarvinJSNamespaceLoader = class {
 	 */
 	constructor(installPath) {
 		this._installPath = installPath;
-
-		this._marvinJSViewerPackage = null;
-		this._finishListeners = [];
-
-		this._loadMarvinJSPackage();
+		this._promise = this._loadMarvinJSPackage();
 	}
 
 	/**
-	 * Loads the Marvin JS namespace.
+	 * Loads the Marvin JS namespace and returns it embedded in a Promise.
 	 * See https://marvinjs-demo.chemaxon.com/latest/examples/example-create-image.html.
 	 */
 	_loadMarvinJSPackage() {
 		// Create an iframe that inserts marvinpack.html.
 		let iframe = document.createElement("iframe");
+
+		let iframePromise = new Promise(function(resolve, reject) {
+			iframe.onload = () => resolve(iframe);
+			iframe.onerror = () => reject(new Error("Load error for iframe " + iframe));
+		});
 
 		let idAttribute = document.createAttribute("id");
 		idAttribute.value = "marvinjspackage-iframe";
@@ -62,54 +62,20 @@ molecularfaces.MarvinJSNamespaceLoader = class {
 		// Attach this iframe to the end of <body>.
 		document.body.append(iframe);
 
-		let obj = this;
-		// Execute package loading on-document-ready
-		molecularfaces.onDocumentReady(
-			function() {
-				MarvinJSUtil.getPackage("#marvinjspackage-iframe").then(function(marvinNameSpace) {
-					marvinNameSpace.onReady(function() {
-						obj._marvinJSViewerPackage = marvinNameSpace;
-						obj._notifyListeners();
-					});
-				}, function(error) {
-					alert("Cannot retrieve marvin instance from iframe:" + error);
+		return iframePromise.then(() => { return MarvinJSUtil.getPackage("#marvinjspackage-iframe"); })
+			.then((marvinNameSpace) => {
+				return new Promise((resolve, reject) => {
+					marvinNameSpace.onReady(() => resolve(marvinNameSpace));
 				});
-			}
-		);
+			}, (error) => {
+				reject("Cannot retrieve marvin instance from iframe: " + error);
+			});
 	}
 
 	/**
-	 * Adds a callback listener that will be notified as soon as 
-	 * this._marvinJSViewerPackage is initialized. The callback function fn will 
-	 * receive the _marvinJSViewerPackage as parameter. Execution of fn may also 
-	 * happen immediately if this._marvinJSViewerPackage has already been 
-	 * initialized.
+	 * Returns a Promise object that embeds the Marvin JS namespace.
 	 */
-	addFinishListener(fn) {
-		if (this._marvinJSViewerPackage == null) {
-			// _marvinJSViewerPackage is not yet initialized, notify later
-			this._finishListeners.push(fn);
-		} else {
-			// _marvinJSViewerPackage is initialized, notify now
-			this._notifyListener(fn);
-		}
-	}
-
-	/**
-	 * Notifies all registered listeners that this._marvinJSViewerPackage is 
-	 * initialized.
-	 */
-	_notifyListeners() {
-		for (let fn of this._finishListeners) {
-			this._notifyListener(fn);
-		}
-	}
-
-	/**
-	 * Notifies a single listener that this._marvinJSViewerPackage is 
-	 * initialized.
-	 */
-	_notifyListener(fn) {
-		fn.call(this, this._marvinJSViewerPackage);
+	status() {
+		return this._promise;
 	}
 }

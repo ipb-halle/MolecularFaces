@@ -26,42 +26,46 @@ var molecularfaces = molecularfaces || {};
  */
 molecularfaces.MolPaintJSViewer = class extends molecularfaces.StructurePlugin {
 	/**
-	 * Initializes the MolPaintJS viewer in a <div> container with the id given 
-	 * by the parameter "divId" and sets its molecule according to the "molecule" 
-	 * parameter. The plugin resource location needs to be defined by the parameter 
-	 * "installPath". The "height" and "width" parameters should not exceed the 
-	 * size of the surrounding <div>.
+	 * This constructor should not be used directly to receive an instance of
+	 * this class. Use the static factory method "newViewer" instead. 
 	 */
-	constructor(divId, molecule, installPath, height, width) {
+	constructor(divId, molecule, height, width) {
 		super();
 
 		this._divId = divId;
 		this._molecule = molecule;
-		this._installPath = installPath;
 		this._height = height;
 		this._width = width;
 		this._viewer = null;
+	}
 
-		this.init();
+	/**
+	 * Returns an initialized MolPaintJS viewer instance embedded inside a
+	 * Promise. The viewer is rendered in a <div> container with the id given by
+	 * the parameter "divId" and a molecule according to the "molecule" parameter.
+	 * The "height" and "width" parameters should not exceed the size of the
+	 * surrounding <div>.
+	 */
+	static newViewer(divId, molecule, height, width) {
+		return new Promise((resolve, reject) => {
+			let obj = new molecularfaces.MolPaintJSViewer(divId, molecule, height, width);
+			obj.init().then(resolve(obj));
+		});
 	}
 
 	init() {
-		// Try to initialize the plugin registry.
-		if (molecularfaces._molPaintJSRegistry == null) {
-			molecularfaces._molPaintJSRegistry = new MolPaintJS();
-		}
+		return new Promise((resolve, reject) => {
+			this._viewer = molPaintJS.newContext(this._divId, {
+				iconSize: 32,
+				sizeX: this._width,
+				sizeY: this._height,
+				viewer: 1
+			});
+			this._viewer.init();
+			this._viewer.setMolecule(this._molecule);
 
-		this._viewer = molecularfaces._molPaintJSRegistry.newContext(this._divId, {
-			installPath: this._installPath,
-			iconSize: 32,
-			sizeX: this._width,
-			sizeY: this._height,
-			viewer: 1
+			resolve(this);
 		});
-		this._viewer.setMolecule(this._molecule);
-		this._viewer.init();
-
-		return this;
 	}
 
 	getMDLv2000() {
@@ -69,11 +73,13 @@ molecularfaces.MolPaintJSViewer = class extends molecularfaces.StructurePlugin {
 	}
 
 	setMDLv2000(molecule) {
-		if (typeof molecule !== "undefined") {
-			this._molecule = molecule;
-			this._viewer.setMolecule(molecule);
-		}
+		return new Promise((resolve, reject) => {
+			if (typeof molecule !== "undefined") {
+				this._molecule = molecule;
+				this._viewer.setMolecule(molecule);
+			}
 
-		return this;
+			resolve(this);
+		});
 	}
 }

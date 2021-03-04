@@ -302,19 +302,23 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * @return JavaScript code
 	 */
 	public StringBuilder encodeLoadExtResources(String loaderJSVar) {
-		StringBuilder sb = new StringBuilder(256);
-		Formatter fmt = new Formatter(sb);
+		if (scriptsExtToLoad.isEmpty() && cssExtToLoad.isEmpty()) {
+			return new StringBuilder();
+		} else {
+			StringBuilder sb = new StringBuilder(256);
+			Formatter fmt = new Formatter(sb);
 
-		sb.append(loaderJSVar);
-		for (String script : scriptsExtToLoad) {
-			fmt.format(".addScriptToHead(\"%s\")", script);
-		}
-		for (String href : cssExtToLoad) {
-			fmt.format(".addCssToHead(\"%s\")", href);
-		}
-		sb.append(".loadResources();");
+			sb.append(loaderJSVar);
+			for (String script : scriptsExtToLoad) {
+				fmt.format(".addScriptToHead(\"%s\")", script);
+			}
+			for (String href : cssExtToLoad) {
+				fmt.format(".addCssToHead(\"%s\")", href);
+			}
+			sb.append(";");
 
-		fmt.close();
-		return sb;
+			fmt.close();
+			return sb;
+		}
 	}
 }

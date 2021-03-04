@@ -137,22 +137,20 @@ public class MarvinJSRenderer extends Renderer {
 		// Register a JS variable if required.
 		String widgetVar = plugin.getWidgetVar();
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("var %s = null;", widgetVar);
+			fmt.format("var %s = ", widgetVar);
 		}
 
-		fmt.format("%s.onLoad(function () {", loaderJSVar);
-
-		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("%s = ", widgetVar);
-		}
-
-		// Start viewer and set the molecule value inline.
-		fmt.format("new molecularfaces.MarvinJSViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
+		/*
+		 * Start viewer, set the molecule value inline and return the viewer object
+		 * embedded in a Promise.
+		 */
+		fmt.format("%s.status().then(() => {", loaderJSVar);
+		fmt.format("return molecularfaces.MarvinJSViewer.newViewer(\"%s\", \"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
 				installPath, plugin.getHeight(), plugin.getWidth());
 
 		fmt.close();
 
-		// end of onLoad
+		// end of then()
 		sb.append("});");
 
 		writer.writeText(sb, null);
@@ -235,18 +233,16 @@ public class MarvinJSRenderer extends Renderer {
 		// Register a JS variable if required.
 		String widgetVar = plugin.getWidgetVar();
 		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("var %s = null;", widgetVar);
+			fmt.format("var %s = ", widgetVar);
 		}
 
-		fmt.format("%s.onLoad(function () {", loaderJSVar);
-
-		if ((widgetVar != null) && (!widgetVar.isEmpty())) {
-			fmt.format("%s = ", widgetVar);
-		}
-
-		// Start editor and set the molecule from the hidden <input> element's value.
+		/*
+		 * Start editor, set the molecule from the hidden <input> element's value and
+		 * return the editor object embedded in a Promise.
+		 */
+		fmt.format("%s.status().then(() => {", loaderJSVar);
 		fmt.format(
-				"new molecularfaces.MarvinJSEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", \"%s\", %d, %d)",
+				"return molecularfaces.MarvinJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", \"%s\", %d, %d)",
 				iframeId, hiddenInputId, installPath, license, plugin.getHeight(), plugin.getWidth());
 
 		/*
@@ -254,12 +250,12 @@ public class MarvinJSRenderer extends Renderer {
 		 * element.
 		 */
 		fmt.format(
-				".addChangeListener(function(mol) { document.getElementById(\"%s\").setAttribute(\"value\", mol); });",
+				".then((editor) => editor.addChangeListener((mol) => { document.getElementById(\"%s\").setAttribute(\"value\", mol); }));",
 				hiddenInputId);
 
 		fmt.close();
 
-		// end of onLoad
+		// end of then()
 		sb.append("});");
 
 		writer.writeText(sb, null);
