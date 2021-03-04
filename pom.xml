@@ -28,8 +28,8 @@
 		<openchemlibjs.version>v7.2.3</openchemlibjs.version>
 		<openchemlibjs.sha256>4c615e20509e3eb6c9a6c6c9591e6f36ad31d7c4f7e7a4c50fe4ceb7dc7cc411</openchemlibjs.sha256>
 
-		<molpaintjs.version>v0.3.1-alpha</molpaintjs.version>
-		<molpaintjs.sha256>36d40d526a660c4c68b0414745590584da0ce6cb1cf128e079a79c4240132c66</molpaintjs.sha256>
+		<molpaintjs.version>v0.3.2-alpha</molpaintjs.version>
+		<molpaintjs.sha256>037bbe9cc7c3d8c402461b578e093af4e6ab169ea4f588da1e3748c0d0102757</molpaintjs.sha256>
 	</properties>
 
 	<build>
@@ -135,7 +135,6 @@
 								<include>MarvinJSViewer.js</include>
 							</includes>
 							<outputFilename>MolecularFaces.js</outputFilename>
-							<skipMinify>true</skipMinify>
 							<closureLanguageOut>ECMASCRIPT5_STRICT</closureLanguageOut>
 						</configuration>
 					</execution>
