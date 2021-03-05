@@ -6,7 +6,7 @@
 
 	<groupId>de.ipb-halle</groupId>
 	<artifactId>molecularfaces</artifactId>
-	<version>0.2.0-SNAPSHOT</version>
+	<version>0.2.0</version>
 	<packaging>jar</packaging>
 
 	<name>MolecularFaces</name>
