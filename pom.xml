@@ -9,12 +9,8 @@
 	<version>0.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<scm>
-		<connection>scm:git:https://github.com/ipb-halle/MolecularFaces.git</connection>
-		<url>https://github.com/ipb-halle/MolecularFaces.git</url>
-	</scm>
-
 	<name>MolecularFaces</name>
+	<description>Java Server Faces UI components for chemistry and biochemistry</description>
 	<url>https://github.com/ipb-halle/MolecularFaces</url>
 
 	<organization>
@@ -22,26 +18,48 @@
 		<url>https://www.ipb-halle.de</url>
 	</organization>
 
+	<developers>
+		<developer>
+			<name>Frank Lange</name>
+			<organization>Leibniz Institute of Plant Biochemistry (IPB), Halle (Saale), Germany</organization>
+			<organizationUrl>https://www.ipb-halle.de</organizationUrl>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:https://github.com/ipb-halle/MolecularFaces.git</connection>
+		<url>https://github.com/ipb-halle/MolecularFaces.git</url>
+	</scm>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<openchemlibjs.version>v7.2.3</openchemlibjs.version>
 		<openchemlibjs.sha256>4c615e20509e3eb6c9a6c6c9591e6f36ad31d7c4f7e7a4c50fe4ceb7dc7cc411</openchemlibjs.sha256>
 
-		<molpaintjs.version>v0.3.2-alpha</molpaintjs.version>
-		<molpaintjs.sha256>037bbe9cc7c3d8c402461b578e093af4e6ab169ea4f588da1e3748c0d0102757</molpaintjs.sha256>
+		<molpaintjs.version>v0.3.4-alpha</molpaintjs.version>
+		<molpaintjs.sha256>a7f423cccec8902915435256fc5485c49cfce9bf0f037cad1257aa3f94b9fc3d</molpaintjs.sha256>
 	</properties>
 
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
 	<build>
-		<resources>
-			<resource>
-				<directory>${project.basedir}/src/main/resources/META-INF/</directory>
-				<excludes>
-					<exclude>resources/molecularfaces/js/*.js</exclude>
-				</excludes>
-				<targetPath>${project.build.directory}/classes/META-INF/</targetPath>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -68,8 +86,29 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>com.googlecode.maven-download-plugin</groupId>
@@ -107,7 +146,7 @@
 				<artifactId>closure-compiler-maven-plugin</artifactId>
 				<version>2.21.0</version>
 				<configuration>
-					<baseSourceDir>${project.basedir}/src/main/resources/META-INF/resources/molecularfaces</baseSourceDir>
+					<baseSourceDir>${project.basedir}/src/main</baseSourceDir>
 					<baseTargetDir>${project.build.directory}/generated-resources</baseTargetDir>
 				</configuration>
 				<executions>
@@ -189,4 +228,28 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

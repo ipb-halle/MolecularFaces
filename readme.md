@@ -10,7 +10,7 @@ The artifacts have not been submitted to Maven Central yet. To include Molecular
 <dependency>
   <groupId>de.ipb-halle</groupId>
   <artifactId>molecularfaces</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
 </dependency>
 ```
  

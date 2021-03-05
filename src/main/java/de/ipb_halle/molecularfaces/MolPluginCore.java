@@ -37,9 +37,20 @@ import javax.faces.event.PostAddToViewEvent;
  */
 @ListenerFor(systemEventClass = PostAddToViewEvent.class)
 public abstract class MolPluginCore extends UIInput implements ComponentSystemEventListener {
+	/**
+	 * Resource library name.
+	 */
 	private static final String RESOURCES_LIBRARY_NAME = "molecularfaces";
 
+	/**
+	 * Component family returned by {@link #getFamily()}
+	 */
 	public static final String COMPONENT_FAMILY = "molecularfaces.MolPluginFamily";
+
+	@Override
+	public String getFamily() {
+		return COMPONENT_FAMILY;
+	}
 
 	/**
 	 * Supported chemical structure plugin types.
@@ -74,7 +85,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	/**
 	 * Set the value of the <code>border</code> property.
 	 * 
-	 * @param border
+	 * @param border boolean value which indicates that the plugin component renders
+	 *               surrounded by a border
 	 */
 	public void setBorder(boolean border) {
 		getStateHelper().put(PropertyKeys.border, border);
@@ -124,7 +136,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	/**
 	 * Set the value of the <code>height</code> property.
 	 * 
-	 * @param height
+	 * @param height height of the rendered plugin
 	 */
 	public void setHeight(int height) {
 		getStateHelper().put(PropertyKeys.height, height);
@@ -146,7 +158,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	/**
 	 * Set the value of the <code>readonly</code> property.
 	 * 
-	 * @param readonly
+	 * @param readonly boolean value which indicates if the plugin component renders
+	 *                 an editor or a viewer
 	 */
 	public void setReadonly(boolean readonly) {
 		getStateHelper().put(PropertyKeys.readonly, readonly);
@@ -155,7 +168,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	/**
 	 * Return the value of the <code>widgetVar</code> property.
 	 * <p>
-	 * The client-side JavaScript variable of the plugin.
+	 * The client-side variable name of a Promise object that embeds the plugin's
+	 * JavaScript instance.
 	 * 
 	 * @return Returns the value of the attribute.
 	 */
@@ -166,7 +180,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	/**
 	 * Set the value of the <code>widgetVar</code> property.
 	 * 
-	 * @param widgetVar
+	 * @param widgetVar name of the client-side Promise object that embeds the
+	 *                  plugin's JavaScript instance
 	 */
 	public void setWidgetVar(String widgetVar) {
 		getStateHelper().put(PropertyKeys.widgetVar, widgetVar);
@@ -189,7 +204,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	/**
 	 * Set the value of the <code>width</code> property.
 	 * 
-	 * @param width
+	 * @param width width of the rendered plugin
 	 */
 	public void setWidth(int width) {
 		getStateHelper().put(PropertyKeys.width, width);
@@ -200,7 +215,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	/**
 	 * Enqueues loading of a JavaScript resource file. The resource will be added
 	 * via JSF's resource mechanism by the
-	 * {@link processEvent(ComponentSystemEvent)} method in the PostAddToViewEvent
+	 * {@link #processEvent(ComponentSystemEvent)} method in the PostAddToViewEvent
 	 * event.
 	 * 
 	 * @param resource name of the file in the web project's resource library
@@ -226,7 +241,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	/**
 	 * Enqueues loading of a stylesheet resource file. The resource will be added
 	 * via JSF's resource mechanism by the
-	 * {@link processEvent(ComponentSystemEvent)} method in the PostAddToViewEvent
+	 * {@link #processEvent(ComponentSystemEvent)} method in the PostAddToViewEvent
 	 * event.
 	 * 
 	 * @param resource name of the file in the web project's resource library
@@ -254,7 +269,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * via @ListenerFor to this component class, which is processed here.
 	 * 
 	 * <p> This method loads all resources that have been enqueued via {@link
-	 * addScriptResource(String)} and {@link addCssResource(String)} via JSF's
+	 * #addScriptResource(String)} and {@link #addCssResource(String)} via JSF's
 	 * resource handling mechanism.
 	 * 
 	 * See: https://stackoverflow.com/a/12451778
@@ -295,13 +310,14 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 
 	/**
 	 * Creates an inline JavaScript code fragment for loading resources that have
-	 * been enqueued via {@link addScriptExt(String)} and {@link addCssExt(String)}.
+	 * been enqueued via {@link #addScriptExt(String)} and
+	 * {@link #addCssExt(String)}.
 	 * 
 	 * @param loaderJSVar JavaScript variable name of the
 	 *                    {@code molecularfaces.ResourcesLoader} instance
 	 * @return JavaScript code
 	 */
-	public StringBuilder encodeLoadExtResources(String loaderJSVar) {
+	protected StringBuilder encodeLoadExtResources(String loaderJSVar) {
 		if (scriptsExtToLoad.isEmpty() && cssExtToLoad.isEmpty()) {
 			return new StringBuilder();
 		} else {

@@ -27,7 +27,7 @@
 			<resource-id>molecularfaces/components/molecule.xhtml</resource-id>
 		</component>
 		<attribute>
-			<description><![CDATA[TODO.]]></description>
+			<description><![CDATA[Render the plugin with a border.]]></description>
 			<name>border</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
@@ -39,31 +39,31 @@
 			<type>java.lang.String</type>
 		</attribute>-->
 		<attribute>
-			<description><![CDATA[TODO.]]></description>
+			<description><![CDATA[Height of the plugin.]]></description>
 			<name>height</name>
 			<required>false</required>
 			<type>java.lang.Integer</type>
 		</attribute>
 		<attribute>
-			<description><![CDATA[TODO.]]></description>
+			<description><![CDATA[Type of the plugin. Available plugin types: OpenChemLibJS, MolPaintJS, MarvinJS.]]></description>
 			<name>pluginType</name>
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
-			<description><![CDATA[TODO.]]></description>
+			<description><![CDATA[Flag indicating that this plugin prevents value changes by the user.]]></description>
 			<name>readonly</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
-			<description><![CDATA[TODO.]]></description>
+			<description><![CDATA[The client-side variable name of a Promise object that embeds the plugin's JavaScript instance. This instance is of type molecularfaces.StructureEditor (editor plugin) or molecularfaces.StructurePlugin (viewer plugin).]]></description>
 			<name>widgetVar</name>
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
-			<description><![CDATA[TODO.]]></description>
+			<description><![CDATA[Width of the plugin.]]></description>
 			<name>width</name>
 			<required>false</required>
 			<type>java.lang.Integer</type>
@@ -74,6 +74,48 @@
 		<component>
 			<resource-id>molecularfaces/components/moleculeRepeatable.xhtml</resource-id>
 		</component>
+		<attribute>
+			<description><![CDATA[Render the plugin with a border.]]></description>
+			<name>border</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<!--<attribute> 
+			<description><![CDATA[TODO.]]></description>
+			<name>format</name> 
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>-->
+		<attribute>
+			<description><![CDATA[Height of the plugin.]]></description>
+			<name>height</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
+		<attribute>
+			<description><![CDATA[Type of the plugin. Available plugin types: OpenChemLibJS, MolPaintJS, MarvinJS.]]></description>
+			<name>pluginType</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description><![CDATA[Flag indicating that this plugin prevents value changes by the user.]]></description>
+			<name>readonly</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description><![CDATA[The client-side variable name of a Promise object that embeds the plugin's JavaScript instance. This instance is of type molecularfaces.StructureEditor (editor plugin) or molecularfaces.StructurePlugin (viewer plugin).]]></description>
+			<name>widgetVar</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description><![CDATA[Width of the plugin.]]></description>
+			<name>width</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
 	</tag>
 	<tag>
 		<tag-name>openChemLibJSPlugin</tag-name>
