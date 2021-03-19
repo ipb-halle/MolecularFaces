@@ -41,11 +41,12 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<openchemlibjs.version>v7.2.3</openchemlibjs.version>
-		<openchemlibjs.sha256>4c615e20509e3eb6c9a6c6c9591e6f36ad31d7c4f7e7a4c50fe4ceb7dc7cc411</openchemlibjs.sha256>
+		<openchemlibjs.version>7.3.0</openchemlibjs.version>
+		<!-- This is the checksum from the package distributed via npm. -->
+		<openchemlibjs.sha256>4fcee56d1bf1689fb20eee2ad5747e270bde9e216b6d5e954b99bc5968053def</openchemlibjs.sha256>
 
-		<molpaintjs.version>v0.3.4-alpha</molpaintjs.version>
-		<molpaintjs.sha256>a7f423cccec8902915435256fc5485c49cfce9bf0f037cad1257aa3f94b9fc3d</molpaintjs.sha256>
+		<molpaintjs.version>v0.3.5-alpha</molpaintjs.version>
+		<molpaintjs.sha256>580893aa3ad25abc2a78d3bee8ff14d2a9a4486e6d8df9291149f471e2c16791</molpaintjs.sha256>
 	</properties>
 
 	<distributionManagement>
@@ -122,7 +123,8 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>https://github.com/cheminfo/openchemlib-js/releases/download/${openchemlibjs.version}/openchemlib-full.js</url>
+							<!-- See https://github.com/cheminfo/openchemlib-js/issues/110#issuecomment-802697504 -->
+							<url>https://unpkg.com/openchemlib@${openchemlibjs.version}/dist/openchemlib-full.js</url>
 							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openchemlibjs/</outputDirectory>
 							<sha256>${openchemlibjs.sha256}</sha256>
 						</configuration>
