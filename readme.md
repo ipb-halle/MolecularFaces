@@ -2,6 +2,10 @@
 
 MolecularFaces is a collection of reusable UI components for Java Server Faces (JSF) featuring input and output plugins for chemistry and biochemistry. It is a spin-off project of [CRIMSy (Cloud Resource & Information Managment System)](https://github.com/ipb-halle/CRIMSy).
 
+### Security warning
+
+Version 0.2.0 contains a serious security flaw in the <mol:molecule> component, which allows JavaScript code execution in the client via malicious molfiles. 
+
 ### Maven
 
 The artifacts are available on Maven Central. To include MolecularFaces into your JSF project, include the following dependency into your project's pom.xml:
