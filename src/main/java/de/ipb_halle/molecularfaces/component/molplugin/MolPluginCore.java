@@ -15,7 +15,7 @@
  * limitations under the License.
  * 
  */
-package de.ipb_halle.molecularfaces;
+package de.ipb_halle.molecularfaces.component.molplugin;
 
 import java.util.Formatter;
 import java.util.HashSet;

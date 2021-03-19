@@ -15,37 +15,37 @@
  * limitations under the License.
  * 
  */
-package de.ipb_halle.molecularfaces;
+package de.ipb_halle.molecularfaces.component.molplugin;
 
 import javax.faces.component.FacesComponent;
 
 /**
  * This {@link javax.faces.component.UIComponent} renders a chemical structure
  * editor or viewer using the
- * <a href="https://github.com/ipb-halle/MolPaintJS">MolPaintJS</a> JavaScript
- * plugin.
+ * <a href="https://github.com/cheminfo/openchemlib-js">OpenChemLib JS</a>
+ * JavaScript plugin.
  * 
  * @author flange
  */
-@FacesComponent(MolPaintJSComponent.COMPONENT_TYPE)
-public class MolPaintJSComponent extends MolPluginCore {
-	public static final String COMPONENT_TYPE = "molecularfaces.MolPaintJS";
-	public static final String DEFAULT_RENDERER = MolPaintJSRenderer.RENDERER_TYPE;
+@FacesComponent(OpenChemLibJSComponent.COMPONENT_TYPE)
+public class OpenChemLibJSComponent extends MolPluginCore {
+	public static final String COMPONENT_TYPE = "molecularfaces.OpenChemLibJS";
+	public static final String DEFAULT_RENDERER = OpenChemLibJSRenderer.RENDERER_TYPE;
 
 	/**
 	 * Name of the context-param in web.xml that specifies the location of
-	 * molpaint.js relative to the application's context root.
+	 * openchemlib-full.js relative to the application's context root.
 	 */
-	public static final String WEBXML_CUSTOM_RESOURCE_URL = "de.ipb_halle.molecularfaces.MOLPAINTJS_URL";
+	public static final String WEBXML_CUSTOM_RESOURCE_URL = "de.ipb_halle.molecularfaces.OPENCHEMLIBJS_URL";
 
-	public MolPaintJSComponent() {
+	public OpenChemLibJSComponent() {
 		super();
 
 		String resourceUrl = getFacesContext().getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL);
 		if ((resourceUrl != null) && (!resourceUrl.isEmpty())) {
 			addScriptExt(resourceUrl);
 		} else {
-			addScriptResource("plugins/molpaintjs/molpaint.js");
+			addScriptResource("plugins/openchemlibjs/openchemlib-full.js");
 		}
 		addScriptResource("js/MolecularFaces.js");
 
