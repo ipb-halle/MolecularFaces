@@ -224,10 +224,42 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-web-api</artifactId>
 			<version>7.0</version>
 			<scope>provided</scope>
+		</dependency>
+		<!-- The bean validation API is provided by the JavaEE container only
+			 during runtime, but not during tests. Note: We are using JavaEE 7
+			 with bean validation 1.1, thus the ancient version. -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.4.3.Final</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.el</artifactId>
+			<version>3.0.1-b12</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- CDK is used during molfile validation. -->
+		<dependency>
+			<groupId>org.openscience.cdk</groupId>
+			<artifactId>cdk-ctab</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openscience.cdk</groupId>
+			<artifactId>cdk-data</artifactId>
+			<version>2.3</version>
 		</dependency>
 	</dependencies>
 

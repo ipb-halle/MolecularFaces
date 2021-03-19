@@ -4,7 +4,7 @@ MolecularFaces is a collection of reusable UI components for Java Server Faces (
 
 ### Security warning
 
-Version 0.2.0 contains a serious security flaw in the <mol:molecule> component, which allows JavaScript code execution in the client via malicious molfiles. 
+Versions 0.2.0 and 0.1.0 contain a serious security flaw in the `<mol:molecule>` component, which allows JavaScript code execution in the client browser via malicious molfiles.
 
 ### Maven
 
