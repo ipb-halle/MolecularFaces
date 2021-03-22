@@ -26,12 +26,31 @@ import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
 import org.openscience.cdk.io.MDLV2000Reader;
 
-public class MolFileValidator implements ConstraintValidator<MolFile, String> {
-	private MolFile annotation;
+/**
+ * Checks that a given String is a valid MDL Molfile V2000 according to the CDK
+ * library.
+ * 
+ * @see <a href=
+ *      "https://github.com/cdk/cdk/blob/2f3cea7a19baaf5da6cdce3da4b3d2f1b9885235/storage/ctab/src/main/java/org/openscience/cdk/io/MDLV2000Reader.java#L312">
+ *      CDK library</a>.
+ * 
+ * @author flange
+ */
+public class MolFileValidator implements ConstraintValidator<Molfile, String> {
+	private Mode cdkReaderMode;
 
 	@Override
-	public void initialize(MolFile constraintAnnotation) {
-		annotation = constraintAnnotation;
+	public void initialize(Molfile constraintAnnotation) {
+		// translation between different enumerations
+		switch (constraintAnnotation.mode()) {
+		case RELAXED:
+			cdkReaderMode = Mode.RELAXED;
+			break;
+		case STRICT:
+		default:
+			cdkReaderMode = Mode.STRICT;
+			break;
+		}
 	}
 
 	@Override
@@ -40,24 +59,11 @@ public class MolFileValidator implements ConstraintValidator<MolFile, String> {
 			return true;
 		}
 
-		// translation between different enumerations
-		Mode mode;
-		switch (annotation.mode()) {
-		case RELAXED:
-			mode = Mode.RELAXED;
-			break;
-		case STRICT:
-		default:
-			mode = Mode.STRICT;
-			break;
-		}
-
 		// try to read the molfile
-		try (MDLV2000Reader reader = new MDLV2000Reader(new StringReader(value), mode)) {
+		try (MDLV2000Reader reader = new MDLV2000Reader(new StringReader(value), cdkReaderMode)) {
 			reader.read(new AtomContainer());
 			return true;
 		} catch (Exception e) {
-			// TODO: fill the constraint validation message with something useful from the exception
 			return false;
 		}
 	}

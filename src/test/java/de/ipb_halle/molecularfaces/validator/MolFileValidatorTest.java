@@ -33,7 +33,7 @@ import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.io.MDLV2000Reader;
 
-import de.ipb_halle.molecularfaces.validator.MolFile.Mode;
+import de.ipb_halle.molecularfaces.validator.Molfile.Mode;
 
 public class MolFileValidatorTest {
 	private static Validator validator;
@@ -44,57 +44,72 @@ public class MolFileValidatorTest {
 	}
 
 	private class RelaxedEntity {
-		@MolFile(mode = Mode.RELAXED)
-		private String molecule = "";
+		@Molfile(mode = Mode.RELAXED)
+		private final String molecule;
 
-		public void setMolecule(String molecule) {
+		public RelaxedEntity(String molecule) {
 			this.molecule = molecule;
 		}
 	}
 
 	private class StrictEntity {
-		@MolFile(mode = Mode.STRICT)
-		private String molecule = "";
+		@Molfile(mode = Mode.STRICT)
+		private final String molecule;
 
-		public void setMolecule(String molecule) {
+		public StrictEntity(String molecule) {
 			this.molecule = molecule;
 		}
 	}
 
-	private Set<ConstraintViolation<RelaxedEntity>> relaxedConstraintViolations;
-	private Set<ConstraintViolation<StrictEntity>> strictConstraintViolations;
-
-	private RelaxedEntity relaxedEntity = new RelaxedEntity();
-	private StrictEntity strictEntity = new StrictEntity();
-
 	@Test
-	public void testIsValid() {
+	public void testValidMolfile() {
 		String validMolfile = "\n" + "Actelion Java MolfileCreator 1.0\n" + "\n"
 				+ "  1  0  0  0  0  0  0  0  0  0999 V2000\n"
 				+ "   10.3125  -11.8125   -0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n" + "M  END\n";
 
-		relaxedEntity.setMolecule(validMolfile);
-		strictEntity.setMolecule(validMolfile);
+		RelaxedEntity relaxedEntity = new RelaxedEntity(validMolfile);
+		StrictEntity strictEntity = new StrictEntity(validMolfile);
+		Set<ConstraintViolation<RelaxedEntity>> relaxedConstraintViolations = validator.validate(relaxedEntity);
+		Set<ConstraintViolation<StrictEntity>> strictConstraintViolations = validator.validate(strictEntity);
 
 		// valid for relaxed and strict
-		relaxedConstraintViolations = validator.validate(relaxedEntity);
 		assertEquals(0, relaxedConstraintViolations.size());
-		strictConstraintViolations = validator.validate(strictEntity);
 		assertEquals(0, strictConstraintViolations.size());
+	}
 
+	@Test
+	public void testInvalidMolfile() {
 		// one space too less after the element symbol
-		String maybeValidMolfile = "\n" + "Actelion Java MolfileCreator 1.0\n" + "\n"
+		String invalidMolfile = "\n" + "Actelion Java MolfileCreator 1.0\n" + "\n"
 				+ "  1  0  0  0  0  0  0  0  0  0999 V2000\n"
 				+ "   10.3125  -11.8125   -0.0000 C  0  0  0  0  0  0  0  0  0  0  0  0\n" + "M  END\n";
 
-		relaxedEntity.setMolecule(maybeValidMolfile);
-		strictEntity.setMolecule(maybeValidMolfile);
+		RelaxedEntity relaxedEntity = new RelaxedEntity(invalidMolfile);
+		StrictEntity strictEntity = new StrictEntity(invalidMolfile);
+		Set<ConstraintViolation<RelaxedEntity>> relaxedConstraintViolations = validator.validate(relaxedEntity);
+		Set<ConstraintViolation<StrictEntity>> strictConstraintViolations = validator.validate(strictEntity);
 
 		// invalid for both relaxed and strict
-		relaxedConstraintViolations = validator.validate(relaxedEntity);
 		assertEquals(1, relaxedConstraintViolations.size());
-		strictConstraintViolations = validator.validate(strictEntity);
 		assertEquals(1, strictConstraintViolations.size());
+		assertEquals("invalid MolFile", relaxedConstraintViolations.iterator().next().getMessage());
+		assertEquals("invalid MolFile", strictConstraintViolations.iterator().next().getMessage());
+	}
+
+	@Test
+	public void testMolfileWithJavaScript() {
+		String evilMolfile = "\n" + "</script><script>alert('Hello world');</script><script>\n" + "\n"
+				+ "  1  0  0  0  0  0  0  0  0  0999 V2000\n"
+				+ "   10.3125  -11.8125   -0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n" + "M  END\n";
+
+		RelaxedEntity relaxedEntity = new RelaxedEntity(evilMolfile);
+		StrictEntity strictEntity = new StrictEntity(evilMolfile);
+		Set<ConstraintViolation<RelaxedEntity>> relaxedConstraintViolations = validator.validate(relaxedEntity);
+		Set<ConstraintViolation<StrictEntity>> strictConstraintViolations = validator.validate(strictEntity);
+
+		// valid for both relaxed and strict
+		assertEquals(0, relaxedConstraintViolations.size());
+		assertEquals(0, strictConstraintViolations.size());
 	}
 
 	/*

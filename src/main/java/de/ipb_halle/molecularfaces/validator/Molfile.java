@@ -26,12 +26,17 @@ import static java.lang.annotation.RetentionPolicy.*;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
+/**
+ * MolFile check constraint.
+ * 
+ * @author flange
+ */
 @Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, TYPE_USE })
 @Retention(RUNTIME)
 @Constraint(validatedBy = MolFileValidator.class)
 @Documented
-public @interface MolFile {
-	String message() default "TODO";
+public @interface Molfile {
+	String message() default "invalid MDL Molfile V2000";
 
 	Class<?>[] groups() default {};
 
