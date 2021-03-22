@@ -92,8 +92,8 @@ public class MolFileValidatorTest {
 		// invalid for both relaxed and strict
 		assertEquals(1, relaxedConstraintViolations.size());
 		assertEquals(1, strictConstraintViolations.size());
-		assertEquals("invalid MolFile", relaxedConstraintViolations.iterator().next().getMessage());
-		assertEquals("invalid MolFile", strictConstraintViolations.iterator().next().getMessage());
+		assertEquals("invalid MDL Molfile V2000", relaxedConstraintViolations.iterator().next().getMessage());
+		assertEquals("invalid MDL Molfile V2000", strictConstraintViolations.iterator().next().getMessage());
 	}
 
 	@Test

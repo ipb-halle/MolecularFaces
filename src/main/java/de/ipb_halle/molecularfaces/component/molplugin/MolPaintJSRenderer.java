@@ -85,10 +85,12 @@ public class MolPaintJSRenderer extends Renderer {
 	}
 
 	private void encodeViewer(FacesContext context, ResponseWriter writer, MolPluginCore plugin) throws IOException {
-		String divId = plugin.getClientId() + "_MolPaintJSViewer";
+		String clientId = plugin.getClientId();
+		String hiddenInputId = clientId + "_Input";
+		String divId = clientId + "_MolPaintJSViewer";
 
-		encodeViewerHTML(writer, plugin, divId);
-		encodeViewerJS(context, writer, plugin, divId);
+		encodeViewerHTML(writer, plugin, divId, hiddenInputId);
+		encodeViewerJS(context, writer, plugin, divId, hiddenInputId);
 	}
 
 	/**
@@ -97,14 +99,23 @@ public class MolPaintJSRenderer extends Renderer {
 	 * 
 	 * @param writer
 	 * @param plugin
-	 * @param divId  DOM id of the embedded &lt;div&gt; element
+	 * @param divId         DOM id of the embedded &lt;div&gt; element
+	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
 	 */
-	private void encodeViewerHTML(ResponseWriter writer, MolPluginCore plugin, String divId) throws IOException {
+	private void encodeViewerHTML(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
+			throws IOException {
 		// inner <div> is used for the plugin's rendering (aka the Javascript target)
 		writer.startElement("div", plugin);
 		writer.writeAttribute("id", divId, null);
 		writer.writeAttribute("style", generateDivStyle(plugin), null);
 		writer.endElement("div");
+
+		// hidden <input> without "name" attribute (prevents submission)
+		writer.startElement("input", plugin);
+		writer.writeAttribute("type", "hidden", null);
+		writer.writeAttribute("id", hiddenInputId, null);
+		writer.writeAttribute("value", plugin.getValue(), "value");
+		writer.endElement("input");
 	}
 
 	/**
@@ -113,10 +124,11 @@ public class MolPaintJSRenderer extends Renderer {
 	 * @param context
 	 * @param writer
 	 * @param plugin
-	 * @param divId   DOM id of the &lt;div&gt; element
+	 * @param divId         DOM id of the &lt;div&gt; element
+	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
 	 */
-	private void encodeViewerJS(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String divId)
-			throws IOException {
+	private void encodeViewerJS(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String divId,
+			String hiddenInputId) throws IOException {
 		String escapedMolecule = escape((String) plugin.getValue());
 
 		writer.startElement("script", plugin);
@@ -140,8 +152,10 @@ public class MolPaintJSRenderer extends Renderer {
 		 * embedded in a Promise.
 		 */
 		fmt.format("%s.status().then(() => {", loaderJSVar);
-		fmt.format("return molecularfaces.MolPaintJSViewer.newViewer(\"%s\", \"%s\", %d, %d);", divId, escapedMolecule,
-				plugin.getHeight(), plugin.getWidth());
+		fmt.format(
+				"return molecularfaces.MolPaintJSViewer.newViewer(\"%s\", "
+						+ "document.getElementById(\"%s\").getAttribute(\"value\"), %d, %d);",
+				divId, hiddenInputId, plugin.getHeight(), plugin.getWidth());
 
 		fmt.close();
 
@@ -232,7 +246,7 @@ public class MolPaintJSRenderer extends Renderer {
 		 */
 		fmt.format(
 				".then((editor) => editor.addChangeListener("
-				+ "(mol) => { document.getElementById(\"%s\").setAttribute(\"value\", mol); }));",
+						+ "(mol) => { document.getElementById(\"%s\").setAttribute(\"value\", mol); }));",
 				hiddenInputId);
 
 		fmt.close();

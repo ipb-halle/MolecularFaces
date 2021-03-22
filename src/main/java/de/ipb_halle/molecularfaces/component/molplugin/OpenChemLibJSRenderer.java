@@ -85,10 +85,12 @@ public class OpenChemLibJSRenderer extends Renderer {
 	}
 
 	private void encodeViewer(ResponseWriter writer, MolPluginCore plugin) throws IOException {
-		String divId = plugin.getClientId() + "_OpenChemLibJSViewer";
+		String clientId = plugin.getClientId();
+		String hiddenInputId = clientId + "_Input";
+		String divId = clientId + "_OpenChemLibJSViewer";
 
-		encodeViewerHTML(writer, plugin, divId);
-		encodeViewerJS(writer, plugin, divId);
+		encodeViewerHTML(writer, plugin, divId, hiddenInputId);
+		encodeViewerJS(writer, plugin, divId, hiddenInputId);
 	}
 
 	/**
@@ -97,14 +99,23 @@ public class OpenChemLibJSRenderer extends Renderer {
 	 * 
 	 * @param writer
 	 * @param plugin
-	 * @param divId  DOM id of the embedded &lt;div&gt; element
+	 * @param divId         DOM id of the embedded &lt;div&gt; element
+	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
 	 */
-	private void encodeViewerHTML(ResponseWriter writer, MolPluginCore plugin, String divId) throws IOException {
+	private void encodeViewerHTML(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
+			throws IOException {
 		// inner <div> is used for the plugin's rendering (aka the Javascript target)
 		writer.startElement("div", plugin);
 		writer.writeAttribute("id", divId, null);
 		writer.writeAttribute("style", generateDivStyle(plugin), null);
 		writer.endElement("div");
+
+		// hidden <input> without "name" attribute (prevents submission)
+		writer.startElement("input", plugin);
+		writer.writeAttribute("type", "hidden", null);
+		writer.writeAttribute("id", hiddenInputId, null);
+		writer.writeAttribute("value", plugin.getValue(), "value");
+		writer.endElement("input");
 	}
 
 	/**
@@ -112,9 +123,11 @@ public class OpenChemLibJSRenderer extends Renderer {
 	 * 
 	 * @param writer
 	 * @param plugin
-	 * @param divId  DOM id of the &lt;div&gt; element
+	 * @param divId         DOM id of the &lt;div&gt; element
+	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
 	 */
-	private void encodeViewerJS(ResponseWriter writer, MolPluginCore plugin, String divId) throws IOException {
+	private void encodeViewerJS(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
+			throws IOException {
 		String escapedMolecule = escape((String) plugin.getValue());
 
 		writer.startElement("script", plugin);
@@ -138,8 +151,10 @@ public class OpenChemLibJSRenderer extends Renderer {
 		 * embedded in a Promise.
 		 */
 		fmt.format("%s.status().then(() => {", loaderJSVar);
-		fmt.format("return molecularfaces.OpenChemLibJSViewer.newViewer(\"%s\", \"%s\", %d, %d);", divId,
-				escapedMolecule, plugin.getHeight(), plugin.getWidth());
+		fmt.format(
+				"return molecularfaces.OpenChemLibJSViewer.newViewer(\"%s\", "
+						+ "document.getElementById(\"%s\").getAttribute(\"value\"), %d, %d);",
+				divId, hiddenInputId, plugin.getHeight(), plugin.getWidth());
 
 		fmt.close();
 
