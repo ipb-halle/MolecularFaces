@@ -31,20 +31,25 @@ import org.junit.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.Bond;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond.Order;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IMolecularFormula;
+import org.openscience.cdk.tools.CDKHydrogenAdder;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
 /**
  * 
  * @author flange
  */
-public class MDLV2000ConverterTest {
+public class MDLV3000ConverterTest {
 	private FacesContext context = null;
 	private UIComponent component = null;
 
-	private Converter converter = new MDLV2000Converter();
+	private Converter converter = new MDLV3000Converter();
 
 	@Test
 	public void testGetAsObjectReturnsNull() {
@@ -58,16 +63,13 @@ public class MDLV2000ConverterTest {
 
 	@Test
 	public void testGetAsObjectWithValidMolfile() {
-		String benzene = "\n" + "Actelion Java MolfileCreator 1.0\n" + "\n"
-				+ "  6  6  0  0  0  0  0  0  0  0999 V2000\n"
-				+ "    5.9375  -10.0000   -0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-				+ "    5.9375  -11.5000   -0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-				+ "    7.2365  -12.2500   -0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-				+ "    8.5356  -11.5000   -0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-				+ "    8.5356  -10.0000   -0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-				+ "    7.2365   -9.2500   -0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n" + "  1  2  2  0  0  0  0\n"
-				+ "  2  3  1  0  0  0  0\n" + "  3  4  2  0  0  0  0\n" + "  4  5  1  0  0  0  0\n"
-				+ "  5  6  2  0  0  0  0\n" + "  6  1  1  0  0  0  0\n" + "M  END";
+		String benzene = "\n" + "Actelion Java MolfileCreator 2.0\n" + "\n"
+				+ "  0  0  0  0  0  0              0 V3000\n" + "M  V30 BEGIN CTAB\n" + "M  V30 COUNTS 6 6 0 0 0\n"
+				+ "M  V30 BEGIN ATOM\n" + "M  V30 1 C 11.5625 -11.5 0 0\n" + "M  V30 2 C 11.5625 -13 0 0\n"
+				+ "M  V30 3 C 12.8615 -13.75 0 0\n" + "M  V30 4 C 14.1605 -13 0 0\n" + "M  V30 5 C 14.1605 -11.5 0 0\n"
+				+ "M  V30 6 C 12.8615 -10.75 0 0\n" + "M  V30 END ATOM\n" + "M  V30 BEGIN BOND\n" + "M  V30 1 2 1 2\n"
+				+ "M  V30 2 1 2 3\n" + "M  V30 3 2 3 4\n" + "M  V30 4 1 4 5\n" + "M  V30 5 2 5 6\n" + "M  V30 6 1 6 1\n"
+				+ "M  V30 END BOND\n" + "M  V30 END CTAB\n" + "M  END";
 
 		IAtomContainer mol = (IAtomContainer) converter.getAsObject(context, component, benzene);
 		assertNotNull(mol);
@@ -104,7 +106,7 @@ public class MDLV2000ConverterTest {
 	}
 
 	@Test
-	public void testOutAndIn() {
+	public void testOutAndIn() throws CDKException {
 		IAtomContainer benzene = new AtomContainer();
 		for (int i = 0; i < 6; i++) {
 			benzene.addAtom(new Atom("C"));
@@ -115,6 +117,16 @@ public class MDLV2000ConverterTest {
 		benzene.addBond(new Bond(benzene.getAtom(3), benzene.getAtom(4), Order.DOUBLE));
 		benzene.addBond(new Bond(benzene.getAtom(4), benzene.getAtom(5), Order.SINGLE));
 		benzene.addBond(new Bond(benzene.getAtom(5), benzene.getAtom(0), Order.DOUBLE));
+
+		/*
+		 * We need to take care for hydrogens or all carbons will have VAL=3 in the
+		 * molfile and the test for the molecular formula will fail. Thanks to fbroda
+		 * for pointing out this solution.
+		 */
+		AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(benzene);
+		IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
+		CDKHydrogenAdder.getInstance(builder).addImplicitHydrogens(benzene);
+		// Kekulization.kekulize(benzene);
 
 		String molfile = converter.getAsString(context, component, benzene);
 		IAtomContainer mol = (IAtomContainer) converter.getAsObject(context, component, molfile);

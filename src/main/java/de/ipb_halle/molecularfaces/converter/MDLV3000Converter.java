@@ -29,19 +29,19 @@ import javax.faces.convert.FacesConverter;
 
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.io.MDLV2000Writer;
+import org.openscience.cdk.io.MDLV3000Reader;
+import org.openscience.cdk.io.MDLV3000Writer;
 
 /**
- * This {@link FacesConverter} converts MDL Molfile V2000 strings to
+ * This {@link FacesConverter} converts MDL Molfile V3000 strings to
  * {@link IAtomContainer}s and vice versa.
  * 
  * @author flange
  */
-@FacesConverter("molecularfaces.MDLV2000Converter")
-public class MDLV2000Converter implements Converter {
+@FacesConverter("molecularfaces.MDLV3000Converter")
+public class MDLV3000Converter implements Converter {
 	/**
-	 * Converts a MDL Molfile V2000 string to an {@link IAtomContainer}.
+	 * Converts a MDL Molfile V3000 string to an {@link IAtomContainer}.
 	 * 
 	 * @return valid {@link IAtomContainer} object or {@code null} if {@code value}
 	 *         is {@code null} or empty.
@@ -54,7 +54,7 @@ public class MDLV2000Converter implements Converter {
 			return null;
 		}
 
-		try (MDLV2000Reader reader = new MDLV2000Reader(new StringReader(value))) {
+		try (MDLV3000Reader reader = new MDLV3000Reader(new StringReader(value))) {
 			return reader.read(new AtomContainer());
 		} catch (Exception e) {
 			throw new ConverterException(new FacesMessage(e.getMessage()), e);
@@ -62,9 +62,9 @@ public class MDLV2000Converter implements Converter {
 	}
 
 	/**
-	 * Converts an {@link IAtomContainer} to a MDL Molfile V2000 string.
+	 * Converts an {@link IAtomContainer} to a MDL Molfile V3000 string.
 	 * 
-	 * @return valid MDL Molfile V2000 or empty string if {@code value} is
+	 * @return valid MDL Molfile V3000 or empty string if {@code value} is
 	 *         {@code null} or not an {@link IAtomContainer}
 	 * @throws ConverterException if writing of the Molfile fails
 	 */
@@ -76,12 +76,12 @@ public class MDLV2000Converter implements Converter {
 		IAtomContainer mol = (IAtomContainer) value;
 
 		StringWriter writer = new StringWriter();
-		try (MDLV2000Writer molWriter = new MDLV2000Writer(writer)) {
+		try (MDLV3000Writer molWriter = new MDLV3000Writer(writer)) {
 			molWriter.write(mol);
 		} catch (Exception e) {
 			throw new ConverterException(new FacesMessage(e.getMessage()), e);
 		}
-
+		
 		return writer.toString();
 	}
 }
