@@ -28,11 +28,9 @@ import org.openscience.cdk.io.MDLV2000Reader;
 
 /**
  * Checks that a given String is a valid MDL Molfile V2000 according to the CDK
- * library.
- * 
- * @see <a href=
- *      "https://github.com/cdk/cdk/blob/2f3cea7a19baaf5da6cdce3da4b3d2f1b9885235/storage/ctab/src/main/java/org/openscience/cdk/io/MDLV2000Reader.java#L312">
- *      CDK library</a>.
+ * library. See <a href=
+ * "https://github.com/cdk/cdk/blob/2f3cea7a19baaf5da6cdce3da4b3d2f1b9885235/storage/ctab/src/main/java/org/openscience/cdk/io/MDLV2000Reader.java#L312">CDK
+ * library</a>.
  * 
  * @author flange
  */

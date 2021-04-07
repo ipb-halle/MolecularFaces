@@ -250,7 +250,7 @@
 			<version>3.0.1-b12</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- CDK is used during molfile validation. -->
+		<!-- CDK is used during molfile validation and conversion. -->
 		<dependency>
 			<groupId>org.openscience.cdk</groupId>
 			<artifactId>cdk-ctab</artifactId>
@@ -260,6 +260,12 @@
 			<groupId>org.openscience.cdk</groupId>
 			<artifactId>cdk-data</artifactId>
 			<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openscience.cdk</groupId>
+			<artifactId>cdk-formula</artifactId>
+			<version>2.3</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
