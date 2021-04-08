@@ -27,7 +27,7 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 /**
- * MolFile check constraint.
+ * Molfile check constraint.
  * 
  * @author flange
  */
@@ -36,7 +36,7 @@ import javax.validation.Payload;
 @Constraint(validatedBy = MolFileValidator.class)
 @Documented
 public @interface Molfile {
-	String message() default "invalid MDL Molfile V2000";
+	String message() default "invalid MDL Molfile";
 
 	Class<?>[] groups() default {};
 
@@ -54,4 +54,17 @@ public @interface Molfile {
 	}
 
 	Mode mode() default Mode.RELAXED;
+
+	public enum Format {
+		/**
+		 * MDL Molfile V2000
+		 */
+		V2000,
+		/**
+		 * MDL Molfile V3000
+		 */
+		V3000;
+	}
+
+	Format format() default Format.V2000;
 }

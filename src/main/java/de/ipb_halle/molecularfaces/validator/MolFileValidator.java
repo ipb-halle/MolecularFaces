@@ -25,20 +25,24 @@ import javax.validation.ConstraintValidatorContext;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.io.IChemObjectReader.Mode;
 import org.openscience.cdk.io.MDLV2000Reader;
+import org.openscience.cdk.io.MDLV3000Reader;
+
+import de.ipb_halle.molecularfaces.validator.Molfile.Format;
 
 /**
- * Checks that a given String is a valid MDL Molfile V2000 according to the CDK
- * library. See <a href=
- * "https://github.com/cdk/cdk/blob/2f3cea7a19baaf5da6cdce3da4b3d2f1b9885235/storage/ctab/src/main/java/org/openscience/cdk/io/MDLV2000Reader.java#L312">CDK
- * library</a>.
+ * Checks that a given String is a valid MDL Molfile according to the CDK
+ * library.
  * 
  * @author flange
  */
 public class MolFileValidator implements ConstraintValidator<Molfile, String> {
 	private Mode cdkReaderMode;
+	private Format format;
 
 	@Override
 	public void initialize(Molfile constraintAnnotation) {
+		format = constraintAnnotation.format();
+
 		// translation between different enumerations
 		switch (constraintAnnotation.mode()) {
 		case RELAXED:
@@ -58,10 +62,21 @@ public class MolFileValidator implements ConstraintValidator<Molfile, String> {
 		}
 
 		// try to read the molfile
-		try (MDLV2000Reader reader = new MDLV2000Reader(new StringReader(value), cdkReaderMode)) {
-			reader.read(new AtomContainer());
-			return true;
-		} catch (Exception e) {
+		if (format == Format.V2000) {
+			try (MDLV2000Reader reader = new MDLV2000Reader(new StringReader(value), cdkReaderMode)) {
+				reader.read(new AtomContainer());
+				return true;
+			} catch (Exception e) {
+				return false;
+			}
+		} else if (format == Format.V3000) {
+			try (MDLV3000Reader reader = new MDLV3000Reader(new StringReader(value), cdkReaderMode)) {
+				reader.read(new AtomContainer());
+				return true;
+			} catch (Exception e) {
+				return false;
+			}
+		} else {
 			return false;
 		}
 	}
