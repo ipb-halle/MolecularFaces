@@ -85,13 +85,13 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 			// Try to plot the image as soon as we have the Marvin package namespace.
 			let obj = this;
 			molecularfaces._marvinJSNamespaceLoaderInstance.status().then((namespace) => {
-				if (this._format === "MDLV2000") {
+				if (obj._format === "MDLV2000") {
 					// Get image of the molecule as SVG.
 					let imgData = namespace.ImageExporter.molToDataUrl(mol, "image/svg", settings);
 
-					_insertSvg(obj._divId, imgData);
+					obj._insertSvg(obj._divId, imgData);
 					resolve(obj);
-				} else if (this._format === "MDLV3000") {
+				} else if (obj._format === "MDLV3000") {
 					// snippets from https://marvinjs-demo.chemaxon.com/latest/examples/example-create-image.html
 					let defaultServices = getDefaultServices(); // function in webservices.js
 					let services = {};
@@ -108,7 +108,7 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 
 					// MarvinJS needs to ask the webservice for V3000, thus we get a Promise.
 					exporter.render(mol).then((imgData) => {
-						_insertSvg(obj._divId, imgData);
+						obj._insertSvg(obj._divId, imgData);
 						resolve(obj);
 					});
 				}

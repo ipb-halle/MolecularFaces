@@ -33,8 +33,8 @@ import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.MDLV2000Writer;
 
 /**
- * This {@link FacesConverter} converts MDL Molfile V2000 strings to
- * {@link IAtomContainer}s and vice versa.
+ * This {@link FacesConverter} converts MDL Molfile V2000 strings to CDK's
+ * {@link IAtomContainer} objects and vice versa.
  * 
  * @author flange
  */

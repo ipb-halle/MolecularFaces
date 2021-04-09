@@ -33,8 +33,8 @@ import org.openscience.cdk.io.MDLV3000Reader;
 import org.openscience.cdk.io.MDLV3000Writer;
 
 /**
- * This {@link FacesConverter} converts MDL Molfile V3000 strings to
- * {@link IAtomContainer}s and vice versa.
+ * This {@link FacesConverter} converts MDL Molfile V3000 strings to CDK's
+ * {@link IAtomContainer} objects and vice versa.
  * 
  * @author flange
  */
@@ -81,7 +81,7 @@ public class MDLV3000Converter implements Converter {
 		} catch (Exception e) {
 			throw new ConverterException(new FacesMessage(e.getMessage()), e);
 		}
-		
+
 		return writer.toString();
 	}
 }

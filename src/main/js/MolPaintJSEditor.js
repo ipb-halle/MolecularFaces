@@ -69,9 +69,9 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 			let obj = this;
 			this._editor.setChangeListener(function() {
 				let mol = null;
-				if (this._format === "MDLV2000") {
+				if (obj._format === "MDLV2000") {
 					mol = molPaintJS.getMDLv2000(obj._divId);
-				} else if (this._format === "MDLV3000") {
+				} else if (obj._format === "MDLV3000") {
 					mol = molPaintJS.getMDLv3000(obj._divId);
 				}
 

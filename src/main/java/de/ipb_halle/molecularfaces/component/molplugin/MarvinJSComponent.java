@@ -47,7 +47,8 @@ public class MarvinJSComponent extends MolPluginCore {
 	 * its webservices. If "true", the &lt;iframe&gt; will embed editorws.html, else
 	 * it will embed editor.html.
 	 * 
-	 * @see https://marvinjs-demo.chemaxon.com/latest/docs/dev/embed.html
+	 * @see <a href=
+	 *      "https://marvinjs-demo.chemaxon.com/latest/docs/dev/embed.html">https://marvinjs-demo.chemaxon.com/latest/docs/dev/embed.html</a>
 	 */
 	public static final String WEBXML_MARVINJS_WEBSERVICES = "de.ipb_halle.molecularfaces.MARVINJS_WEBSERVICES";
 

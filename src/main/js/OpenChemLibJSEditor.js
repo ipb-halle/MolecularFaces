@@ -63,9 +63,9 @@ molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEdito
 			let obj = this;
 			this._editor.setChangeListenerCallback(function(idcode, molecule) {
 				let mol = null;
-				if (this._format === "MDLV2000") {
+				if (obj._format === "MDLV2000") {
 					mol = molecule.toMolfile();
-				} else if (this._format === "MDLV3000") {
+				} else if (obj._format === "MDLV3000") {
 					mol = molecule.toMolfileV3();
 				}
 
