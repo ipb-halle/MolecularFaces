@@ -27,6 +27,9 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
+import de.ipb_halle.molecularfaces.util.WebXml;
+import de.ipb_halle.molecularfaces.util.WebXmlImpl;
+
 /**
  * This {@link javax.faces.render.Renderer} renders a chemical structure editor
  * or viewer using the <a href="https://chemaxon.com/products/marvin-js">Marvin
@@ -44,6 +47,8 @@ public class MarvinJSRenderer extends Renderer {
 	 * This variable is defined in MolecularFaces.js.
 	 */
 	private String loaderJSVar = "molecularfaces.marvinJSLoaderInstance";
+
+	private WebXml webXml = new WebXmlImpl();
 
 	@Override
 	public void decode(FacesContext context, UIComponent component) {
@@ -134,10 +139,7 @@ public class MarvinJSRenderer extends Renderer {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		String installPath = context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL);
-		if (installPath == null) {
-			installPath = "";
-		}
+		String installPath = webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL, context, "");
 
 		StringBuilder sb = new StringBuilder(512 + installPath.length() + escapedMolecule.length());
 
@@ -159,8 +161,8 @@ public class MarvinJSRenderer extends Renderer {
 		fmt.format("%s.status().then(() => {", loaderJSVar);
 		fmt.format(
 				"return molecularfaces.MarvinJSViewer.newViewer(\"%s\", "
-						+ "document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", %d, %d);",
-				divId, hiddenInputId, installPath, plugin.getHeight(), plugin.getWidth());
+						+ "document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", %d, %d, \"%s\");",
+				divId, hiddenInputId, installPath, plugin.getHeight(), plugin.getWidth(), plugin.getFormat());
 
 		fmt.close();
 
@@ -192,13 +194,15 @@ public class MarvinJSRenderer extends Renderer {
 	 */
 	private void encodeEditorHTML(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String iframeId,
 			String hiddenInputId) throws IOException {
+		String installPath = webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL, context, "");
+		String embed = webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_WEBSERVICES, context, "").equals("true")
+				? "/editorws.html"
+				: "/editor.html";
+
 		// inner <iframe> used for the plugin's rendering (aka the JavaScript target)
 		writer.startElement("iframe", plugin);
 		writer.writeAttribute("id", iframeId, null);
-		writer.writeAttribute("src",
-				context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL)
-						+ "/editor.html",
-				null);
+		writer.writeAttribute("src", installPath + embed, null);
 		writer.writeAttribute("style", "height:" + plugin.getHeight() + "px;width:" + plugin.getWidth() + "px;", null);
 		writer.endElement("iframe");
 
@@ -228,14 +232,8 @@ public class MarvinJSRenderer extends Renderer {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		String installPath = context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL);
-		if (installPath == null) {
-			installPath = "";
-		}
-		String license = context.getExternalContext().getInitParameter(MarvinJSComponent.WEBXML_MARVINJS_LICENSE_URL);
-		if (license == null) {
-			license = "";
-		}
+		String installPath = webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL, context, "");
+		String license = webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_LICENSE_URL, context, "");
 
 		StringBuilder sb = new StringBuilder(512 + installPath.length() + license.length());
 
@@ -256,8 +254,8 @@ public class MarvinJSRenderer extends Renderer {
 		 */
 		fmt.format("%s.status().then(() => {", loaderJSVar);
 		fmt.format(
-				"return molecularfaces.MarvinJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", \"%s\", %d, %d)",
-				iframeId, hiddenInputId, installPath, license, plugin.getHeight(), plugin.getWidth());
+				"return molecularfaces.MarvinJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", \"%s\", %d, %d, \"%s\")",
+				iframeId, hiddenInputId, installPath, license, plugin.getHeight(), plugin.getWidth(), plugin.getFormat());
 
 		/*
 		 * Register an on-change callback to fill the value of the hidden <input>

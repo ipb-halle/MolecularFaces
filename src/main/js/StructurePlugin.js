@@ -43,42 +43,24 @@ molecularfaces.StructurePlugin = class {
 	}
 
 	/**
-	 * Returns the stored molecule in the MDL Molfile v2000 format.
-	 */
-	getMol() {
-		return this.getMDLv2000();
-	}
-
-	/**
-	 * Sets the molecule in the MDL Molfile v2000 format.
-	 * 
-	 * Returns this object embedded in a Promise that indicates the status of this
-	 * molecule change process, because some plugin implementations require full
-	 * reinitialization.
-	 */
-	setMol(molecule) {
-		return this.setMDLv2000(molecule);
-	}
-
-	/**
 	 * Abstract method
-	 * 
-	 * Returns the stored molecule in the MDL Molfile v2000 format.
+	 *
+	 * Returns the stored molecule.
 	 */
-	getMDLv2000() {
+	getMolecule() {
 		throw new Error("This method is abstract and must be implemented by the subclass.");
 	}
 
 	/**
 	 * Abstract method
-	 * 
-	 * Sets the molecule in the MDL Molfile v2000 format.
 	 *
+	 * Sets the molecule.
+	 * 
 	 * Returns this object embedded in a Promise that indicates the status of this
 	 * molecule change process, because some plugin implementations require full
 	 * reinitialization.
 	 */
-	setMDLv2000(molecule) {
+	setMolecule(molecule) {
 		throw new Error("This method is abstract and must be implemented by the subclass.");
 	}
 }

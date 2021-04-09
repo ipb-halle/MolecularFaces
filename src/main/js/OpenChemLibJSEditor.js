@@ -29,11 +29,12 @@ molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEdito
 	 * This constructor should not be used directly to receive an instance of
 	 * this class. Use the static factory method "newEditor" instead. 
 	 */
-	constructor(divId, molecule) {
+	constructor(divId, molecule, format) {
 		super();
 
 		this._divId = divId;
 		this._molecule = molecule;
+		this._format = format;
 		this._editor = null;
 	}
 
@@ -41,10 +42,11 @@ molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEdito
 	 * Returns an initialized OpenChemLibJS editor instance embedded inside a
 	 * Promise. The editor is rendered in a <div> container with the id given by
 	 * the parameter "divId" and a molecule according to the "molecule" parameter.
+	 * The chemical file format needs to be specified via the "format" parameter.
 	 */
-	static newEditor(divId, molecule) {
+	static newEditor(divId, molecule, format) {
 		return new Promise((resolve, reject) => {
-			let obj = new molecularfaces.OpenChemLibJSEditor(divId, molecule);
+			let obj = new molecularfaces.OpenChemLibJSEditor(divId, molecule, format);
 			obj.init().then(resolve(obj));
 		});
 	}
@@ -56,11 +58,16 @@ molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEdito
 
 			this._editor = window.OCL.StructureEditor.createSVGEditor(this._divId, 1);
 
-			this.setMDLv2000(this._molecule);
+			this.setMolecule(this._molecule);
 
 			let obj = this;
 			this._editor.setChangeListenerCallback(function(idcode, molecule) {
-				let mol = molecule.toMolfile();
+				let mol = null;
+				if (this._format === "MDLV2000") {
+					mol = molecule.toMolfile();
+				} else if (this._format === "MDLV3000") {
+					mol = molecule.toMolfileV3();
+				}
 
 				obj._molecule = mol;
 				obj.notifyChange(mol);
@@ -70,11 +77,11 @@ molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEdito
 		});
 	}
 
-	getMDLv2000() {
+	getMolecule() {
 		return this._molecule;
 	}
 
-	setMDLv2000(molecule) {
+	setMolecule(molecule) {
 		return new Promise((resolve, reject) => {
 			if (typeof molecule !== "undefined") {
 				this._molecule = molecule;

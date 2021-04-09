@@ -19,6 +19,9 @@ package de.ipb_halle.molecularfaces.component.molplugin;
 
 import javax.faces.component.FacesComponent;
 
+import de.ipb_halle.molecularfaces.util.WebXml;
+import de.ipb_halle.molecularfaces.util.WebXmlImpl;
+
 /**
  * This {@link javax.faces.component.UIComponent} renders a chemical structure
  * editor or viewer using the
@@ -40,11 +43,22 @@ public class MarvinJSComponent extends MolPluginCore {
 	public static final String WEBXML_MARVINJS_BASE_URL = "de.ipb_halle.molecularfaces.MARVINJS_BASE_URL";
 
 	/**
+	 * Name of the context-param in web.xml that specifies if Marvin JS should use
+	 * its webservices. If "true", the &lt;iframe&gt; will embed editorws.html, else
+	 * it will embed editor.html.
+	 * 
+	 * @see https://marvinjs-demo.chemaxon.com/latest/docs/dev/embed.html
+	 */
+	public static final String WEBXML_MARVINJS_WEBSERVICES = "de.ipb_halle.molecularfaces.MARVINJS_WEBSERVICES";
+
+	/**
 	 * Name of the context-param in web.xml that specifies the location of Marvin
 	 * JS' license file (marvin4js-license.cxl) relative to
 	 * {@link WEBXML_MARVINJS_BASE_URL}.
 	 */
 	public static final String WEBXML_MARVINJS_LICENSE_URL = "de.ipb_halle.molecularfaces.MARVINJS_LICENSE_URL";
+
+	private WebXml webXml = new WebXmlImpl();
 
 	public MarvinJSComponent() {
 		super();
@@ -53,9 +67,15 @@ public class MarvinJSComponent extends MolPluginCore {
 		 * Always include Marvin JS via external resources defined by
 		 * WEBXML_MARVINJS_BASE_URL.
 		 */
-		String baseDir = getFacesContext().getExternalContext().getInitParameter(WEBXML_MARVINJS_BASE_URL);
+		String baseDir = webXml.getContextParam(WEBXML_MARVINJS_BASE_URL, getFacesContext(), null);
 		addScriptExt(baseDir + "/gui/lib/promise-1.0.0.min.js");
 		addScriptExt(baseDir + "/js/marvinjslauncher.js");
+
+		// webservices.js needs to be included if we use the viewer.
+		if (isReadonly() && webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_WEBSERVICES, getFacesContext(), "")
+				.equals("true")) {
+			addScriptExt(baseDir + "/js/webservices.js");
+		}
 
 		addScriptResource("js/MolecularFaces.js");
 

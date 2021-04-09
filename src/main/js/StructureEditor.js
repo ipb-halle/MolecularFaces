@@ -39,8 +39,7 @@ molecularfaces.StructureEditor = class extends molecularfaces.StructurePlugin {
 
 	/**
 	 * Adds a callback listener that will be notified upon a change of the molecule.
-	 * The callback function "fn" will receive the new molecule (in the MDL 
-	 * Molfile v2000 format) as parameter.
+	 * The callback function "fn" will receive the new molecule as parameter.
 	 * 
 	 * Returns this object to support method chaining.
 	 */
@@ -65,8 +64,7 @@ molecularfaces.StructureEditor = class extends molecularfaces.StructurePlugin {
 	}
 
 	/**
-	 * Notifies all registered on-change callback listeners about the new molecule 
-	 * (in the MDL Molfile v2000 format).
+	 * Notifies all registered on-change callback listeners about the new molecule.
 	 */
 	notifyChange(newMolecule) {
 		for (let fn of this._changeListeners) {
@@ -85,7 +83,7 @@ molecularfaces.StructureEditor = class extends molecularfaces.StructurePlugin {
 	}
 
 	/* 
-	 * Note: setMol(molecule) is not overridden. It should not trigger 
+	 * Note: setMolecule(molecule) is not overridden. It should not trigger 
 	 * notifyChange(newMolecule) explicitly, but the editor plugin itself may
 	 * trigger an on-change event.
 	 */

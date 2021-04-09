@@ -29,7 +29,7 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 	 * This constructor should not be used directly to receive an instance of
 	 * this class. Use the static factory method "newEditor" instead. 
 	 */
-	constructor(divId, molecule, height, width) {
+	constructor(divId, molecule, height, width, format) {
 		super();
 
 		this._divId = divId;
@@ -37,6 +37,7 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 		this._height = height;
 		this._width = width;
 		this._iconSize = 32;
+		this._format = format;
 		this._editor = null;
 	}
 
@@ -45,11 +46,12 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 	 * Promise. The editor is rendered in a <div> container with the id given by
 	 * the parameter "divId" and a molecule according to the "molecule" parameter.
 	 * The "height" and "width" parameters should not exceed the size of the
-	 * surrounding <div>.
+	 * surrounding <div>. The chemical file format needs to be specified via the
+	 * "format" parameter.
 	 */
-	static newEditor(divId, molecule, height, width) {
+	static newEditor(divId, molecule, height, width, format) {
 		return new Promise((resolve, reject) => {
-			let obj = new molecularfaces.MolPaintJSEditor(divId, molecule, height, width);
+			let obj = new molecularfaces.MolPaintJSEditor(divId, molecule, height, width, format);
 			obj.init().then(resolve(obj));
 		});
 	}
@@ -66,7 +68,12 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 
 			let obj = this;
 			this._editor.setChangeListener(function() {
-				let mol = molPaintJS.getMDLv2000(obj._divId);
+				let mol = null;
+				if (this._format === "MDLV2000") {
+					mol = molPaintJS.getMDLv2000(obj._divId);
+				} else if (this._format === "MDLV3000") {
+					mol = molPaintJS.getMDLv3000(obj._divId);
+				}
 
 				obj._molecule = mol;
 				obj.notifyChange(mol);
@@ -76,11 +83,11 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 		});
 	}
 
-	getMDLv2000() {
+	getMolecule() {
 		return this._molecule;
 	}
 
-	setMDLv2000(molecule) {
+	setMolecule(molecule) {
 		return new Promise((resolve, reject) => {
 			if (typeof molecule !== "undefined") {
 				this._molecule = molecule;

@@ -68,11 +68,11 @@ molecularfaces.MolPaintJSViewer = class extends molecularfaces.StructurePlugin {
 		});
 	}
 
-	getMDLv2000() {
+	getMolecule() {
 		return this._molecule;
 	}
 
-	setMDLv2000(molecule) {
+	setMolecule(molecule) {
 		return new Promise((resolve, reject) => {
 			if (typeof molecule !== "undefined") {
 				this._molecule = molecule;

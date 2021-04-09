@@ -45,11 +45,11 @@ Example:
 
 ##### Supported plugins
 
-Plugin | Version | License | Editor | Viewer
------- | ------- | ------- | ------ | ------
-[OpenChemLib JS](https://github.com/cheminfo/openchemlib-js) | [v7.3.0](https://github.com/cheminfo/openchemlib-js/releases/tag/v7.3.0) | [BSD-3-Clause](https://github.com/cheminfo/openchemlib-js/blob/master/LICENSE) | [x] | [x]
-[MolPaintJS](https://github.com/ipb-halle/MolPaintJS) | [v0.3.5-alpha](https://github.com/ipb-halle/MolPaintJS/releases/tag/v0.3.5-alpha) | [Apache License 2.0](https://github.com/ipb-halle/MolPaintJS/blob/master/LICENSE) | [x] | [x]
-[Marvin JS](https://chemaxon.com/products/marvin-js) | 21.1.0 | proprietary | [x] | [x]
+Plugin | Version | License | Editor | Viewer | Molfile V2000 support | Molfile V3000 support
+------ | ------- | ------- | ------ | ------ | --------------------- | ---------------------
+[OpenChemLib JS](https://github.com/cheminfo/openchemlib-js) | [v7.3.0](https://github.com/cheminfo/openchemlib-js/releases/tag/v7.3.0) | [BSD-3-Clause](https://github.com/cheminfo/openchemlib-js/blob/master/LICENSE) | [x] | [x] | [x] | [x]
+[MolPaintJS](https://github.com/ipb-halle/MolPaintJS) | [v0.3.5-alpha](https://github.com/ipb-halle/MolPaintJS/releases/tag/v0.3.5-alpha) | [Apache License 2.0](https://github.com/ipb-halle/MolPaintJS/blob/master/LICENSE) | [x] | [x] | [x] | [x]
+[Marvin JS](https://chemaxon.com/products/marvin-js) | 21.1.0 | proprietary | [x] | [x] | [x] | requires web services
 
 ##### Usage example
 
@@ -130,3 +130,4 @@ The resource dependencies are not part of the jar build pipeline. It is necessar
 Context-params:
 * `de.ipb_halle.molecularfaces.MARVINJS_BASE_URL` (required): location of the extracted Marvin JS core archive
 * `de.ipb_halle.molecularfaces.MARVINJS_LICENSE_URL` (required): location of Marvin JS' license file (marvin4js-license.cxl) relative to `de.ipb_halle.molecularfaces.MARVINJS_BASE_URL`
+* `de.ipb_halle.molecularfaces.MARVINJS_WEBSERVICES` (optional): if set to "true", use JChem Webservice (embeds editorws.html)

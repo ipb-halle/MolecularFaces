@@ -32,12 +32,12 @@
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>
-		<!--<attribute> 
-			<description><![CDATA[TODO.]]></description>
-			<name>format</name> 
+		<attribute>
+			<description><![CDATA[Chemical file format. Available formats: MDLV2000, MDLV3000]]></description>
+			<name>format</name>
 			<required>false</required>
 			<type>java.lang.String</type>
-		</attribute>-->
+		</attribute>
 		<attribute>
 			<description><![CDATA[Height of the plugin.]]></description>
 			<name>height</name>
@@ -80,12 +80,12 @@
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>
-		<!--<attribute> 
-			<description><![CDATA[TODO.]]></description>
-			<name>format</name> 
+		<attribute>
+			<description><![CDATA[Chemical file format. Available formats: MDLV2000, MDLV3000]]></description>
+			<name>format</name>
 			<required>false</required>
 			<type>java.lang.String</type>
-		</attribute>-->
+		</attribute>
 		<attribute>
 			<description><![CDATA[Height of the plugin.]]></description>
 			<name>height</name>

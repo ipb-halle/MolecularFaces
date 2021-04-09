@@ -19,6 +19,9 @@ package de.ipb_halle.molecularfaces.component.molplugin;
 
 import javax.faces.component.FacesComponent;
 
+import de.ipb_halle.molecularfaces.util.WebXml;
+import de.ipb_halle.molecularfaces.util.WebXmlImpl;
+
 /**
  * This {@link javax.faces.component.UIComponent} renders a chemical structure
  * editor or viewer using the
@@ -32,6 +35,8 @@ public class OpenChemLibJSComponent extends MolPluginCore {
 	public static final String COMPONENT_TYPE = "molecularfaces.OpenChemLibJS";
 	public static final String DEFAULT_RENDERER = OpenChemLibJSRenderer.RENDERER_TYPE;
 
+	private WebXml webXml = new WebXmlImpl();
+
 	/**
 	 * Name of the context-param in web.xml that specifies the location of
 	 * openchemlib-full.js relative to the application's context root.
@@ -41,7 +46,7 @@ public class OpenChemLibJSComponent extends MolPluginCore {
 	public OpenChemLibJSComponent() {
 		super();
 
-		String resourceUrl = getFacesContext().getExternalContext().getInitParameter(WEBXML_CUSTOM_RESOURCE_URL);
+		String resourceUrl = webXml.getContextParam(WEBXML_CUSTOM_RESOURCE_URL, getFacesContext(), null);
 		if ((resourceUrl != null) && (!resourceUrl.isEmpty())) {
 			addScriptExt(resourceUrl);
 		} else {

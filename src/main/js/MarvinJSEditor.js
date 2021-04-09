@@ -29,7 +29,7 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 	 * This constructor should not be used directly to receive an instance of
 	 * this class. Use the static factory method "newEditor" instead. 
 	 */
-	constructor(iframeId, molecule, installPath, licensePath, height, width) {
+	constructor(iframeId, molecule, installPath, licensePath, height, width, format) {
 		super();
 
 		this._iframeId = iframeId;
@@ -38,6 +38,7 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 		this._licensePath = licensePath;
 		this._height = height;
 		this._width = width;
+		this._format = format;
 		this._editor = null;
 	}
 
@@ -49,11 +50,12 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 	 * parameter "installPath" and the license location (relative to
 	 * "installPath") is defined by the parameter "licensePath". The "height"
 	 * and "width" parameters should not exceed the size of the surrounding
-	 * container.
+	 * container. The chemical file format needs to be specified via the
+	 * "format" parameter.
 	 */
-	static newEditor(iframeId, molecule, installPath, licensePath, height, width) {
+	static newEditor(iframeId, molecule, installPath, licensePath, height, width, format) {
 		return new Promise((resolve, reject) => {
-			let obj = new molecularfaces.MarvinJSEditor(iframeId, molecule, installPath, licensePath, height, width);
+			let obj = new molecularfaces.MarvinJSEditor(iframeId, molecule, installPath, licensePath, height, width, format);
 			obj.init().then(resolve(obj));
 		});
 	}
@@ -91,10 +93,21 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 
 					// Register an on-change listener.
 					obj._editor.on("molchange", function() {
-						let molecule = obj._editor.exportAsMol();
+						if (this._format === "MDLV2000") {
+							// MarvinJS can deliver V2000 immediately.
+							let molecule = obj._editor.exportAsMol();
 
-						obj._molecule = molecule;
-						obj.notifyChange(molecule);
+							obj._molecule = molecule;
+							obj.notifyChange(molecule);
+						} else if ((this._format === "MDLV3000") && obj._editor.getSupportedFormats().exportFormats.includes("mol:V3")) {
+							// MarvinJS needs to ask the webservice for V3000, thus we get a Promise.
+							obj._editor.exportStructure("mol:V3").then(function(molecule) {
+								obj._molecule = molecule;
+								obj.notifyChange(molecule);
+							}, function(error) {
+								alert("Molecule export failed:"+error);
+							});
+						}
 					});
 
 					// Resolve the init() Promise.
@@ -107,11 +120,11 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 		});
 	}
 
-	getMDLv2000() {
+	getMolecule() {
 		return this._molecule;
 	}
 
-	setMDLv2000(molecule) {
+	setMolecule(molecule) {
 		return new Promise((resolve, reject) => {
 			if (typeof molecule !== "undefined") {
 				this._molecule = molecule;
@@ -122,7 +135,7 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 					mol = molecule;
 				}
 
-				this._editor.importStructure("mol", mol).catch(function(error) {
+				this._editor.importStructure(null, mol).catch(function(error) {
 					reject(error);
 				});
 			}

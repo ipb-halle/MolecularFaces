@@ -235,8 +235,8 @@ public class OpenChemLibJSRenderer extends Renderer {
 		 */
 		fmt.format("%s.status().then(() => {", loaderJSVar);
 		fmt.format(
-				"return molecularfaces.OpenChemLibJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"))",
-				divId, hiddenInputId);
+				"return molecularfaces.OpenChemLibJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\")",
+				divId, hiddenInputId, plugin.getFormat());
 
 		/*
 		 * Register an on-change callback to fill the value of the hidden <input>

@@ -237,8 +237,8 @@ public class MolPaintJSRenderer extends Renderer {
 		 */
 		fmt.format("%s.status().then(() => {", loaderJSVar);
 		fmt.format(
-				"return molecularfaces.MolPaintJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), %d, %d)",
-				divId, hiddenInputId, plugin.getHeight(), plugin.getWidth());
+				"return molecularfaces.MolPaintJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), %d, %d, \"%s\")",
+				divId, hiddenInputId, plugin.getHeight(), plugin.getWidth(), plugin.getFormat());
 
 		/*
 		 * Register an on-change callback to fill the value of the hidden <input>

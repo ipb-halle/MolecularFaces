@@ -66,8 +66,20 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 		}
 	}
 
+	/**
+	 * Possible values for the <code>format</code> property.
+	 */
+	public enum Format {
+		MDLV2000, MDLV3000;
+
+		@Override
+		public String toString() {
+			return this.name();
+		}
+	};
+
 	protected enum PropertyKeys {
-		border, /* format, */ height, readonly, widgetVar, width;
+		border, format, height, readonly, widgetVar, width;
 	}
 
 	/**
@@ -75,7 +87,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * <p>
 	 * Flag indicating that this element is rendered with a border.
 	 * 
-	 * @return Returns the value of the attribute or <code>false</code> if it has
+	 * @return the value of the attribute or <code>false</code> if it has
 	 *         not been set in the JSF view.
 	 */
 	public boolean isBorder() {
@@ -92,32 +104,31 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 		getStateHelper().put(PropertyKeys.border, border);
 	}
 
-	// format is not yet implemented in the renderers!
-	/*
-	 * Possible values for the <code>format</code> property.
-	 */
-	// public static final String[] FORMATS = { "molFile", "molFileV3", "smiles" };
-
-	/*
-	 * Return the value of the <code>format</code> property. <p> Controls the
-	 * chemical file format to be used in the <code>value</code> property. <p>
-	 * Possible values: "molFile" (MDL Molfile V2000), "molFileV3" (MDL Molfile
-	 * V3000) and "smiles" (SMILES).
+	public static final String DEFAULT_FORMAT = Format.MDLV3000.toString();
+	
+	/**
+	 * Return the value of the <code>format</code> property.
+	 * <p>
+	 * Controls the chemical file format to be used in the <code>value</code>
+	 * property.
+	 * <p>
+	 * Possible values are provided by the {@link Format} enumeration.
 	 * 
-	 * @return Returns the value of the attribute.
+	 * @return the value of the attribute or "MDLV3000" if it has not
+	 *         been set in the JSF view.
 	 */
-	/*
-	 * public String getFormat() { return (String)
-	 * getStateHelper().eval(PropertyKeys.format); }
-	 */
+	public String getFormat() {
+		return (String) getStateHelper().eval(PropertyKeys.format, DEFAULT_FORMAT);
+	}
 
-	/*
+	/**
 	 * Set the value of the <code>format</code> property.
+	 * 
+	 * @param format chemical file format
 	 */
-	/*
-	 * public void setFormat(String format) {
-	 * getStateHelper().put(PropertyKeys.format, format); }
-	 */
+	public void setFormat(String format) {
+		getStateHelper().put(PropertyKeys.format, format);
+	}
 
 	public static final int DEFAULT_HEIGHT = 400;
 
@@ -126,7 +137,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * <p>
 	 * The height of the structure editor plugin in pixels.
 	 * 
-	 * @return Returns the value of the attribute or 400 if it has not been set in
+	 * @return the value of the attribute or 400 if it has not been set in
 	 *         the JSF view.
 	 */
 	public int getHeight() {
@@ -148,7 +159,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * Flag indicating that this element is in editable (full structure editor) or
 	 * in view-only mode.
 	 * 
-	 * @return Returns the value of the attribute or <code>false</code> if it has
+	 * @return the value of the attribute or <code>false</code> if it has
 	 *         not been set in the JSF view.
 	 */
 	public boolean isReadonly() {
@@ -171,7 +182,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * The client-side variable name of a Promise object that embeds the plugin's
 	 * JavaScript instance.
 	 * 
-	 * @return Returns the value of the attribute.
+	 * @return the value of the attribute.
 	 */
 	public String getWidgetVar() {
 		return (String) getStateHelper().eval(PropertyKeys.widgetVar);
@@ -194,7 +205,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * <p>
 	 * The width of the structure editor plugin in pixels.
 	 * 
-	 * @return Returns the value of the attribute or 400 if it has not been set in
+	 * @return the value of the attribute or 400 if it has not been set in
 	 *         the JSF view.
 	 */
 	public int getWidth() {

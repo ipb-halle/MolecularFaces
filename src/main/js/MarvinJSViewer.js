@@ -35,13 +35,14 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 	 * This constructor should not be used directly to receive an instance of
 	 * this class. Use the static factory method "newViewer" instead. 
 	 */
-	constructor(divId, molecule, installPath, height, width) {
+	constructor(divId, molecule, installPath, height, width, format) {
 		super();
 
 		this._divId = divId;
 		this._molecule = molecule;
 		this._installPath = installPath;
 		this._height = height;
+		this._format = format;
 		this._width = width;
 	}
 
@@ -51,11 +52,12 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 	 * the parameter "divId" and a molecule according to the "molecule" parameter.
 	 * The install location of Marvin JS needs to be defined by the parameter
 	 * "installPath". The "height" and "width" parameters should not exceed the
-	 * size of the surrounding <div>.
+	 * size of the surrounding <div>. The chemical file format needs to be
+	 * specified via the "format" parameter.
 	 */
-	static newViewer(divId, molecule, installPath, height, width) {
+	static newViewer(divId, molecule, installPath, height, width, format) {
 		return new Promise((resolve, reject) => {
-			let obj = new molecularfaces.MarvinJSViewer(divId, molecule, installPath, height, width);
+			let obj = new molecularfaces.MarvinJSViewer(divId, molecule, installPath, height, width, format);
 			obj.init().then(resolve(obj));
 		});
 	}
@@ -83,27 +85,53 @@ molecularfaces.MarvinJSViewer = class extends molecularfaces.StructurePlugin {
 			// Try to plot the image as soon as we have the Marvin package namespace.
 			let obj = this;
 			molecularfaces._marvinJSNamespaceLoaderInstance.status().then((namespace) => {
-				// Get image of the molecule as SVG.
-				let imgData = namespace.ImageExporter.molToDataUrl(mol, "image/svg", settings);
+				if (this._format === "MDLV2000") {
+					// Get image of the molecule as SVG.
+					let imgData = namespace.ImageExporter.molToDataUrl(mol, "image/svg", settings);
 
-				// target <div>
-				let div = document.getElementById(obj._divId);
+					_insertSvg(obj._divId, imgData);
+					resolve(obj);
+				} else if (this._format === "MDLV3000") {
+					// snippets from https://marvinjs-demo.chemaxon.com/latest/examples/example-create-image.html
+					let defaultServices = getDefaultServices(); // function in webservices.js
+					let services = {};
+					services['molconvertws'] = defaultServices['molconvertws'];
 
-				// clear everything (might be relevant if setMDLv2000(molecule) is called)
-				div.innerHTML = '';
+					let params = {
+						'imageType': "image/svg",
+						'settings': settings,
+						'inputFormat': "mol:V3",
+						'services': services
+					}
 
-				// attach the image
-				div.insertAdjacentHTML('beforeend', imgData);
-				resolve(obj);
+					let exporter = new namespace.ImageExporter(params);
+
+					// MarvinJS needs to ask the webservice for V3000, thus we get a Promise.
+					exporter.render(mol).then((imgData) => {
+						_insertSvg(obj._divId, imgData);
+						resolve(obj);
+					});
+				}
 			});
 		});
 	}
 
-	getMDLv2000() {
+	_insertSvg(divId, svg) {
+		// target <div>
+		let div = document.getElementById(divId);
+
+		// clear everything (might be relevant if setMolecule(molecule) is called)
+		div.innerHTML = '';
+
+		// attach the image
+		div.insertAdjacentHTML('beforeend', svg);
+	}
+
+	getMolecule() {
 		return this._molecule;
 	}
 
-	setMDLv2000(molecule) {
+	setMolecule(molecule) {
 		return new Promise((resolve, reject) => {
 			if (typeof molecule !== "undefined") {
 				this._molecule = molecule;
