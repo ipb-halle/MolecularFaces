@@ -87,8 +87,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * <p>
 	 * Flag indicating that this element is rendered with a border.
 	 * 
-	 * @return the value of the attribute or <code>false</code> if it has
-	 *         not been set in the JSF view.
+	 * @return the value of the attribute or <code>false</code> if it has not been
+	 *         set in the JSF view.
 	 */
 	public boolean isBorder() {
 		return (boolean) getStateHelper().eval(PropertyKeys.border, false);
@@ -105,7 +105,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	}
 
 	public static final String DEFAULT_FORMAT = Format.MDLV3000.toString();
-	
+
 	/**
 	 * Return the value of the <code>format</code> property.
 	 * <p>
@@ -114,8 +114,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * <p>
 	 * Possible values are provided by the {@link Format} enumeration.
 	 * 
-	 * @return the value of the attribute or "MDLV3000" if it has not
-	 *         been set in the JSF view.
+	 * @return the value of the attribute or "MDLV3000" if it has not been set in
+	 *         the JSF view.
 	 */
 	public String getFormat() {
 		return (String) getStateHelper().eval(PropertyKeys.format, DEFAULT_FORMAT);
@@ -137,8 +137,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * <p>
 	 * The height of the structure editor plugin in pixels.
 	 * 
-	 * @return the value of the attribute or 400 if it has not been set in
-	 *         the JSF view.
+	 * @return the value of the attribute or 400 if it has not been set in the JSF
+	 *         view.
 	 */
 	public int getHeight() {
 		return (int) getStateHelper().eval(PropertyKeys.height, DEFAULT_HEIGHT);
@@ -159,8 +159,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * Flag indicating that this element is in editable (full structure editor) or
 	 * in view-only mode.
 	 * 
-	 * @return the value of the attribute or <code>false</code> if it has
-	 *         not been set in the JSF view.
+	 * @return the value of the attribute or <code>false</code> if it has not been
+	 *         set in the JSF view.
 	 */
 	public boolean isReadonly() {
 		return (boolean) getStateHelper().eval(PropertyKeys.readonly, false);
@@ -205,8 +205,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * <p>
 	 * The width of the structure editor plugin in pixels.
 	 * 
-	 * @return the value of the attribute or 400 if it has not been set in
-	 *         the JSF view.
+	 * @return the value of the attribute or 400 if it has not been set in the JSF
+	 *         view.
 	 */
 	public int getWidth() {
 		return (int) getStateHelper().eval(PropertyKeys.width, DEFAULT_WIDTH);
@@ -281,7 +281,9 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * 
 	 * <p> This method loads all resources that have been enqueued via {@link
 	 * #addScriptResource(String)} and {@link #addCssResource(String)} via JSF's
-	 * resource handling mechanism.
+	 * resource handling mechanism. Afterwards it calls {@link
+	 * #processPostAddToViewEvent()} that may be used by component implementations
+	 * inheriting this class.
 	 * 
 	 * See: https://stackoverflow.com/a/12451778
 	 */
@@ -314,9 +316,19 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 				// Add the component to <head>.
 				getFacesContext().getViewRoot().addComponentResource(getFacesContext(), cssResource, "head");
 			}
+
+			processPostAddToViewEvent();
 		}
 
 		super.processEvent(event);
+	}
+
+	/**
+	 * Interested client components can override this method to execute code in the
+	 * {@link PostAddToViewEvent} of the component. The default implementation does
+	 * nothing.
+	 */
+	protected void processPostAddToViewEvent() {
 	}
 
 	/**

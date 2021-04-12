@@ -61,6 +61,8 @@ public class MarvinJSComponent extends MolPluginCore {
 
 	private WebXml webXml = new WebXmlImpl();
 
+	private final String baseDir = webXml.getContextParam(WEBXML_MARVINJS_BASE_URL, getFacesContext(), null);
+
 	public MarvinJSComponent() {
 		super();
 
@@ -68,19 +70,28 @@ public class MarvinJSComponent extends MolPluginCore {
 		 * Always include Marvin JS via external resources defined by
 		 * WEBXML_MARVINJS_BASE_URL.
 		 */
-		String baseDir = webXml.getContextParam(WEBXML_MARVINJS_BASE_URL, getFacesContext(), null);
 		addScriptExt(baseDir + "/gui/lib/promise-1.0.0.min.js");
 		addScriptExt(baseDir + "/js/marvinjslauncher.js");
-
-		// webservices.js needs to be included if we use the viewer.
-		if (isReadonly() && webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_WEBSERVICES, getFacesContext(), "")
-				.equals("true")) {
-			addScriptExt(baseDir + "/js/webservices.js");
-		}
 
 		addScriptResource("js/MolecularFaces.js");
 
 		setRendererType(DEFAULT_RENDERER);
+	}
+
+	@Override
+	protected void processPostAddToViewEvent() {
+		/*
+		 * webservices.js needs to be included if we use the viewer.
+		 * 
+		 * The usual trouble with loading resources dynamically: We cannot use
+		 * isReadonly() in the constructor of the component, because the attribute from
+		 * the view has not been applied to this component yet. That is why it is done
+		 * in the {@link PostAddToViewEvent}.
+		 */
+		if (isReadonly() && webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_WEBSERVICES, getFacesContext(), "")
+				.equals("true")) {
+			addScriptExt(baseDir + "/js/webservices.js");
+		}
 	}
 
 	@Override
