@@ -28,7 +28,7 @@ import de.ipb_halle.molecularfaces.util.WebXml;
 import de.ipb_halle.molecularfaces.util.WebXmlImpl;
 
 /**
- * This {@link Renderer} renders a chemical structure editor or viewer using the
+ * This {@link javax.faces.render.Renderer} renders a chemical structure editor or viewer using the
  * <a href="https://chemaxon.com/products/marvin-js">Marvin JS</a> Javascript
  * plugin.
  * 

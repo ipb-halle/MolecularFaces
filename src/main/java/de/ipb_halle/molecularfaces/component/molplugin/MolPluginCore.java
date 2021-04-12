@@ -104,7 +104,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 		getStateHelper().put(PropertyKeys.border, border);
 	}
 
-	public static final String DEFAULT_FORMAT = Format.MDLV3000.toString();
+	public static final String DEFAULT_FORMAT = Format.MDLV2000.toString();
 
 	/**
 	 * Return the value of the <code>format</code> property.
@@ -114,7 +114,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * <p>
 	 * Possible values are provided by the {@link Format} enumeration.
 	 * 
-	 * @return the value of the attribute or "MDLV3000" if it has not been set in
+	 * @return the value of the attribute or "MDLV2000" if it has not been set in
 	 *         the JSF view.
 	 */
 	public String getFormat() {

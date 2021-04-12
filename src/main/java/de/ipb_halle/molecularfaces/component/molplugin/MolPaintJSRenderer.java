@@ -25,7 +25,7 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 
 /**
- * This {@link Renderer} renders a chemical structure editor or viewer using the
+ * This {@link javax.faces.render.Renderer} renders a chemical structure editor or viewer using the
  * <a href="https://github.com/ipb-halle/MolPaintJS">MolPaintJS</a> Javascript
  * plugin.
  * 

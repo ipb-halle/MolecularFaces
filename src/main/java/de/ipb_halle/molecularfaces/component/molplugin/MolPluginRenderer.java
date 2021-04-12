@@ -71,8 +71,8 @@ public abstract class MolPluginRenderer extends Renderer {
 	 * converter's {@link Converter#getAsString(FacesContext, UIComponent, Object)}
 	 * method. If no converter is defined, it just returns the value.
 	 * 
-	 * @param context
-	 * @param component
+	 * @param context {@link FacesContext} for the request we are processing
+	 * @param component component of the molecular structure plugin to be encoded
 	 * @return converted value
 	 */
 	protected String getValueAsString(FacesContext context, MolPluginCore component) {
