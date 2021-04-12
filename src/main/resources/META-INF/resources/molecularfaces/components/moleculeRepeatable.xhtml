@@ -20,6 +20,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:composite="http://xmlns.jcp.org/jsf/composite"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 	xmlns:mol="http://github.com/ipb-halle/MolecularFaces">
 <h:head />
@@ -28,7 +29,10 @@
 		<composite:attribute name="pluginType" default="OpenChemLibJS" />
 		<composite:attribute name="value" required="true" />
 		<composite:attribute name="border" default="false" />
-		<composite:attribute name="format" default="MolfileV3000" />
+		<!-- see https://stackoverflow.com/questions/39149708/jsf-optional-converter-in-composite-component -->
+		<composite:attribute name="converter"
+			default="molecularfaces.DummyConverter" />
+		<composite:attribute name="format" default="MolfileV2000" />
 		<composite:attribute name="height" default="400" />
 		<composite:attribute name="readonly" default="false" />
 		<composite:attribute name="widgetVar" />
@@ -41,19 +45,25 @@
 				<mol:openChemLibJSPlugin value="#{cc.attrs.value}"
 					border="#{cc.attrs.border}" format="#{cc.attrs.format}"
 					height="#{cc.attrs.height}" readonly="#{cc.attrs.readonly}"
-					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}" />
+					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}">
+					<f:converter converterId="#{cc.attrs.converter}" />
+				</mol:openChemLibJSPlugin>
 			</ui:fragment>
 			<ui:fragment rendered="#{cc.attrs.pluginType eq 'MolPaintJS'}">
 				<mol:molPaintJSPlugin value="#{cc.attrs.value}"
 					border="#{cc.attrs.border}" format="#{cc.attrs.format}"
 					height="#{cc.attrs.height}" readonly="#{cc.attrs.readonly}"
-					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}" />
+					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}">
+					<f:converter converterId="#{cc.attrs.converter}" />
+				</mol:molPaintJSPlugin>
 			</ui:fragment>
 			<ui:fragment rendered="#{cc.attrs.pluginType eq 'MarvinJS'}">
 				<mol:marvinJSPlugin value="#{cc.attrs.value}"
 					border="#{cc.attrs.border}" format="#{cc.attrs.format}"
 					height="#{cc.attrs.height}" readonly="#{cc.attrs.readonly}"
-					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}" />
+					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}">
+					<f:converter converterId="#{cc.attrs.converter}" />
+				</mol:marvinJSPlugin>
 			</ui:fragment>
 		</div>
 	</composite:implementation>

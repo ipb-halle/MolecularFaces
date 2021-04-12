@@ -19,24 +19,20 @@ package de.ipb_halle.molecularfaces.component.molplugin;
 
 import java.io.IOException;
 import java.util.Formatter;
-import java.util.Map;
-
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
-import javax.faces.render.Renderer;
 
 /**
- * This {@link javax.faces.render.Renderer} renders a chemical structure editor
- * or viewer using the
+ * This {@link Renderer} renders a chemical structure editor or viewer using the
  * <a href="https://github.com/ipb-halle/MolPaintJS">MolPaintJS</a> Javascript
  * plugin.
  * 
  * @author flange
  */
 @FacesRenderer(rendererType = MolPaintJSRenderer.RENDERER_TYPE, componentFamily = MolPluginCore.COMPONENT_FAMILY)
-public class MolPaintJSRenderer extends Renderer {
+public class MolPaintJSRenderer extends MolPluginRenderer {
 	public static final String RENDERER_TYPE = "molecularfaces.MolPaintJSRenderer";
 
 	/**
@@ -45,20 +41,6 @@ public class MolPaintJSRenderer extends Renderer {
 	 * This variable is defined in MolecularFaces.js.
 	 */
 	private String loaderJSVar = "molecularfaces.molPaintJSLoaderInstance";
-
-	@Override
-	public void decode(FacesContext context, UIComponent component) {
-		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
-		MolPluginCore plugin = (MolPluginCore) component;
-
-		if (!plugin.isReadonly()) {
-			String clientId = plugin.getClientId(context);
-
-			String value = requestMap.get(clientId);
-
-			plugin.setSubmittedValue(value);
-		}
-	}
 
 	@Override
 	public void encodeBegin(FacesContext context, UIComponent component) throws IOException {
@@ -89,21 +71,22 @@ public class MolPaintJSRenderer extends Renderer {
 		String hiddenInputId = clientId + "_Input";
 		String divId = clientId + "_MolPaintJSViewer";
 
-		encodeViewerHTML(writer, plugin, divId, hiddenInputId);
-		encodeViewerJS(context, writer, plugin, divId, hiddenInputId);
+		encodeViewerHTML(context, writer, plugin, divId, hiddenInputId);
+		encodeViewerJS(writer, plugin, divId, hiddenInputId);
 	}
 
 	/**
 	 * Encodes the HTML part of the plugin viewer into the writer. It consists of a
 	 * &lt;div&gt; element that the Javascript plugin uses as rendering target.
 	 * 
+	 * @param context
 	 * @param writer
 	 * @param plugin
 	 * @param divId         DOM id of the embedded &lt;div&gt; element
 	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
 	 */
-	private void encodeViewerHTML(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
-			throws IOException {
+	private void encodeViewerHTML(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String divId,
+			String hiddenInputId) throws IOException {
 		// inner <div> is used for the plugin's rendering (aka the Javascript target)
 		writer.startElement("div", plugin);
 		writer.writeAttribute("id", divId, null);
@@ -114,27 +97,24 @@ public class MolPaintJSRenderer extends Renderer {
 		writer.startElement("input", plugin);
 		writer.writeAttribute("type", "hidden", null);
 		writer.writeAttribute("id", hiddenInputId, null);
-		writer.writeAttribute("value", plugin.getValue(), "value");
+		writer.writeAttribute("value", getValueAsString(context, plugin), "value");
 		writer.endElement("input");
 	}
 
 	/**
 	 * Encodes the Javascript part of the plugin viewer into the writer.
 	 * 
-	 * @param context
 	 * @param writer
 	 * @param plugin
 	 * @param divId         DOM id of the &lt;div&gt; element
 	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
 	 */
-	private void encodeViewerJS(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String divId,
-			String hiddenInputId) throws IOException {
-		String escapedMolecule = escape((String) plugin.getValue());
-
+	private void encodeViewerJS(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
+			throws IOException {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
-		StringBuilder sb = new StringBuilder(512 + escapedMolecule.length());
+		StringBuilder sb = new StringBuilder(512);
 
 		// resource loading
 		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
@@ -171,21 +151,22 @@ public class MolPaintJSRenderer extends Renderer {
 		String hiddenInputId = clientId + "_Input";
 		String divId = clientId + "_MolPaintJSEditor";
 
-		encodeEditorHTML(writer, plugin, divId, hiddenInputId);
-		encodeEditorJS(context, writer, plugin, divId, hiddenInputId);
+		encodeEditorHTML(context, writer, plugin, divId, hiddenInputId);
+		encodeEditorJS(writer, plugin, divId, hiddenInputId);
 	}
 
 	/**
 	 * Encodes the HTML part of the plugin editor into the writer. It consists of a
 	 * &lt;div&gt; and a hidden &lt;input&gt; element.
 	 * 
+	 * @param context
 	 * @param writer
 	 * @param plugin
 	 * @param divId         DOM id of the embedded &lt;div&gt; element
 	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
 	 */
-	private void encodeEditorHTML(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
-			throws IOException {
+	private void encodeEditorHTML(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String divId,
+			String hiddenInputId) throws IOException {
 		// inner <div> used for the plugin's rendering (aka the Javascript target)
 		writer.startElement("div", plugin);
 		writer.writeAttribute("id", divId, null);
@@ -197,7 +178,7 @@ public class MolPaintJSRenderer extends Renderer {
 		writer.writeAttribute("type", "hidden", null);
 		writer.writeAttribute("id", hiddenInputId, null);
 		writer.writeAttribute("name", plugin.getClientId(), null);
-		writer.writeAttribute("value", plugin.getValue(), "value");
+		writer.writeAttribute("value", getValueAsString(context, plugin), "value");
 		writer.endElement("input");
 	}
 
@@ -207,14 +188,13 @@ public class MolPaintJSRenderer extends Renderer {
 	 * Note: Different components of this plugin type will use one and the same
 	 * Javascript variable, which will be overwritten in case it already exists.
 	 * 
-	 * @param context
 	 * @param writer
 	 * @param plugin
 	 * @param divId         DOM id of the &lt;div&gt; element
 	 * @param hiddenInputId DOM id of the hidden &lt;input&gt; element
 	 */
-	private void encodeEditorJS(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String divId,
-			String hiddenInputId) throws IOException {
+	private void encodeEditorJS(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
+			throws IOException {
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
@@ -256,36 +236,5 @@ public class MolPaintJSRenderer extends Renderer {
 
 		writer.writeText(sb, null);
 		writer.endElement("script");
-	}
-
-	private String generateDivStyle(MolPluginCore plugin) {
-		StringBuilder sb = new StringBuilder(128);
-
-		// width attribute
-		sb.append("width:").append(plugin.getWidth()).append("px;");
-
-		// height attribute
-		sb.append("height:").append(plugin.getHeight()).append("px;");
-
-		// border attribute
-		if (plugin.isBorder()) {
-			sb.append("border:solid;border-width:1px;");
-		}
-
-		return sb.toString();
-	}
-
-	/**
-	 * Escape string for HTML / XML. Used mainly for molecules in MDL MOL format.
-	 * 
-	 * @param s string to escape
-	 * @return escaped string
-	 */
-	private String escape(String s) {
-		if (s == null) {
-			return "";
-		}
-
-		return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "");
 	}
 }

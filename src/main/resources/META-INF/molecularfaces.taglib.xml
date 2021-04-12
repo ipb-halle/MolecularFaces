@@ -33,6 +33,12 @@
 			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
+			<description><![CDATA[Converter instance registered with this component.]]></description>
+			<name>converter</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
 			<description><![CDATA[Chemical file format. Available formats: MDLV2000, MDLV3000]]></description>
 			<name>format</name>
 			<required>false</required>
@@ -79,6 +85,12 @@
 			<name>border</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description><![CDATA[Converter instance registered with this component.]]></description>
+			<name>converter</name>
+			<required>false</required>
+			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
 			<description><![CDATA[Chemical file format. Available formats: MDLV2000, MDLV3000]]></description>

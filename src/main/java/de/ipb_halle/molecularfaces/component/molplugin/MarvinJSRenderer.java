@@ -19,26 +19,23 @@ package de.ipb_halle.molecularfaces.component.molplugin;
 
 import java.io.IOException;
 import java.util.Formatter;
-import java.util.Map;
-
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
-import javax.faces.render.Renderer;
 
 import de.ipb_halle.molecularfaces.util.WebXml;
 import de.ipb_halle.molecularfaces.util.WebXmlImpl;
 
 /**
- * This {@link javax.faces.render.Renderer} renders a chemical structure editor
- * or viewer using the <a href="https://chemaxon.com/products/marvin-js">Marvin
- * JS</a> Javascript plugin.
+ * This {@link Renderer} renders a chemical structure editor or viewer using the
+ * <a href="https://chemaxon.com/products/marvin-js">Marvin JS</a> Javascript
+ * plugin.
  * 
  * @author flange
  */
 @FacesRenderer(rendererType = MarvinJSRenderer.RENDERER_TYPE, componentFamily = MolPluginCore.COMPONENT_FAMILY)
-public class MarvinJSRenderer extends Renderer {
+public class MarvinJSRenderer extends MolPluginRenderer {
 	public static final String RENDERER_TYPE = "molecularfaces.MarvinJSRenderer";
 
 	/**
@@ -49,20 +46,6 @@ public class MarvinJSRenderer extends Renderer {
 	private String loaderJSVar = "molecularfaces.marvinJSLoaderInstance";
 
 	private WebXml webXml = new WebXmlImpl();
-
-	@Override
-	public void decode(FacesContext context, UIComponent component) {
-		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
-		MolPluginCore plugin = (MolPluginCore) component;
-
-		if (!plugin.isReadonly()) {
-			String clientId = plugin.getClientId(context);
-
-			String value = requestMap.get(clientId);
-
-			plugin.setSubmittedValue(value);
-		}
-	}
 
 	@Override
 	public void encodeBegin(FacesContext context, UIComponent component) throws IOException {
@@ -94,7 +77,7 @@ public class MarvinJSRenderer extends Renderer {
 		String hiddenInputId = clientId + "_Input";
 		String divId = clientId + "_MarvinJSViewer";
 
-		encodeViewerHTML(writer, plugin, divId, hiddenInputId);
+		encodeViewerHTML(context, writer, plugin, divId, hiddenInputId);
 		encodeViewerJS(context, writer, plugin, divId, hiddenInputId);
 	}
 
@@ -102,13 +85,14 @@ public class MarvinJSRenderer extends Renderer {
 	 * Encodes the HTML part of the plugin viewer into the writer. It consists of a
 	 * &lt;div&gt; element that the Javascript plugin uses as rendering target.
 	 * 
+	 * @param context
 	 * @param writer
 	 * @param plugin
 	 * @param divId         DOM id of the embedded &lt;div&gt; element
 	 * @param hiddenInputId DOM id of the embedded hidden &lt;input&gt; element
 	 */
-	private void encodeViewerHTML(ResponseWriter writer, MolPluginCore plugin, String divId, String hiddenInputId)
-			throws IOException {
+	private void encodeViewerHTML(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String divId,
+			String hiddenInputId) throws IOException {
 		// inner <div> is used for the plugin's rendering (aka the Javascript target)
 		writer.startElement("div", plugin);
 		writer.writeAttribute("id", divId, null);
@@ -119,7 +103,7 @@ public class MarvinJSRenderer extends Renderer {
 		writer.startElement("input", plugin);
 		writer.writeAttribute("type", "hidden", null);
 		writer.writeAttribute("id", hiddenInputId, null);
-		writer.writeAttribute("value", plugin.getValue(), "value");
+		writer.writeAttribute("value", getValueAsString(context, plugin), "value");
 		writer.endElement("input");
 	}
 
@@ -134,14 +118,12 @@ public class MarvinJSRenderer extends Renderer {
 	 */
 	private void encodeViewerJS(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String divId,
 			String hiddenInputId) throws IOException {
-		String escapedMolecule = escape((String) plugin.getValue());
-
 		writer.startElement("script", plugin);
 		writer.writeAttribute("type", "text/javascript", null);
 
 		String installPath = webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL, context, "");
 
-		StringBuilder sb = new StringBuilder(512 + installPath.length() + escapedMolecule.length());
+		StringBuilder sb = new StringBuilder(512 + installPath.length());
 
 		// resource loading
 		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
@@ -211,7 +193,7 @@ public class MarvinJSRenderer extends Renderer {
 		writer.writeAttribute("type", "hidden", null);
 		writer.writeAttribute("id", hiddenInputId, null);
 		writer.writeAttribute("name", plugin.getClientId(), null);
-		writer.writeAttribute("value", plugin.getValue(), "value");
+		writer.writeAttribute("value", getValueAsString(context, plugin), "value");
 		writer.endElement("input");
 	}
 
@@ -255,7 +237,8 @@ public class MarvinJSRenderer extends Renderer {
 		fmt.format("%s.status().then(() => {", loaderJSVar);
 		fmt.format(
 				"return molecularfaces.MarvinJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", \"%s\", %d, %d, \"%s\")",
-				iframeId, hiddenInputId, installPath, license, plugin.getHeight(), plugin.getWidth(), plugin.getFormat());
+				iframeId, hiddenInputId, installPath, license, plugin.getHeight(), plugin.getWidth(),
+				plugin.getFormat());
 
 		/*
 		 * Register an on-change callback to fill the value of the hidden <input>
@@ -272,36 +255,5 @@ public class MarvinJSRenderer extends Renderer {
 
 		writer.writeText(sb, null);
 		writer.endElement("script");
-	}
-
-	private String generateDivStyle(MolPluginCore plugin) {
-		StringBuilder sb = new StringBuilder(128);
-
-		// width attribute
-		sb.append("width:").append(plugin.getWidth()).append("px;");
-
-		// height attribute
-		sb.append("height:").append(plugin.getHeight()).append("px;");
-
-		// border attribute
-		if (plugin.isBorder()) {
-			sb.append("border:solid;border-width:1px;");
-		}
-
-		return sb.toString();
-	}
-
-	/**
-	 * Escape string for HTML / XML. Used mainly for molecules in MDL MOL format.
-	 * 
-	 * @param s string to escape
-	 * @return escaped string
-	 */
-	private String escape(String s) {
-		if (s == null) {
-			return "";
-		}
-
-		return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "");
 	}
 }
