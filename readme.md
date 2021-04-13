@@ -14,7 +14,7 @@ The artifacts are available on Maven Central. To include MolecularFaces into you
 <dependency>
   <groupId>de.ipb-halle</groupId>
   <artifactId>molecularfaces</artifactId>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
 </dependency>
 ```
  
