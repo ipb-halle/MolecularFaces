@@ -35,7 +35,7 @@ import de.ipb_halle.molecularfaces.validator.Molfile.Format;
  * 
  * @author flange
  */
-public class MolFileValidator implements ConstraintValidator<Molfile, String> {
+public class MolfileValidator implements ConstraintValidator<Molfile, String> {
 	private Mode cdkReaderMode;
 	private Format format;
 

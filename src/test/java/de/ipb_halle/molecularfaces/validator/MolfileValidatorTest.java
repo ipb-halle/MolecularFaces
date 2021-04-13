@@ -28,7 +28,7 @@ import org.junit.Test;
 import de.ipb_halle.molecularfaces.validator.Molfile.Format;
 import de.ipb_halle.molecularfaces.validator.Molfile.Mode;
 
-public class MolFileValidatorTest {
+public class MolfileValidatorTest {
 	private static Validator validator;
 
 	@BeforeClass

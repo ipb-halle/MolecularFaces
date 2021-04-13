@@ -33,7 +33,7 @@ import javax.validation.Payload;
  */
 @Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, TYPE_USE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = MolFileValidator.class)
+@Constraint(validatedBy = MolfileValidator.class)
 @Documented
 public @interface Molfile {
 	String message() default "invalid MDL Molfile";
