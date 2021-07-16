@@ -177,7 +177,7 @@ public class MarvinJSRenderer extends MolPluginRenderer {
 	private void encodeEditorHTML(FacesContext context, ResponseWriter writer, MolPluginCore plugin, String iframeId,
 			String hiddenInputId) throws IOException {
 		String installPath = webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_BASE_URL, context, "");
-		String embed = webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_WEBSERVICES, context, "").equals("true")
+		String embed = webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_WEBSERVICES, context, "").equalsIgnoreCase("true")
 				? "/editorws.html"
 				: "/editor.html";
 

@@ -45,7 +45,8 @@ public class MarvinJSComponent extends MolPluginCore {
 	/**
 	 * Name of the context-param in web.xml that specifies if Marvin JS should use
 	 * its webservices. If "true", the &lt;iframe&gt; will embed editorws.html, else
-	 * it will embed editor.html.
+	 * it will embed editor.html. In readonly mode, the component will load
+	 * /js/webservices.js relative to {@link WEBXML_MARVINJS_BASE_URL}.
 	 * 
 	 * @see <a href=
 	 *      "https://marvinjs-demo.chemaxon.com/latest/docs/dev/embed.html">https://marvinjs-demo.chemaxon.com/latest/docs/dev/embed.html</a>
@@ -89,7 +90,7 @@ public class MarvinJSComponent extends MolPluginCore {
 		 * in the {@link PostAddToViewEvent}.
 		 */
 		if (isReadonly() && webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_WEBSERVICES, getFacesContext(), "")
-				.equals("true")) {
+				.equalsIgnoreCase("true")) {
 			addScriptExt(baseDir + "/js/webservices.js");
 		}
 	}
