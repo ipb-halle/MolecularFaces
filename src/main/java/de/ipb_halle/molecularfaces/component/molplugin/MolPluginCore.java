@@ -17,17 +17,14 @@
  */
 package de.ipb_halle.molecularfaces.component.molplugin;
 
-import java.util.Formatter;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.faces.component.UIInput;
-import javax.faces.component.UIOutput;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.ListenerFor;
 import javax.faces.event.PostAddToViewEvent;
+
+import de.ipb_halle.molecularfaces.util.ResourceLoader;
 
 /**
  * This class holds the attribute states of the chemical structure plugins and
@@ -38,14 +35,11 @@ import javax.faces.event.PostAddToViewEvent;
 @ListenerFor(systemEventClass = PostAddToViewEvent.class)
 public abstract class MolPluginCore extends UIInput implements ComponentSystemEventListener {
 	/**
-	 * Resource library name.
-	 */
-	private static final String RESOURCES_LIBRARY_NAME = "molecularfaces";
-
-	/**
 	 * Component family returned by {@link #getFamily()}
 	 */
 	public static final String COMPONENT_FAMILY = "molecularfaces.MolPluginFamily";
+
+	private ResourceLoader resourceLoader = new ResourceLoader();
 
 	@Override
 	public String getFamily() {
@@ -221,8 +215,6 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 		getStateHelper().put(PropertyKeys.width, width);
 	}
 
-	private Set<String> scriptResourcesToLoad = new HashSet<>();
-
 	/**
 	 * Enqueues loading of a JavaScript resource file. The resource will be added
 	 * via JSF's resource mechanism by the
@@ -232,10 +224,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * @param resource name of the file in the web project's resource library
 	 */
 	protected void addScriptResource(String resource) {
-		scriptResourcesToLoad.add(resource);
+		resourceLoader.addScriptResource(resource);
 	}
-
-	private Set<String> scriptsExtToLoad = new HashSet<>();
 
 	/**
 	 * Enqueues loading of a JavaScript resource file. The resource will be loaded
@@ -244,10 +234,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * @param src path of the resource file
 	 */
 	protected void addScriptExt(String src) {
-		scriptsExtToLoad.add(src);
+		resourceLoader.addScriptExt(src);
 	}
-
-	private Set<String> cssResourcesToLoad = new HashSet<>();
 
 	/**
 	 * Enqueues loading of a stylesheet resource file. The resource will be added
@@ -258,10 +246,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * @param resource name of the file in the web project's resource library
 	 */
 	protected void addCssResource(String resource) {
-		cssResourcesToLoad.add(resource);
+		resourceLoader.addCssResource(resource);
 	}
-
-	private Set<String> cssExtToLoad = new HashSet<>();
 
 	/**
 	 * Enqueues loading of a stylesheet resource file. The resource will be loaded
@@ -270,7 +256,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * @param href path of the resource file
 	 */
 	protected void addCssExt(String href) {
-		cssExtToLoad.add(href);
+		resourceLoader.addCssExt(href);
 	}
 
 	/*
@@ -278,46 +264,18 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * the @ResourceDependencies annotation). This has to be done before the render
 	 * response, so an event listener for PostAddToViewEvent is registered
 	 * via @ListenerFor to this component class, which is processed here.
-	 * 
-	 * <p> This method loads all resources that have been enqueued via {@link
-	 * #addScriptResource(String)} and {@link #addCssResource(String)} via JSF's
-	 * resource handling mechanism. Afterwards it calls {@link
-	 * #processPostAddToViewEvent()} that may be used by component implementations
-	 * inheriting this class.
-	 * 
 	 * See: https://stackoverflow.com/a/12451778
+	 * <p>
+	 * This method calls {@link #processPostAddToViewEvent()} that may be used by
+	 * component implementations extending this class. Afterwards it loads all
+	 * resources that have been enqueued via {@link #addScriptResource(String)} and
+	 * {@link #addCssResource(String)} via JSF's resource handling mechanism.
 	 */
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
 		if (event instanceof PostAddToViewEvent) {
-			for (String resource : scriptResourcesToLoad) {
-				/*
-				 * Create an UIComponent that includes the script from the resource library.
-				 */
-				UIOutput jsResource = new UIOutput();
-				jsResource.setRendererType("javax.faces.resource.Script");
-				jsResource.getAttributes().put("library", RESOURCES_LIBRARY_NAME);
-				jsResource.getAttributes().put("name", resource);
-
-				// Add the component to <head>.
-				getFacesContext().getViewRoot().addComponentResource(getFacesContext(), jsResource, "head");
-			}
-
-			for (String resource : cssResourcesToLoad) {
-				/*
-				 * Create an UIComponent that includes the stylesheet file from the resource
-				 * library.
-				 */
-				UIOutput cssResource = new UIOutput();
-				cssResource.setRendererType("javax.faces.resource.Stylesheet");
-				cssResource.getAttributes().put("library", RESOURCES_LIBRARY_NAME);
-				cssResource.getAttributes().put("name", resource);
-
-				// Add the component to <head>.
-				getFacesContext().getViewRoot().addComponentResource(getFacesContext(), cssResource, "head");
-			}
-
 			processPostAddToViewEvent();
+			resourceLoader.processPostAddToViewEvent(getFacesContext());
 		}
 
 		super.processEvent(event);
@@ -325,8 +283,8 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 
 	/**
 	 * Interested client components can override this method to execute code in the
-	 * {@link PostAddToViewEvent} of the component. The default implementation does
-	 * nothing.
+	 * {@link PostAddToViewEvent} of the component before resource loading happens.
+	 * The default implementation does nothing.
 	 */
 	protected void processPostAddToViewEvent() {
 	}
@@ -341,23 +299,6 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 * @return JavaScript code
 	 */
 	protected StringBuilder encodeLoadExtResources(String loaderJSVar) {
-		if (scriptsExtToLoad.isEmpty() && cssExtToLoad.isEmpty()) {
-			return new StringBuilder();
-		} else {
-			StringBuilder sb = new StringBuilder(256);
-			Formatter fmt = new Formatter(sb);
-
-			sb.append(loaderJSVar);
-			for (String script : scriptsExtToLoad) {
-				fmt.format(".addScriptToHead(\"%s\")", script);
-			}
-			for (String href : cssExtToLoad) {
-				fmt.format(".addCssToHead(\"%s\")", href);
-			}
-			sb.append(";");
-
-			fmt.close();
-			return sb;
-		}
+		return resourceLoader.encodeLoadExtResources(loaderJSVar);
 	}
 }
