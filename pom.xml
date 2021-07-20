@@ -41,12 +41,20 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+		<!-- OpenChemLib JS -->
 		<openchemlibjs.version>7.4.0</openchemlibjs.version>
 		<!-- This is the checksum from the package distributed via npm. -->
 		<openchemlibjs.sha256>6e12e9d8b79ca1bf22fe3abbe2fd1288023a8766ca8a89c2c1061668bc1fe6bb</openchemlibjs.sha256>
 
+		<!-- MolPaintJS -->
 		<molpaintjs.version>v0.3.5-alpha</molpaintjs.version>
 		<molpaintjs.sha256>580893aa3ad25abc2a78d3bee8ff14d2a9a4486e6d8df9291149f471e2c16791</molpaintjs.sha256>
+
+		<!-- openVectorEditor -->
+		<openVectorEditor.version>16.3.5</openVectorEditor.version>
+		<!-- These are the checksums from the package distributed via npm. -->
+		<openVectorEditor.min.js.sha256>7a08cb9a569d42c74a55c9eb93ad5123fd1bd926c474927f62a15dc0c9c21a01</openVectorEditor.min.js.sha256>
+		<openVectorEditor.main.css.sha256>2cc041f07746abe0374aa0a464ceabc64ad5802e4286d6a9dc5f08c2d5d42492</openVectorEditor.main.css.sha256>
 	</properties>
 
 	<distributionManagement>
@@ -111,11 +119,13 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- 3rd party plugin downloads -->
 			<plugin>
 				<groupId>com.googlecode.maven-download-plugin</groupId>
 				<artifactId>download-maven-plugin</artifactId>
 				<version>1.6.1</version>
 				<executions>
+					<!-- OpenChemLib JS -->
 					<execution>
 						<id>download-openchemlibjs</id>
 						<phase>generate-resources</phase>
@@ -127,8 +137,11 @@
 							<url>https://unpkg.com/openchemlib@${openchemlibjs.version}/dist/openchemlib-full.js</url>
 							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openchemlibjs/</outputDirectory>
 							<sha256>${openchemlibjs.sha256}</sha256>
+							<checkSignature>true</checkSignature>
 						</configuration>
 					</execution>
+
+					<!-- MolPaintJS -->
 					<execution>
 						<id>download-molpaintjs</id>
 						<phase>generate-resources</phase>
@@ -139,6 +152,35 @@
 							<url>https://github.com/ipb-halle/MolPaintJS/releases/download/${molpaintjs.version}/molpaint.js</url>
 							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/molpaintjs/</outputDirectory>
 							<sha256>${molpaintjs.sha256}</sha256>
+							<checkSignature>true</checkSignature>
+						</configuration>
+					</execution>
+
+					<!-- openVectorEditor -->
+					<execution>
+						<id>download-openVectorEditor-min-js</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://unpkg.com/open-vector-editor@${openVectorEditor.version}/umd/open-vector-editor.min.js</url>
+							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openVectorEditor/</outputDirectory>
+							<sha256>${openVectorEditor.min.js.sha256}</sha256>
+							<checkSignature>true</checkSignature>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-openVectorEditor-main-css</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://unpkg.com/open-vector-editor@${openVectorEditor.version}/umd/main.css</url>
+							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openVectorEditor/</outputDirectory>
+							<sha256>${openVectorEditor.main.css.sha256}</sha256>
+							<checkSignature>true</checkSignature>
 						</configuration>
 					</execution>
 				</executions>
