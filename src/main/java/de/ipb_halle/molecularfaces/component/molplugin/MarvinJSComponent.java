@@ -18,6 +18,11 @@
 package de.ipb_halle.molecularfaces.component.molplugin;
 
 import javax.faces.component.FacesComponent;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.ComponentSystemEvent;
+import javax.faces.event.ComponentSystemEventListener;
+import javax.faces.event.ListenerFor;
+import javax.faces.event.PostAddToViewEvent;
 
 import de.ipb_halle.molecularfaces.util.WebXml;
 import de.ipb_halle.molecularfaces.util.WebXmlImpl;
@@ -30,8 +35,9 @@ import de.ipb_halle.molecularfaces.util.WebXmlImpl;
  * 
  * @author flange
  */
+@ListenerFor(systemEventClass = PostAddToViewEvent.class)
 @FacesComponent(MarvinJSComponent.COMPONENT_TYPE)
-public class MarvinJSComponent extends MolPluginCore {
+public class MarvinJSComponent extends MolPluginCore implements ComponentSystemEventListener {
 	public static final String COMPONENT_TYPE = "molecularfaces.MarvinJS";
 	public static final String DEFAULT_RENDERER = MarvinJSRenderer.RENDERER_TYPE;
 
@@ -71,25 +77,34 @@ public class MarvinJSComponent extends MolPluginCore {
 		 * Always include Marvin JS via external resources defined by
 		 * WEBXML_MARVINJS_BASE_URL.
 		 */
-		addScriptExtToHead(baseDir + "/gui/lib/promise-1.0.0.min.js");
-		addScriptExtToHead(baseDir + "/js/marvinjslauncher.js");
+		getResourceLoader().addScriptExtToHead(baseDir + "/gui/lib/promise-1.0.0.min.js");
+		getResourceLoader().addScriptExtToHead(baseDir + "/js/marvinjslauncher.js");
 
 		setRendererType(DEFAULT_RENDERER);
 	}
 
 	@Override
-	protected void processPostAddToViewEvent() {
-		/*
-		 * webservices.js needs to be included if we use the viewer.
-		 * 
-		 * The usual trouble with loading resources dynamically: We cannot use
-		 * isReadonly() in the constructor of the component, because the attribute from
-		 * the view has not been applied to this component yet. That is why it is done
-		 * in the {@link PostAddToViewEvent}.
-		 */
-		if (isReadonly() && webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_WEBSERVICES, getFacesContext(), "")
-				.equalsIgnoreCase("true")) {
-			addScriptExtToHead(baseDir + "/js/webservices.js");
+	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+		if (event instanceof PostAddToViewEvent) {
+			processPostAddToViewEvent();
+		}
+
+		super.processEvent(event);
+	}
+
+	/*
+	 * webservices.js needs to be included if we use the viewer.
+	 * 
+	 * The usual trouble with loading resources dynamically: We cannot use
+	 * isReadonly() in the constructor of the component, because the attribute from
+	 * the view has not been applied to this component yet. That is why it is done
+	 * in the {@link PostAddToViewEvent}.
+	 */
+	private void processPostAddToViewEvent() {
+		boolean useWebServices = webXml.getContextParam(WEBXML_MARVINJS_WEBSERVICES, getFacesContext(), "")
+				.equalsIgnoreCase("true");
+		if (isReadonly() && useWebServices) {
+			getResourceLoader().addScriptExtToHead(baseDir + "/js/webservices.js");
 		}
 	}
 

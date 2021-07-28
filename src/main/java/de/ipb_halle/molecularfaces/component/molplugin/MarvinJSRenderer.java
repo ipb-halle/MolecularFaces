@@ -127,7 +127,7 @@ public class MarvinJSRenderer extends MolPluginRenderer {
 		StringBuilder sb = new StringBuilder(512 + installPath.length());
 
 		// resource loading
-		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
+		sb.append(plugin.getResourceLoader().encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);
 
@@ -221,7 +221,7 @@ public class MarvinJSRenderer extends MolPluginRenderer {
 		StringBuilder sb = new StringBuilder(512 + installPath.length() + license.length());
 
 		// resource loading
-		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
+		sb.append(plugin.getResourceLoader().encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);
 

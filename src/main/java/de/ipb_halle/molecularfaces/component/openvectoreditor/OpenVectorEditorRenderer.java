@@ -127,7 +127,7 @@ public class OpenVectorEditorRenderer extends Renderer {
 		StringBuilder sb = new StringBuilder(512);
 
 		// resource loading
-		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
+		sb.append(plugin.getResourceLoader().encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);
 

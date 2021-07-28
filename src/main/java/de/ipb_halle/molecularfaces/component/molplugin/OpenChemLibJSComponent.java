@@ -48,9 +48,9 @@ public class OpenChemLibJSComponent extends MolPluginCore {
 
 		String resourceUrl = webXml.getContextParam(WEBXML_CUSTOM_RESOURCE_URL, getFacesContext(), null);
 		if ((resourceUrl != null) && (!resourceUrl.isEmpty())) {
-			addScriptExtToHead(resourceUrl);
+			getResourceLoader().addScriptExtToHead(resourceUrl);
 		} else {
-			addScriptResourceToHead("plugins/openchemlibjs/openchemlib-full.js");
+			getResourceLoader().addScriptResourceToHead("plugins/openchemlibjs/openchemlib-full.js");
 		}
 
 		setRendererType(DEFAULT_RENDERER);

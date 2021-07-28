@@ -48,9 +48,9 @@ public class MolPaintJSComponent extends MolPluginCore {
 
 		String resourceUrl = webXml.getContextParam(WEBXML_CUSTOM_RESOURCE_URL, getFacesContext(), null);
 		if ((resourceUrl != null) && (!resourceUrl.isEmpty())) {
-			addScriptExtToHead(resourceUrl);
+			getResourceLoader().addScriptExtToHead(resourceUrl);
 		} else {
-			addScriptResourceToHead("plugins/molpaintjs/molpaint.js");
+			getResourceLoader().addScriptResourceToHead("plugins/molpaintjs/molpaint.js");
 		}
 
 		setRendererType(DEFAULT_RENDERER);

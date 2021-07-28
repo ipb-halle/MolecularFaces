@@ -25,13 +25,17 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.component.html.HtmlBody;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.ComponentSystemEvent;
+import javax.faces.event.ComponentSystemEventListener;
+import javax.faces.event.PostAddToViewEvent;
 
 /**
- * This class enqueues resources and loads them upon request.
+ * This class enqueues resources and loads them automatically or upon request.
  * 
  * @author flange
  */
-public class ResourceLoader {
+public class ResourceLoader implements ComponentSystemEventListener {
 	/**
 	 * Resource library name.
 	 */
@@ -46,10 +50,24 @@ public class ResourceLoader {
 	private Set<String> cssResourcesToLoad = new HashSet<>();
 	private Set<String> cssExtToLoad = new HashSet<>();
 
+	// Required by Mojarra?!?!? Please investigate!
+	public ResourceLoader() {
+	}
+
+	public ResourceLoader(UIComponent component) {
+		component.subscribeToEvent(PostAddToViewEvent.class, this);
+	}
+
+	@Override
+	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		loadScriptResources(context);
+		loadCssResources(context);
+	}
+
 	/**
-	 * Enqueues loading of a JavaScript resource file. The resource will be added
-	 * via JSF's resource mechanism to the &lt;head&gt; when calling the
-	 * {@link #processPostAddToViewEvent(FacesContext)} method.
+	 * Enqueues loading of a JavaScript resource file that will be added via JSF's
+	 * resource mechanism to the &lt;head&gt;.
 	 * 
 	 * @param resource name of the file in the web project's resource library
 	 */
@@ -58,9 +76,8 @@ public class ResourceLoader {
 	}
 
 	/**
-	 * Enqueues loading of a JavaScript resource file. The resource will be added
-	 * via JSF's resource mechanism to the top of &lt;body&gt; when calling the
-	 * {@link #processPostAddToViewEvent(FacesContext)} method.
+	 * Enqueues loading of a JavaScript resource file that be added via JSF's
+	 * resource mechanism to the top of &lt;body&gt;.
 	 * <p>
 	 * Note: There is no guarantee on the load order among the resources enqueued by
 	 * this method.
@@ -72,10 +89,9 @@ public class ResourceLoader {
 	}
 
 	/**
-	 * Enqueues loading of a JavaScript file. The resource will be loaded in the
-	 * &lt;head&gt; via the JavaScript class {@code molecularfaces.ResourcesLoader}.
-	 * The code snippet can be requested via
-	 * {@link #encodeLoadExtResources(String)}.
+	 * Enqueues loading of a JavaScript file that will be loaded in the &lt;head&gt;
+	 * via the JavaScript class {@code molecularfaces.ResourcesLoader}. The code
+	 * snippet can be requested via {@link #encodeLoadExtResources(String)}.
 	 * 
 	 * @param src path of the file
 	 */
@@ -84,9 +100,8 @@ public class ResourceLoader {
 	}
 
 	/**
-	 * Enqueues loading of a stylesheet resource file. The resource will be added
-	 * via JSF's resource mechanism when calling the
-	 * {@link #processPostAddToViewEvent(FacesContext)} method.
+	 * Enqueues loading of a stylesheet resource file that will be added via JSF's
+	 * resource mechanism.
 	 * 
 	 * @param resource name of the file in the web project's resource library
 	 */
@@ -95,27 +110,14 @@ public class ResourceLoader {
 	}
 
 	/**
-	 * Enqueues loading of a stylesheet file. The resource will be loaded via the
-	 * JavaScript class {@code molecularfaces.ResourcesLoader}. The code snippet can
-	 * be requested via {@link #encodeLoadExtResources(String)}.
+	 * Enqueues loading of a stylesheet file that will be loaded via the JavaScript
+	 * class {@code molecularfaces.ResourcesLoader}. The code snippet can be
+	 * requested via {@link #encodeLoadExtResources(String)}.
 	 * 
 	 * @param href path of the file
 	 */
 	public void addCssExt(String href) {
 		cssExtToLoad.add(href);
-	}
-
-	/**
-	 * Adds all resources enqueued via {@link #addScriptResourceToHead(String)},
-	 * {@link #addScriptResourceToBodyAtTop(String)} and
-	 * {@link #addCssResource(String)} as JSF resource components to their
-	 * respective targets and clears the queues.
-	 * 
-	 * @param context current faces context
-	 */
-	public void processPostAddToViewEvent(FacesContext context) {
-		loadScriptResources(context);
-		loadCssResources(context);
 	}
 
 	private void loadScriptResources(FacesContext context) {
@@ -180,9 +182,8 @@ public class ResourceLoader {
 	}
 
 	/**
-	 * Creates an inline JavaScript code fragment for loading resources that have
-	 * been enqueued via {@link #addScriptExtToHead(String)} and
-	 * {@link #addCssExt(String)}.
+	 * Generates a JavaScript code fragment for loading resources that have been
+	 * enqueued for loading via {@code molecularfaces.ResourcesLoader}.
 	 * 
 	 * @param loaderJSVar JavaScript variable name of the
 	 *                    {@code molecularfaces.ResourcesLoader} instance

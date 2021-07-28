@@ -119,7 +119,7 @@ public class MolPaintJSRenderer extends MolPluginRenderer {
 		StringBuilder sb = new StringBuilder(512);
 
 		// resource loading
-		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
+		sb.append(plugin.getResourceLoader().encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);
 
@@ -203,7 +203,7 @@ public class MolPaintJSRenderer extends MolPluginRenderer {
 		StringBuilder sb = new StringBuilder(512);
 
 		// resource loading
-		sb.append(plugin.encodeLoadExtResources(loaderJSVar));
+		sb.append(plugin.getResourceLoader().encodeLoadExtResources(loaderJSVar));
 
 		Formatter fmt = new Formatter(sb);
 
