@@ -205,7 +205,9 @@
 							<sourceDir>js</sourceDir>
 							<targetDir>js</targetDir>
 							<includes>
+								<!-- Order is important! -->
 								<include>ResourcesLoader.js</include>
+								<include>OnChangeSubject.js</include>
 								<include>MolecularFaces.js</include>
 								<include>StructurePlugin.js</include>
 								<include>StructureEditor.js</include>
@@ -216,8 +218,9 @@
 								<include>MarvinJSEditor.js</include>
 								<include>MarvinJSNamespaceLoader.js</include>
 								<include>MarvinJSViewer.js</include>
+								<include>OpenVectorEditor.js</include>
 							</includes>
-							<outputFilename>MolecularFaces.js</outputFilename>
+							<outputFilename>MolecularFaces.min.js</outputFilename>
 							<closureLanguageOut>ECMASCRIPT5_STRICT</closureLanguageOut>
 						</configuration>
 					</execution>

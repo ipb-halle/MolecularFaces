@@ -70,7 +70,7 @@ molecularfaces.OpenChemLibJSEditor = class extends molecularfaces.StructureEdito
 				}
 
 				obj._molecule = mol;
-				obj.notifyChange(mol);
+				obj.getOnChangeSubject().notifyChange(mol);
 			});
 
 			resolve(this);

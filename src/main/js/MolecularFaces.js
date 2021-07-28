@@ -27,6 +27,7 @@ var molecularfaces = molecularfaces || {};
 molecularfaces.openChemLibJSLoaderInstance = new molecularfaces.ResourcesLoader();
 molecularfaces.molPaintJSLoaderInstance = new molecularfaces.ResourcesLoader();
 molecularfaces.marvinJSLoaderInstance = new molecularfaces.ResourcesLoader();
+molecularfaces.openVectorEditorLoaderInstance = new molecularfaces.ResourcesLoader();
 
 /**
  * Promise that resolves upon on-document-ready.

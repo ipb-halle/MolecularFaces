@@ -15,7 +15,7 @@
  * limitations under the License.
  * 
  */
-package de.ipb_halle.molecularfaces.component.molplugin;
+package de.ipb_halle.molecularfaces.component.openvectoreditor;
 
 import javax.faces.component.UIInput;
 import javax.faces.event.AbortProcessingException;
@@ -23,139 +23,37 @@ import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.ListenerFor;
 import javax.faces.event.PostAddToViewEvent;
-
 import de.ipb_halle.molecularfaces.util.ResourceLoader;
 
 /**
- * This class holds the attribute states of the chemical structure plugins and
+ * This class holds the attribute states of the &lt;mol:openVectorEditor&gt; component and
  * provides support for dynamic resource loading.
  * 
  * @author flange
  */
 @ListenerFor(systemEventClass = PostAddToViewEvent.class)
-public abstract class MolPluginCore extends UIInput implements ComponentSystemEventListener {
+public abstract class OpenVectorEditorCore extends UIInput implements ComponentSystemEventListener {
 	/**
 	 * Component family returned by {@link #getFamily()}
 	 */
-	public static final String COMPONENT_FAMILY = "molecularfaces.MolPluginFamily";
+	public static final String COMPONENT_FAMILY = "molecularfaces.OpenVectorEditorFamily";
 
 	private ResourceLoader resourceLoader = new ResourceLoader();
-
-	protected MolPluginCore() {
-		addScriptResourceToHead("js/MolecularFaces.min.js");
-	}
 
 	@Override
 	public String getFamily() {
 		return COMPONENT_FAMILY;
 	}
 
-	/**
-	 * Supported chemical structure plugin types.
-	 * 
-	 * @author flange
-	 */
-	public enum PluginType {
-		OpenChemLibJS, MolPaintJS, MarvinJS;
-
-		@Override
-		public String toString() {
-			return this.name();
-		}
-	}
-
-	/**
-	 * Possible values for the <code>format</code> property.
-	 */
-	public enum Format {
-		MDLV2000, MDLV3000;
-
-		@Override
-		public String toString() {
-			return this.name();
-		}
-	};
-
 	protected enum PropertyKeys {
-		border, format, height, readonly, widgetVar, width;
-	}
-
-	/**
-	 * Return the value of the <code>border</code> property.
-	 * <p>
-	 * Flag indicating that this element is rendered with a border.
-	 * 
-	 * @return the value of the attribute or <code>false</code> if it has not been
-	 *         set in the JSF view.
-	 */
-	public boolean isBorder() {
-		return (boolean) getStateHelper().eval(PropertyKeys.border, false);
-	}
-
-	/**
-	 * Set the value of the <code>border</code> property.
-	 * 
-	 * @param border boolean value which indicates that the plugin component renders
-	 *               surrounded by a border
-	 */
-	public void setBorder(boolean border) {
-		getStateHelper().put(PropertyKeys.border, border);
-	}
-
-	public static final String DEFAULT_FORMAT = Format.MDLV2000.toString();
-
-	/**
-	 * Return the value of the <code>format</code> property.
-	 * <p>
-	 * Controls the chemical file format to be used in the <code>value</code>
-	 * property.
-	 * <p>
-	 * Possible values are provided by the {@link Format} enumeration.
-	 * 
-	 * @return the value of the attribute or "MDLV2000" if it has not been set in
-	 *         the JSF view.
-	 */
-	public String getFormat() {
-		return (String) getStateHelper().eval(PropertyKeys.format, DEFAULT_FORMAT);
-	}
-
-	/**
-	 * Set the value of the <code>format</code> property.
-	 * 
-	 * @param format chemical file format
-	 */
-	public void setFormat(String format) {
-		getStateHelper().put(PropertyKeys.format, format);
-	}
-
-	public static final int DEFAULT_HEIGHT = 400;
-
-	/**
-	 * Return the value of the <code>height</code> property.
-	 * <p>
-	 * The height of the structure editor plugin in pixels.
-	 * 
-	 * @return the value of the attribute or 400 if it has not been set in the JSF
-	 *         view.
-	 */
-	public int getHeight() {
-		return (int) getStateHelper().eval(PropertyKeys.height, DEFAULT_HEIGHT);
-	}
-
-	/**
-	 * Set the value of the <code>height</code> property.
-	 * 
-	 * @param height height of the rendered plugin
-	 */
-	public void setHeight(int height) {
-		getStateHelper().put(PropertyKeys.height, height);
+		readonly, widgetVar;
 	}
 
 	/**
 	 * Return the value of the <code>readonly</code> property.
 	 * <p>
-	 * Flag indicating that this element is in editable (full structure editor) or
-	 * in view-only mode.
+	 * Flag indicating that this element is in editable or
+	 * in read-only mode.
 	 * 
 	 * @return the value of the attribute or <code>false</code> if it has not been
 	 *         set in the JSF view.
@@ -167,8 +65,7 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	/**
 	 * Set the value of the <code>readonly</code> property.
 	 * 
-	 * @param readonly boolean value which indicates if the plugin component renders
-	 *                 an editor or a viewer
+	 * @param readonly boolean value which indicates the rendering of the component in read-only mode
 	 */
 	public void setReadonly(boolean readonly) {
 		getStateHelper().put(PropertyKeys.readonly, readonly);
@@ -196,29 +93,6 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 		getStateHelper().put(PropertyKeys.widgetVar, widgetVar);
 	}
 
-	public static final int DEFAULT_WIDTH = 400;
-
-	/**
-	 * Return the value of the <code>width</code> property.
-	 * <p>
-	 * The width of the structure editor plugin in pixels.
-	 * 
-	 * @return the value of the attribute or 400 if it has not been set in the JSF
-	 *         view.
-	 */
-	public int getWidth() {
-		return (int) getStateHelper().eval(PropertyKeys.width, DEFAULT_WIDTH);
-	}
-
-	/**
-	 * Set the value of the <code>width</code> property.
-	 * 
-	 * @param width width of the rendered plugin
-	 */
-	public void setWidth(int width) {
-		getStateHelper().put(PropertyKeys.width, width);
-	}
-
 	/**
 	 * Enqueues loading of a JavaScript resource file. The resource will be added
 	 * via JSF's resource mechanism to the &lt;head&gt; when calling the
@@ -229,6 +103,21 @@ public abstract class MolPluginCore extends UIInput implements ComponentSystemEv
 	 */
 	protected void addScriptResourceToHead(String resource) {
 		resourceLoader.addScriptResourceToHead(resource);
+	}
+
+	/**
+	 * Enqueues loading of a JavaScript resource file. The resource will be added
+	 * via JSF's resource mechanism to the top of &lt;body&gt; when calling the
+	 * {@link #processEvent(ComponentSystemEvent)} method in the PostAddToViewEvent
+	 * event.
+	 * <p>
+	 * Note: There is no guarantee on the load order among the resources enqueued by
+	 * this method.
+	 * 
+	 * @param resource name of the file in the web project's resource library
+	 */
+	protected void addScriptResourceToBodyAtTop(String resource) {
+		resourceLoader.addScriptResourceToBodyAtTop(resource);
 	}
 
 	/**

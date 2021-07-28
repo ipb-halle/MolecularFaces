@@ -147,4 +147,10 @@
 			<component-type>molecularfaces.MarvinJS</component-type>
 		</component>
 	</tag>
+		<tag>
+		<tag-name>openVectorEditor</tag-name>
+		<component>
+			<component-type>molecularfaces.OpenVectorEditor</component-type>
+		</component>
+	</tag>
 </facelet-taglib>

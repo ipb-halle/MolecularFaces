@@ -98,12 +98,12 @@ molecularfaces.MarvinJSEditor = class extends molecularfaces.StructureEditor {
 							let molecule = obj._editor.exportAsMol();
 
 							obj._molecule = molecule;
-							obj.notifyChange(molecule);
+							obj.getOnChangeSubject().notifyChange(molecule);
 						} else if ((obj._format === "MDLV3000") && obj._editor.getSupportedFormats().exportFormats.includes("mol:V3")) {
 							// MarvinJS needs to ask the webservice for V3000, thus we get a Promise.
 							obj._editor.exportStructure("mol:V3").then(function(molecule) {
 								obj._molecule = molecule;
-								obj.notifyChange(molecule);
+								obj.getOnChangeSubject().notifyChange(molecule);
 							}, function(error) {
 								alert("Molecule export failed:"+error);
 							});

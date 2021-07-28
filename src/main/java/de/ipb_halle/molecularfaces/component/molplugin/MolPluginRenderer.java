@@ -17,13 +17,12 @@
  */
 package de.ipb_halle.molecularfaces.component.molplugin;
 
-import java.util.Map;
-
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.render.Renderer;
+
+import de.ipb_halle.molecularfaces.util.RendererUtils;
 
 /**
  * This {@link Renderer} offers functionalities for the specific renderers of
@@ -34,59 +33,17 @@ import javax.faces.render.Renderer;
 public abstract class MolPluginRenderer extends Renderer {
 	@Override
 	public void decode(FacesContext context, UIComponent component) {
-		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
 		MolPluginCore plugin = (MolPluginCore) component;
 
 		if (!plugin.isReadonly()) {
-			String clientId = plugin.getClientId(context);
-
-			String value = requestMap.get(clientId);
-
-			plugin.setSubmittedValue(value);
+			RendererUtils.decodeComponent(context, plugin);
 		}
 	}
 
 	@Override
 	public Object getConvertedValue(FacesContext context, UIComponent component, Object submittedValue)
 			throws ConverterException {
-		if ((context == null) || (component == null)) {
-			throw new NullPointerException();
-		}
-
-		if (submittedValue instanceof String) {
-			if (component instanceof MolPluginCore) {
-				Converter converter = ((MolPluginCore) component).getConverter();
-
-				if (converter != null) {
-					return converter.getAsObject(context, component, (String) submittedValue);
-				}
-			}
-		}
-
-		return submittedValue;
-	}
-
-	/**
-	 * Converts a component's value to a string by invoking the component's
-	 * converter's {@link Converter#getAsString(FacesContext, UIComponent, Object)}
-	 * method. If no converter is defined, it just returns the value.
-	 * 
-	 * @param context {@link FacesContext} for the request we are processing
-	 * @param component component of the molecular structure plugin to be encoded
-	 * @return converted value
-	 */
-	protected String getValueAsString(FacesContext context, MolPluginCore component) {
-		if ((context == null) || (component == null)) {
-			throw new NullPointerException();
-		}
-
-		Converter converter = component.getConverter();
-
-		if (converter != null) {
-			return converter.getAsString(context, component, component.getValue());
-		}
-
-		return (String) component.getValue();
+		return RendererUtils.convertSubmittedValueToObject(context, component, submittedValue);
 	}
 
 	/**

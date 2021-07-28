@@ -71,10 +71,8 @@ public class MarvinJSComponent extends MolPluginCore {
 		 * Always include Marvin JS via external resources defined by
 		 * WEBXML_MARVINJS_BASE_URL.
 		 */
-		addScriptExt(baseDir + "/gui/lib/promise-1.0.0.min.js");
-		addScriptExt(baseDir + "/js/marvinjslauncher.js");
-
-		addScriptResource("js/MolecularFaces.js");
+		addScriptExtToHead(baseDir + "/gui/lib/promise-1.0.0.min.js");
+		addScriptExtToHead(baseDir + "/js/marvinjslauncher.js");
 
 		setRendererType(DEFAULT_RENDERER);
 	}
@@ -91,7 +89,7 @@ public class MarvinJSComponent extends MolPluginCore {
 		 */
 		if (isReadonly() && webXml.getContextParam(MarvinJSComponent.WEBXML_MARVINJS_WEBSERVICES, getFacesContext(), "")
 				.equalsIgnoreCase("true")) {
-			addScriptExt(baseDir + "/js/webservices.js");
+			addScriptExtToHead(baseDir + "/js/webservices.js");
 		}
 	}
 

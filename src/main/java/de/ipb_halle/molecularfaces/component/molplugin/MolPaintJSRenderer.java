@@ -24,6 +24,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 
+import de.ipb_halle.molecularfaces.util.RendererUtils;
+
 /**
  * This {@link javax.faces.render.Renderer} renders a chemical structure editor or viewer using the
  * <a href="https://github.com/ipb-halle/MolPaintJS">MolPaintJS</a> Javascript
@@ -97,7 +99,7 @@ public class MolPaintJSRenderer extends MolPluginRenderer {
 		writer.startElement("input", plugin);
 		writer.writeAttribute("type", "hidden", null);
 		writer.writeAttribute("id", hiddenInputId, null);
-		writer.writeAttribute("value", getValueAsString(context, plugin), "value");
+		writer.writeAttribute("value", RendererUtils.convertValueToString(context, plugin, plugin.getValue()), "value");
 		writer.endElement("input");
 	}
 
@@ -128,8 +130,8 @@ public class MolPaintJSRenderer extends MolPluginRenderer {
 		}
 
 		/*
-		 * Start viewer, set the molecule value inline and return the viewer object
-		 * embedded in a Promise.
+		 * Start viewer, set the molecule from the hidden <input> element's value and
+		 * return the viewer object embedded in a Promise.
 		 */
 		fmt.format("%s.status().then(() => {", loaderJSVar);
 		fmt.format(
@@ -178,7 +180,7 @@ public class MolPaintJSRenderer extends MolPluginRenderer {
 		writer.writeAttribute("type", "hidden", null);
 		writer.writeAttribute("id", hiddenInputId, null);
 		writer.writeAttribute("name", plugin.getClientId(), null);
-		writer.writeAttribute("value", getValueAsString(context, plugin), "value");
+		writer.writeAttribute("value", RendererUtils.convertValueToString(context, plugin, plugin.getValue()), "value");
 		writer.endElement("input");
 	}
 
@@ -225,7 +227,7 @@ public class MolPaintJSRenderer extends MolPluginRenderer {
 		 * element.
 		 */
 		fmt.format(
-				".then((editor) => editor.addChangeListener("
+				".then((editor) => editor.getOnChangeSubject().addChangeCallback("
 						+ "(mol) => { document.getElementById(\"%s\").setAttribute(\"value\", mol); }));",
 				hiddenInputId);
 

@@ -21,7 +21,9 @@ import java.util.Formatter;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
+import javax.faces.component.html.HtmlBody;
 import javax.faces.context.FacesContext;
 
 /**
@@ -38,36 +40,52 @@ public class ResourceLoader {
 	/*
 	 * Queue objects
 	 */
-	private Set<String> scriptResourcesToLoad = new HashSet<>();
-	private Set<String> scriptsExtToLoad = new HashSet<>();
+	private Set<String> scriptResourcesToLoadInHead = new HashSet<>();
+	private Set<String> scriptResourcesToLoadInBodyAtTop = new HashSet<>();
+	private Set<String> scriptsExtToLoadInHead = new HashSet<>();
 	private Set<String> cssResourcesToLoad = new HashSet<>();
 	private Set<String> cssExtToLoad = new HashSet<>();
 
 	/**
 	 * Enqueues loading of a JavaScript resource file. The resource will be added
-	 * via JSF's resource mechanism by the
+	 * via JSF's resource mechanism to the &lt;head&gt; when calling the
 	 * {@link #processPostAddToViewEvent(FacesContext)} method.
 	 * 
 	 * @param resource name of the file in the web project's resource library
 	 */
-	public void addScriptResource(String resource) {
-		scriptResourcesToLoad.add(resource);
+	public void addScriptResourceToHead(String resource) {
+		scriptResourcesToLoadInHead.add(resource);
 	}
 
 	/**
-	 * Enqueues loading of a JavaScript resource file. The resource will be loaded
-	 * via the JavaScript class {@code molecularfaces.ResourcesLoader}. The code
-	 * snippet can be requested via {@link #encodeLoadExtResources(String)}.
+	 * Enqueues loading of a JavaScript resource file. The resource will be added
+	 * via JSF's resource mechanism to the top of &lt;body&gt; when calling the
+	 * {@link #processPostAddToViewEvent(FacesContext)} method.
+	 * <p>
+	 * Note: There is no guarantee on the load order among the resources enqueued by
+	 * this method.
 	 * 
-	 * @param src path of the resource file
+	 * @param resource name of the file in the web project's resource library
 	 */
-	public void addScriptExt(String src) {
-		scriptsExtToLoad.add(src);
+	public void addScriptResourceToBodyAtTop(String resource) {
+		scriptResourcesToLoadInBodyAtTop.add(resource);
+	}
+
+	/**
+	 * Enqueues loading of a JavaScript file. The resource will be loaded in the
+	 * &lt;head&gt; via the JavaScript class {@code molecularfaces.ResourcesLoader}.
+	 * The code snippet can be requested via
+	 * {@link #encodeLoadExtResources(String)}.
+	 * 
+	 * @param src path of the file
+	 */
+	public void addScriptExtToHead(String src) {
+		scriptsExtToLoadInHead.add(src);
 	}
 
 	/**
 	 * Enqueues loading of a stylesheet resource file. The resource will be added
-	 * via JSF's resource mechanism by the
+	 * via JSF's resource mechanism when calling the
 	 * {@link #processPostAddToViewEvent(FacesContext)} method.
 	 * 
 	 * @param resource name of the file in the web project's resource library
@@ -77,19 +95,21 @@ public class ResourceLoader {
 	}
 
 	/**
-	 * Enqueues loading of a stylesheet resource file. The resource will be loaded
-	 * via the JavaScript class {@code molecularfaces.ResourcesLoader}. The code
-	 * snippet can be requested via {@link #encodeLoadExtResources(String)}.
+	 * Enqueues loading of a stylesheet file. The resource will be loaded via the
+	 * JavaScript class {@code molecularfaces.ResourcesLoader}. The code snippet can
+	 * be requested via {@link #encodeLoadExtResources(String)}.
 	 * 
-	 * @param href path of the resource file
+	 * @param href path of the file
 	 */
 	public void addCssExt(String href) {
 		cssExtToLoad.add(href);
 	}
 
 	/**
-	 * Adds all resources enqueued via {@link #addScriptResource(String)} and
-	 * {@link #addCssResource(String)} as JSF resource components to &lt;head&gt;.
+	 * Adds all resources enqueued via {@link #addScriptResourceToHead(String)},
+	 * {@link #addScriptResourceToBodyAtTop(String)} and
+	 * {@link #addCssResource(String)} as JSF resource components to their
+	 * respective targets and clears the queues.
 	 * 
 	 * @param context current faces context
 	 */
@@ -98,34 +118,70 @@ public class ResourceLoader {
 		loadCssResources(context);
 	}
 
+	private void loadScriptResources(FacesContext context) {
+		for (String resource : scriptResourcesToLoadInHead) {
+			UIComponent component = createResourceComponent(resource, "javax.faces.resource.Script");
+			addComponentToHead(component, context);
+		}
+		scriptResourcesToLoadInHead.clear();
+
+		for (String resource : scriptResourcesToLoadInBodyAtTop) {
+			UIComponent component = createResourceComponent(resource, "javax.faces.resource.Script");
+			addComponentToBodyAtTop(component, context);
+		}
+		/*
+		 * Why is it important to clear THIS queue? MyFaces fires another
+		 * PostAddToViewEvent to the component when adding a child to the body (done in
+		 * addComponentToBodyAtTop(...)), thus we end up in an infinite
+		 * fire-event-add-component loop. Mojarra shows no such behavior.
+		 */
+		scriptResourcesToLoadInBodyAtTop.clear();
+	}
+
 	private void loadCssResources(FacesContext context) {
 		for (String resource : cssResourcesToLoad) {
-			loadResource(resource, "javax.faces.resource.Stylesheet", context);
+			UIComponent component = createResourceComponent(resource, "javax.faces.resource.Stylesheet");
+			addComponentToHead(component, context);
 		}
+		cssResourcesToLoad.clear();
 	}
 
-	private void loadScriptResources(FacesContext context) {
-		for (String resource : scriptResourcesToLoad) {
-			loadResource(resource, "javax.faces.resource.Script", context);
-		}
-	}
-
-	private void loadResource(String resourceName, String rendererType, FacesContext context) {
-		/*
-		 * Create an UIComponent that includes the resource from the resource library.
-		 */
+	private UIComponent createResourceComponent(String resourceName, String rendererType) {
 		UIOutput resourceComponent = new UIOutput();
 		resourceComponent.setRendererType(rendererType);
 		resourceComponent.getAttributes().put("library", RESOURCES_LIBRARY_NAME);
 		resourceComponent.getAttributes().put("name", resourceName);
 
-		// Add the component to <head>.
-		context.getViewRoot().addComponentResource(context, resourceComponent, "head");
+		return resourceComponent;
+	}
+
+	private void addComponentToHead(UIComponent componentToAdd, FacesContext context) {
+		context.getViewRoot().addComponentResource(context, componentToAdd, "head");
+	}
+
+	private void addComponentToBodyAtTop(UIComponent componentToAdd, FacesContext context) {
+		UIComponent body = findBodyComponent(context);
+
+		if (body != null) {
+			// MyFaces fires a PostAddToViewEvent after this.
+			body.getChildren().add(0, componentToAdd);
+		}
+	}
+
+	private UIComponent findBodyComponent(FacesContext context) {
+		UIComponent root = context.getViewRoot();
+		for (UIComponent component : root.getChildren()) {
+			if (component instanceof HtmlBody) {
+				return component;
+			}
+		}
+
+		return null;
 	}
 
 	/**
 	 * Creates an inline JavaScript code fragment for loading resources that have
-	 * been enqueued via {@link #addScriptExt(String)} and
+	 * been enqueued via {@link #addScriptExtToHead(String)} and
 	 * {@link #addCssExt(String)}.
 	 * 
 	 * @param loaderJSVar JavaScript variable name of the
@@ -133,14 +189,14 @@ public class ResourceLoader {
 	 * @return JavaScript code
 	 */
 	public StringBuilder encodeLoadExtResources(String loaderJSVar) {
-		if (scriptsExtToLoad.isEmpty() && cssExtToLoad.isEmpty()) {
+		if (scriptsExtToLoadInHead.isEmpty() && cssExtToLoad.isEmpty()) {
 			return new StringBuilder();
 		} else {
 			StringBuilder sb = new StringBuilder(256);
 			Formatter fmt = new Formatter(sb);
 
 			sb.append(loaderJSVar);
-			for (String script : scriptsExtToLoad) {
+			for (String script : scriptsExtToLoadInHead) {
 				fmt.format(".addScriptToHead(\"%s\")", script);
 			}
 			for (String href : cssExtToLoad) {

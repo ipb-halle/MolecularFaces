@@ -76,7 +76,7 @@ molecularfaces.MolPaintJSEditor = class extends molecularfaces.StructureEditor {
 				}
 
 				obj._molecule = mol;
-				obj.notifyChange(mol);
+				obj.getOnChangeSubject().notifyChange(mol);
 			});
 
 			resolve(this);
