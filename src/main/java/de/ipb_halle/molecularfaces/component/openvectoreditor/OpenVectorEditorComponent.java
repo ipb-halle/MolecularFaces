@@ -46,15 +46,14 @@ public class OpenVectorEditorComponent extends OpenVectorEditorCore {
 	public OpenVectorEditorComponent() {
 		super();
 
-		// Not implemented yet!
-		/*String resourceBaseUrl = webXml.getContextParam(WEBXML_CUSTOM_RESOURCE_BASE_URL, getFacesContext(), null);
+		String resourceBaseUrl = webXml.getContextParam(WEBXML_CUSTOM_RESOURCE_BASE_URL, getFacesContext(), null);
 		if ((resourceBaseUrl != null) && (!resourceBaseUrl.isEmpty())) {
-			addScriptExtToBodyAtTop(resourceBaseUrl + "/open-vector-editor.min.js");
-			addCssExt(resourceBaseUrl + "/main.css");
-		} else {*/
+			getResourceLoader().addScriptExtToBodyAtTop(resourceBaseUrl + "/open-vector-editor.min.js");
+			getResourceLoader().addCssExt(resourceBaseUrl + "/main.css");
+		} else {
 			getResourceLoader().addScriptResourceToBodyAtTop("plugins/openVectorEditor/open-vector-editor.min.js");
 			getResourceLoader().addCssResource("plugins/openVectorEditor/main.css");
-		//}
+		}
 		getResourceLoader().addScriptResourceToHead("js/MolecularFaces.min.js");
 
 		setRendererType(DEFAULT_RENDERER);

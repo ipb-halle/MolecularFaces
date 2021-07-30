@@ -51,6 +51,7 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	private Set<String> scriptResourcesToLoadInHead = new HashSet<>();
 	private Set<String> scriptResourcesToLoadInBodyAtTop = new HashSet<>();
 	private Set<String> scriptsExtToLoadInHead = new HashSet<>();
+	private Set<String> scriptsExtToLoadInBodyAtTop = new HashSet<>();
 	private Set<String> cssResourcesToLoad = new HashSet<>();
 	private Set<String> cssExtToLoad = new HashSet<>();
 
@@ -84,7 +85,7 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	}
 
 	/**
-	 * Enqueues loading of a JavaScript resource file that be added via JSF's
+	 * Enqueues loading of a JavaScript resource file that will be added via JSF's
 	 * resource mechanism to the top of &lt;body&gt;.
 	 * <p>
 	 * Note: There is no guarantee on the load order among the resources enqueued by
@@ -105,6 +106,18 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	 */
 	public void addScriptExtToHead(String src) {
 		scriptsExtToLoadInHead.add(src);
+	}
+
+	/**
+	 * Enqueues loading of a JavaScript file that will be loaded in the top of
+	 * &lt;body&gt; via the JavaScript class {@code molecularfaces.ResourcesLoader}.
+	 * The code snippet can be requested via
+	 * {@link #encodeLoadExtResources(String)}.
+	 * 
+	 * @param src path of the file
+	 */
+	public void addScriptExtToBodyAtTop(String src) {
+		scriptsExtToLoadInBodyAtTop.add(src);
 	}
 
 	/**
@@ -207,6 +220,9 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 			sb.append(loaderJSVar);
 			for (String script : scriptsExtToLoadInHead) {
 				fmt.format(".addScriptToHead(\"%s\")", script);
+			}
+			for (String script : scriptsExtToLoadInBodyAtTop) {
+				fmt.format(".addScriptToBodyAtTop(\"%s\")", script);
 			}
 			for (String href : cssExtToLoad) {
 				fmt.format(".addCssToHead(\"%s\")", href);

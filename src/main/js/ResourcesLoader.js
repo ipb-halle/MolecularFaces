@@ -22,16 +22,13 @@ var molecularfaces = molecularfaces || {};
 
 /**
  * This class provides support for dynamic resource loading of JavaScript and
- * stylesheet files.
+ * stylesheet files. Identical resources may be enqueued several times, but are
+ * loaded exactly once.
  * 
  * Usage:
- * - enqueue resources with the addScriptToHead(String) and addCssToHead(String)
- *   methods
- * - start attachment of the resources to <head> by calling loadResources()
- * - register a callback function with onLoad(function) that is called as soon as
- *   ALL resources are loaded.
- *
- * Identical resources may be enqueued several times, but are loaded exactly once.
+ * - enqueue resources with the add...(String) methods
+ * - the Promise that status() returns will resolve as soon as all enqueued
+ *   resources are loaded.
  */
 molecularfaces.ResourcesLoader = class {
 	constructor() {
@@ -40,7 +37,7 @@ molecularfaces.ResourcesLoader = class {
 	}
 
 	/**
-	 * Enqueues the loading of a JavaScript file.
+	 * Enqueues the loading of a JavaScript file to be added to &lt;head&gt;.
 	 */
 	addScriptToHead(src) {
 		if (!this._resources.includes(src)) {
@@ -57,6 +54,30 @@ molecularfaces.ResourcesLoader = class {
 			script.setAttribute("src", src);
 
 			document.head.appendChild(script);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Enqueues the loading of a JavaScript file to be added to the top of
+	 * &lt;<body&gt;.
+	 */
+	addScriptToBodyAtTop(src) {
+		if (!this._resources.includes(src)) {
+			this._resources.push(src);
+
+			let script = document.createElement("script");
+
+			this._promises.push(new Promise(function(resolve, reject) {
+				script.onload = () => resolve(script);
+				script.onerror = () => reject(new Error("Load error for script " + src));
+			}));
+
+			script.setAttribute("type", "text/javascript");
+			script.setAttribute("src", src);
+
+			document.body.prepend(script);
 		}
 
 		return this;
@@ -86,6 +107,9 @@ molecularfaces.ResourcesLoader = class {
 		return this;
 	}
 
+	/**
+	 * Returns a Promise that indicates the load status of all enqueued resources.
+	 */
 	status() {
 		return Promise.all(this._promises);
 	}
