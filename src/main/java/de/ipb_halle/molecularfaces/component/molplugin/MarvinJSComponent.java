@@ -52,7 +52,7 @@ public class MarvinJSComponent extends MolPluginCore implements ComponentSystemE
 	 * Name of the context-param in web.xml that specifies if Marvin JS should use
 	 * its webservices. If "true", the &lt;iframe&gt; will embed editorws.html, else
 	 * it will embed editor.html. In readonly mode, the component will load
-	 * /js/webservices.js relative to {@link WEBXML_MARVINJS_BASE_URL}.
+	 * /js/webservices.js relative to {@link #WEBXML_MARVINJS_BASE_URL}.
 	 * 
 	 * @see <a href=
 	 *      "https://marvinjs-demo.chemaxon.com/latest/docs/dev/embed.html">https://marvinjs-demo.chemaxon.com/latest/docs/dev/embed.html</a>
@@ -62,13 +62,13 @@ public class MarvinJSComponent extends MolPluginCore implements ComponentSystemE
 	/**
 	 * Name of the context-param in web.xml that specifies the location of Marvin
 	 * JS' license file (marvin4js-license.cxl) relative to
-	 * {@link WEBXML_MARVINJS_BASE_URL}.
+	 * {@link #WEBXML_MARVINJS_BASE_URL}.
 	 */
 	public static final String WEBXML_MARVINJS_LICENSE_URL = "de.ipb_halle.molecularfaces.MARVINJS_LICENSE_URL";
 
 	private WebXml webXml = new WebXmlImpl();
 
-	private final String baseDir = webXml.getContextParam(WEBXML_MARVINJS_BASE_URL, getFacesContext(), null);
+	private final String baseDir = webXml.getContextParam(WEBXML_MARVINJS_BASE_URL, getFacesContext(), "");
 
 	public MarvinJSComponent() {
 		super();
@@ -101,8 +101,7 @@ public class MarvinJSComponent extends MolPluginCore implements ComponentSystemE
 	 * in the {@link PostAddToViewEvent}.
 	 */
 	private void processPostAddToViewEvent() {
-		boolean useWebServices = webXml.getContextParam(WEBXML_MARVINJS_WEBSERVICES, getFacesContext(), "")
-				.equalsIgnoreCase("true");
+		boolean useWebServices = webXml.isContextParamTrue(WEBXML_MARVINJS_WEBSERVICES, getFacesContext());
 		if (isReadonly() && useWebServices) {
 			getResourceLoader().addScriptExtToHead(baseDir + "/js/webservices.js");
 		}

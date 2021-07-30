@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.molecularfaces.util;
 
+import java.io.Serializable;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,11 +32,14 @@ import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.PostAddToViewEvent;
 
 /**
- * This class enqueues resources and loads them automatically or upon request.
+ * This class enqueues resources and loads them either automatically or upon
+ * request.
  * 
  * @author flange
  */
-public class ResourceLoader implements ComponentSystemEventListener {
+public class ResourceLoader implements ComponentSystemEventListener, Serializable {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Resource library name.
 	 */
@@ -50,19 +54,23 @@ public class ResourceLoader implements ComponentSystemEventListener {
 	private Set<String> cssResourcesToLoad = new HashSet<>();
 	private Set<String> cssExtToLoad = new HashSet<>();
 
-	// Required by Mojarra?!?!? Please investigate!
-	public ResourceLoader() {
-	}
-
+	/**
+	 * Registers a PostAddToView event to the given component, in which this
+	 * instance will attach its enqueued resources to the component tree.
+	 * 
+	 * @param component UI component
+	 */
 	public ResourceLoader(UIComponent component) {
 		component.subscribeToEvent(PostAddToViewEvent.class, this);
 	}
 
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		FacesContext context = FacesContext.getCurrentInstance();
-		loadScriptResources(context);
-		loadCssResources(context);
+		if (event instanceof PostAddToViewEvent) {
+			FacesContext context = FacesContext.getCurrentInstance();
+			loadScriptResources(context);
+			loadCssResources(context);
+		}
 	}
 
 	/**

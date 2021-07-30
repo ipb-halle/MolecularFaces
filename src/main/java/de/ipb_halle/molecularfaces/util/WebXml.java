@@ -51,4 +51,33 @@ public interface WebXml {
 	default public String getContextParam(String paramName, String defaultValue) {
 		return getContextParam(paramName, FacesContext.getCurrentInstance(), defaultValue);
 	}
+
+	/**
+	 * Parses the {@code param-value} for the {@code context-param} given by
+	 * {@code param-name} via the given {@link FacesContext} instance and returns
+	 * {@code true} if the {@code param-value} is equal, ignoring case, to the
+	 * string "true".
+	 * 
+	 * @param paramName {@code param-name} of the {@code context-param} element in
+	 *                  web.xml
+	 * @param context   {@link FacesContext} instance
+	 * @return {@code true} if the context-param's value is true
+	 */
+	default public boolean isContextParamTrue(String paramName, FacesContext context) {
+		return Boolean.parseBoolean(getContextParam(paramName, context, "false"));
+	}
+
+	/**
+	 * Parses the {@code param-value} for the {@code context-param} given by
+	 * {@code param-name} via the current {@link FacesContext} instance and returns
+	 * {@code true} if the {@code param-value} is equal, ignoring case, to the
+	 * string "true".
+	 * 
+	 * @param paramName {@code param-name} of the {@code context-param} element in
+	 *                  web.xml
+	 * @return {@code true} if the context-param's value is true
+	 */
+	default public boolean isContextParamTrue(String paramName) {
+		return isContextParamTrue(paramName, FacesContext.getCurrentInstance());
+	}
 }
