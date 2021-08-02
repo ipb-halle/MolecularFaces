@@ -42,9 +42,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- OpenChemLib JS -->
-		<openchemlibjs.version>7.4.0</openchemlibjs.version>
+		<openchemlibjs.version>7.4.1</openchemlibjs.version>
 		<!-- This is the checksum from the package distributed via npm. -->
-		<openchemlibjs.sha256>6e12e9d8b79ca1bf22fe3abbe2fd1288023a8766ca8a89c2c1061668bc1fe6bb</openchemlibjs.sha256>
+		<openchemlibjs.sha256>e37439f6f4f397bdadaf0091109516916216db16ca8aa1bcbee3b7bfbad8869d</openchemlibjs.sha256>
 
 		<!-- MolPaintJS -->
 		<molpaintjs.version>v0.3.5-alpha</molpaintjs.version>

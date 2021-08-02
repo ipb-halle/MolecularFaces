@@ -43,7 +43,7 @@ Example:
 
 Plugin | Version | License | Editor | Viewer | Molfile V2000 support | Molfile V3000 support
 ------ | ------- | ------- | ------ | ------ | --------------------- | ---------------------
-[OpenChemLib JS](https://github.com/cheminfo/openchemlib-js) | [v7.4.0](https://github.com/cheminfo/openchemlib-js/releases/tag/v7.4.0) | [BSD-3-Clause](https://github.com/cheminfo/openchemlib-js/blob/master/LICENSE) | [x] | [x] | [x] | [x]
+[OpenChemLib JS](https://github.com/cheminfo/openchemlib-js) | [v7.4.1](https://github.com/cheminfo/openchemlib-js/releases/tag/v7.4.1) | [BSD-3-Clause](https://github.com/cheminfo/openchemlib-js/blob/master/LICENSE) | [x] | [x] | [x] | [x]
 [MolPaintJS](https://github.com/ipb-halle/MolPaintJS) | [v0.3.5-alpha](https://github.com/ipb-halle/MolPaintJS/releases/tag/v0.3.5-alpha) | [Apache License 2.0](https://github.com/ipb-halle/MolPaintJS/blob/master/LICENSE) | [x] | [x] | [x] | [x]
 [Marvin JS](https://chemaxon.com/products/marvin-js) | 21.1.0 | proprietary | [x] | [x] | [x] | requires web services
 
