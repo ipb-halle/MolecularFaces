@@ -231,13 +231,12 @@ public class MarvinJSRenderer extends MolPluginRenderer {
 			fmt.format("var %s = ", widgetVar);
 		}
 
-		/*
-		 * Start editor, set the molecule from the hidden <input> element's value and
-		 * return the editor object embedded in a Promise.
-		 */
+		// after resource loading finished
 		fmt.format("%s.status().then(() => {", loaderJSVar);
-		fmt.format(
-				"return molecularfaces.MarvinJSEditor.newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", \"%s\", %d, %d, \"%s\")",
+
+		// Start editor, set the molecule from the hidden <input> element's value.
+		fmt.format("let editorPromise = molecularfaces.MarvinJSEditor"
+				+ ".newEditor(\"%s\", document.getElementById(\"%s\").getAttribute(\"value\"), \"%s\", \"%s\", %d, %d, \"%s\");",
 				iframeId, hiddenInputId, installPath, license, plugin.getHeight(), plugin.getWidth(),
 				plugin.getFormat());
 
@@ -245,13 +244,17 @@ public class MarvinJSRenderer extends MolPluginRenderer {
 		 * Register an on-change callback to fill the value of the hidden <input>
 		 * element.
 		 */
-		fmt.format(
-				".then((editor) => editor.getOnChangeSubject().addChangeCallback((mol) => { document.getElementById(\"%s\").setAttribute(\"value\", mol); }));",
+		fmt.format("editorPromise.then(editor => "
+				+ "editor.getOnChangeSubject().addChangeCallback((mol) => { "
+				+ "document.getElementById(\"%s\").setAttribute(\"value\", mol); }));",
 				hiddenInputId);
 
 		fmt.close();
 
-		// end of then()
+		// Return the editor object embedded in another Promise that is written into widgetVar.
+		sb.append("return editorPromise;");
+
+		// end of then() block of the ResourcesLoader's Promise
 		sb.append("});");
 
 		writer.writeText(sb, null);

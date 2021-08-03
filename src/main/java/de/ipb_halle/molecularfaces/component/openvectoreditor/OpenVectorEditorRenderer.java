@@ -137,33 +137,38 @@ public class OpenVectorEditorRenderer extends Renderer {
 			fmt.format("var %s = ", widgetVar);
 		}
 
+		// after resource loading finished
+		fmt.format("%s.status().then(() => {", loaderJSVar);
+
 		/*
 		 * Start the editor, set the sequence value after a String-to-JSON
-		 * transformation and return the editor object embedded in a Promise.
+		 * transformation..
 		 */
-		fmt.format("%s.status().then(() => {", loaderJSVar);
 		fmt.format("let valueAsText = document.getElementById(\"%s\").getAttribute(\"value\");", hiddenInputId);
 		fmt.format("let valueAsJSON = {};");
 		fmt.format("if (!(!valueAsText || valueAsText.length === 0)) {");
 		fmt.format("try { valueAsJSON = JSON.parse(valueAsText); }");
 		fmt.format("catch(e) { console.error(\"%s\" + e); }", "Could not parse JSON input: ");
 		fmt.format("}");
-		fmt.format(
-				"return molecularfaces.OpenVectorEditor.newEditor(\"%s\", valueAsJSON, %b)",
+		fmt.format("let editorPromise = molecularfaces.OpenVectorEditor"
+				+ ".newEditor(\"%s\", valueAsJSON, %b);",
 				divId, plugin.isReadonly());
 
 		/*
 		 * Register an on-change callback to fill the value of the hidden <input>
 		 * element. Perform a JSON-to-String transformation on the sequence data before.
 		 */
-		fmt.format(
-				".then((editor) => editor.getOnChangeSubject().addChangeCallback("
-						+ "(sequence) => { document.getElementById(\"%s\").setAttribute(\"value\", JSON.stringify(sequence)); }));",
+		fmt.format("editorPromise.then(editor => "
+				+ "editor.getOnChangeSubject().addChangeCallback((sequence) => { "
+				+ "document.getElementById(\"%s\").setAttribute(\"value\", JSON.stringify(sequence)); }));",
 				hiddenInputId);
 
 		fmt.close();
 
-		// end of then()
+		// Return the editor object embedded in another Promise that is written into widgetVar.
+		sb.append("return editorPromise;");
+
+		// end of then() block of the ResourcesLoader's Promise
 		sb.append("});");
 
 		return sb.toString();
