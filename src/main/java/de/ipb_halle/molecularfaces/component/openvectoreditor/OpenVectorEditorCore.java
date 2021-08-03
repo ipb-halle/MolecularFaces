@@ -31,6 +31,12 @@ public abstract class OpenVectorEditorCore extends UIInput {
 	 */
 	public static final String COMPONENT_FAMILY = "molecularfaces.OpenVectorEditorFamily";
 
+	/**
+	 * An empty protein sequence as JSON string that may be used to initiate the
+	 * OpenVectorEditor in protein sequence mode.
+	 */
+	public static final String EMPTY_PROTEIN_SEQUENCE_JSON = "{\"isProtein\":true}";
+
 	private ResourceLoader resourceLoader = new ResourceLoader(this);
 
 	protected ResourceLoader getResourceLoader() {

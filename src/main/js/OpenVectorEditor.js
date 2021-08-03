@@ -52,7 +52,8 @@ molecularfaces.OpenVectorEditor = class {
 			withPreviewMode: true,
 			showReadOnly: false,
 			disableSetReadOnly: true,
-			showMenuBar: true
+			showMenuBar: true,
+			editorName: obj._divId
 		}
 	}
 
@@ -73,8 +74,11 @@ molecularfaces.OpenVectorEditor = class {
 		return new Promise((resolve, reject) => {
 			let domNode = document.getElementById(this._divId);
 
-			// Clear all previously rendered editors in our <div>.
-			domNode.innerHTML = '';
+			/*
+			 * OpenVectorEditor does not tolerate clearing its <div> when calling
+			 * init() more than once.
+			 */
+			//domNode.innerHTML = '';
 
 			this._editor = window.createVectorEditor(domNode, this._editorProps);
 
