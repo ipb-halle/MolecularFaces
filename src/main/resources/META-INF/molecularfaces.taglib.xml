@@ -36,7 +36,7 @@
 			<description><![CDATA[Converter instance registered with this component.]]></description>
 			<name>converter</name>
 			<required>false</required>
-			<type>java.lang.String</type>
+			<type>java.faces.convert.Converter</type>
 		</attribute>
 		<attribute>
 			<description><![CDATA[Chemical file format. Available formats: MDLV2000, MDLV3000]]></description>
@@ -90,7 +90,7 @@
 			<description><![CDATA[Converter instance registered with this component.]]></description>
 			<name>converter</name>
 			<required>false</required>
-			<type>java.lang.String</type>
+			<type>java.faces.convert.Converter</type>
 		</attribute>
 		<attribute>
 			<description><![CDATA[Chemical file format. Available formats: MDLV2000, MDLV3000]]></description>
@@ -152,5 +152,23 @@
 		<component>
 			<component-type>molecularfaces.OpenVectorEditor</component-type>
 		</component>
+		<attribute>
+			<description><![CDATA[Converter instance registered with this component.]]></description>
+			<name>converter</name>
+			<required>false</required>
+			<type>java.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description><![CDATA[Flag indicating that this plugin prevents value changes by the user.]]></description>
+			<name>readonly</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description><![CDATA[The client-side variable name of a Promise object that embeds the plugin's JavaScript instance. This instance is of type molecularfaces.OpenVectorEditor.]]></description>
+			<name>widgetVar</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
 	</tag>
 </facelet-taglib>

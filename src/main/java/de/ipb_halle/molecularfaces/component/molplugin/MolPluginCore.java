@@ -129,7 +129,7 @@ public abstract class MolPluginCore extends UIInput {
 	/**
 	 * Return the value of the <code>height</code> property.
 	 * <p>
-	 * The height of the structure editor plugin in pixels.
+	 * The height of the plugin in pixels.
 	 * 
 	 * @return the value of the attribute or 400 if it has not been set in the JSF
 	 *         view.
@@ -197,7 +197,7 @@ public abstract class MolPluginCore extends UIInput {
 	/**
 	 * Return the value of the <code>width</code> property.
 	 * <p>
-	 * The width of the structure editor plugin in pixels.
+	 * The width of the plugin in pixels.
 	 * 
 	 * @return the value of the attribute or 400 if it has not been set in the JSF
 	 *         view.
