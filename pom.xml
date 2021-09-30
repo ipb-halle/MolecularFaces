@@ -51,10 +51,13 @@
 		<molpaintjs.sha256>580893aa3ad25abc2a78d3bee8ff14d2a9a4486e6d8df9291149f471e2c16791</molpaintjs.sha256>
 
 		<!-- openVectorEditor -->
-		<openVectorEditor.version>16.3.5</openVectorEditor.version>
+		<openVectorEditor.version>16.3.18</openVectorEditor.version>
 		<!-- These are the checksums from the package distributed via npm. -->
-		<openVectorEditor.min.js.sha256>7a08cb9a569d42c74a55c9eb93ad5123fd1bd926c474927f62a15dc0c9c21a01</openVectorEditor.min.js.sha256>
-		<openVectorEditor.main.css.sha256>2cc041f07746abe0374aa0a464ceabc64ad5802e4286d6a9dc5f08c2d5d42492</openVectorEditor.main.css.sha256>
+		<openVectorEditor.min.js.sha256>88ec80b623069665051cca04bc29764df508656792e23acee7ca0060318edb78</openVectorEditor.min.js.sha256>
+		<openVectorEditor.main.css.sha256>7cc916424bf20811b989b6329acf2453c07be24d2a5477775282e72846beb604</openVectorEditor.main.css.sha256>
+		<!--<openVectorEditor.icons-16.1645f50f.woff.sha256>9700ae986c3357a771c7276c8eb30d1adc0c7b270bfd0bd56f6ea2df568cb88b</openVectorEditor.icons-16.1645f50f.woff.sha256>
+		<openVectorEditor.icons-16.2368f88a.eot.sha256>a8ef9e585479427f5f7fa35e4201caf851a748c5cdf7d89ecf5ba3bd84179eda</openVectorEditor.icons-16.2368f88a.eot.sha256>
+		<openVectorEditor.icons-16.13933033.ttf.sha256>3159a9b5dbf9c28ea27e925b24a468fc51298a49e16be06341fdf672efa19605</openVectorEditor.icons-16.13933033.ttf.sha256>-->
 	</properties>
 
 	<distributionManagement>
@@ -183,6 +186,45 @@
 							<checkSignature>true</checkSignature>
 						</configuration>
 					</execution>
+					<!--<execution>
+						<id>download-openVectorEditor-icons-16.1645f50f.woff</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://unpkg.com/open-vector-editor@${openVectorEditor.version}/umd/icons-16.1645f50f.woff</url>
+							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openVectorEditor/</outputDirectory>
+							<sha256>${openVectorEditor.icons-16.1645f50f.woff.sha256}</sha256>
+							<checkSignature>true</checkSignature>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-openVectorEditor-icons-16.2368f88a.eot</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://unpkg.com/open-vector-editor@${openVectorEditor.version}/umd/icons-16.2368f88a.eot</url>
+							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openVectorEditor/</outputDirectory>
+							<sha256>${openVectorEditor.icons-16.2368f88a.eot.sha256}</sha256>
+							<checkSignature>true</checkSignature>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-openVectorEditor-icons-16.13933033.ttf</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://unpkg.com/open-vector-editor@${openVectorEditor.version}/umd/icons-16.13933033.ttf</url>
+							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openVectorEditor/</outputDirectory>
+							<sha256>${openVectorEditor.icons-16.13933033.ttf.sha256}</sha256>
+							<checkSignature>true</checkSignature>
+						</configuration>
+					</execution>-->
 				</executions>
 			</plugin>
 			<plugin>
@@ -229,6 +271,13 @@
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>3.2.0</version>
+				<configuration>
+					<nonFilteredFileExtensions>
+						<nonFilteredFileExtension>woff</nonFilteredFileExtension>
+						<nonFilteredFileExtension>eot</nonFilteredFileExtension>
+						<nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+					</nonFilteredFileExtensions>
+				</configuration>
 				<executions>
 					<execution>
 						<id>copy-downloaded-resources</id>

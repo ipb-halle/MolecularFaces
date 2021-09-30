@@ -2,7 +2,7 @@
 
 ## Components
 
-### [Teselagen's Open Source Vector Editor Component](https://github.com/TeselaGen/openVectorEditor): `<mol:openVectorEditor>`
+### [Teselagen's Open Source Vector Editor](https://github.com/TeselaGen/openVectorEditor) Component: `<mol:openVectorEditor>`
 
 Sequence data is passed between the OpenVectorEditor (OVE) JavaScript plugin and the JSF backing bean as JSON object in the data model described by `sequenceData` in [OVE's editorState documentation](https://github.com/TeselaGen/openVectorEditor#editorstate). For security reasons, please consider sanitizing incoming and outgoing JSON data, for instance with a JSF converter based on [OWASP's JSON Sanitizer](https://github.com/OWASP/json-sanitizer).
 
@@ -24,3 +24,7 @@ All resource dependencies (open-vector-editor.min.js and main.css) are included 
 
 Context-params:
 * `de.ipb_halle.molecularfaces.OPENVECTOREDITOR_BASE_URL` (optional): location of OVE's standalone (UMD) installation relative to the application's context root
+
+#### Known issues
+
+* Blueprint, a dependency of OVE, declares global CSS (see [OVE issue #604](https://github.com/TeselaGen/openVectorEditor/issues/604)). This will for instance override some CSS declarations of BootsFaces. No workaround available at the moment.
