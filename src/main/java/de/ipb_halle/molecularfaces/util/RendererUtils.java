@@ -18,6 +18,7 @@
 package de.ipb_halle.molecularfaces.util;
 
 import java.util.Map;
+import java.util.Objects;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
@@ -42,8 +43,13 @@ public class RendererUtils {
 	 * 
 	 * @param context   {@link FacesContext} for the request we are processing
 	 * @param component component to be decoded
+	 * @throws NullPointerException if {@code context} or {@code component} are
+	 *                              {@code null}
 	 */
 	public static void decodeComponent(FacesContext context, UIInput component) {
+		Objects.requireNonNull(context);
+		Objects.requireNonNull(component);
+
 		Map<String, String> requestMap = context.getExternalContext().getRequestParameterMap();
 		String clientId = component.getClientId(context);
 		String value = requestMap.get(clientId);
@@ -59,14 +65,13 @@ public class RendererUtils {
 	 * @return converted value
 	 * @throws ConverterException   if the submitted value cannot be converted
 	 *                              successfully
-	 * @throws NullPointerException if {@code context} or {@code component} is
+	 * @throws NullPointerException if {@code context} or {@code component} are
 	 *                              {@code null}
 	 */
 	public static Object convertSubmittedValueToObject(FacesContext context, UIComponent component,
 			Object submittedValue) throws ConverterException {
-		if ((context == null) || (component == null)) {
-			throw new NullPointerException();
-		}
+		Objects.requireNonNull(context);
+		Objects.requireNonNull(component);
 
 		if ((submittedValue instanceof String) && (component instanceof UIInput)) {
 			UIInput inputComponent = (UIInput) component;
@@ -90,14 +95,13 @@ public class RendererUtils {
 	 * @param value     value to be converted
 	 * @return converted value
 	 * @throws ConverterException   if the value cannot be converted successfully
-	 * @throws NullPointerException if {@code context} or {@code component} is
+	 * @throws NullPointerException if {@code context} or {@code component} are
 	 *                              {@code null}
 	 */
 	public static String convertValueToString(FacesContext context, UIInput component, Object value)
 			throws ConverterException {
-		if ((context == null) || (component == null)) {
-			throw new NullPointerException();
-		}
+		Objects.requireNonNull(context);
+		Objects.requireNonNull(component);
 
 		Converter converter = component.getConverter();
 
