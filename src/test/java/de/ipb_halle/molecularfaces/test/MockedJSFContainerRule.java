@@ -47,6 +47,10 @@ public class MockedJSFContainerRule implements TestRule {
 	private void before() {
 		container = new MockedJsfTestContainer();
 		container.setUpAll();
+
+		// This allows the use of UIViewRoot.addComponentResource(...).
+		container.getApplication().addComponent("javax.faces.ComponentResourceContainer",
+				"org.apache.myfaces.component.ComponentResourceContainer");
 	}
 
 	private void after() {

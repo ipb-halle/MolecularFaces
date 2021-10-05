@@ -211,26 +211,25 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	 * @return JavaScript code
 	 */
 	public StringBuilder encodeLoadExtResources(String loaderJSVar) {
-		if (scriptsExtToLoadInHead.isEmpty() && cssExtToLoad.isEmpty()) {
-			return new StringBuilder();
-		} else {
-			StringBuilder sb = new StringBuilder(256);
-			Formatter fmt = new Formatter(sb);
+		StringBuilder sb = new StringBuilder(256);
+		Formatter fmt = new Formatter(sb);
 
-			sb.append(loaderJSVar);
-			for (String script : scriptsExtToLoadInHead) {
-				fmt.format(".addScriptToHead(\"%s\")", script);
-			}
-			for (String script : scriptsExtToLoadInBodyAtTop) {
-				fmt.format(".addScriptToBodyAtTop(\"%s\")", script);
-			}
-			for (String href : cssExtToLoad) {
-				fmt.format(".addCssToHead(\"%s\")", href);
-			}
-			sb.append(";");
-
-			fmt.close();
-			return sb;
+		for (String script : scriptsExtToLoadInHead) {
+			fmt.format(".addScriptToHead(\"%s\")", script);
 		}
+		for (String script : scriptsExtToLoadInBodyAtTop) {
+			fmt.format(".addScriptToBodyAtTop(\"%s\")", script);
+		}
+		for (String href : cssExtToLoad) {
+			fmt.format(".addCssToHead(\"%s\")", href);
+		}
+		fmt.close();
+
+		if (sb.length() > 0) {
+			sb.insert(0, loaderJSVar);
+			sb.append(";");
+		}
+
+		return sb;
 	}
 }
