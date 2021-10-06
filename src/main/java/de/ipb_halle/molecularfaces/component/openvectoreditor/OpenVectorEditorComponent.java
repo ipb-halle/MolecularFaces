@@ -58,9 +58,4 @@ public class OpenVectorEditorComponent extends OpenVectorEditorCore {
 
 		setRendererType(DEFAULT_RENDERER);
 	}
-
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
-	}
 }

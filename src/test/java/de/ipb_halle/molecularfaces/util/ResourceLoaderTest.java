@@ -17,14 +17,19 @@
  */
 package de.ipb_halle.molecularfaces.util;
 
+import static de.ipb_halle.molecularfaces.test.TestUtils.getComponentsInBody;
+import static de.ipb_halle.molecularfaces.test.TestUtils.getResourceComponentsFromHead;
+import static de.ipb_halle.molecularfaces.test.TestUtils.matchingResourceComponentsInList;
+import static java.util.Collections.EMPTY_SET;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
-
+import java.util.Set;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
 import javax.faces.component.UIOutput;
@@ -52,7 +57,7 @@ public class ResourceLoaderTest {
 
 	private String javaScript = "javax.faces.resource.Script";
 	private String stylesheet = "javax.faces.resource.Stylesheet";
-	private String libraryName = "molecularfaces";
+	private String libraryName = ResourceLoader.RESOURCES_LIBRARY_NAME;
 
 	@Rule
 	public MockedJSFContainerRule rule = new MockedJSFContainerRule();
@@ -70,32 +75,67 @@ public class ResourceLoaderTest {
 	}
 
 	@Test
+	public void test_checkQueueGetters_withoutEnqueuedResources() {
+		assertEquals(EMPTY_SET,	loader.getScriptResourcesToLoadInHead());
+		assertEquals(EMPTY_SET, loader.getScriptResourcesToLoadInBodyAtTop());
+		assertEquals(EMPTY_SET, loader.getScriptsExtToLoadInHead());
+		assertEquals(EMPTY_SET,	loader.getScriptsExtToLoadInBodyAtTop());
+		assertEquals(EMPTY_SET, loader.getCssResourcesToLoad());
+		assertEquals(EMPTY_SET, loader.getCssExtToLoad());
+	}
+
+	@Test
+	public void test_queueGetters_areImmutable() {
+		assertThrows(UnsupportedOperationException.class, () -> loader.getScriptResourcesToLoadInHead().add("abc"));
+		assertThrows(UnsupportedOperationException.class, () -> loader.getScriptResourcesToLoadInBodyAtTop().add("abc"));
+		assertThrows(UnsupportedOperationException.class, () -> loader.getScriptsExtToLoadInHead().add("abc"));
+		assertThrows(UnsupportedOperationException.class, () -> loader.getScriptsExtToLoadInBodyAtTop().add("abc"));
+		assertThrows(UnsupportedOperationException.class, () -> loader.getCssResourcesToLoad().add("abc"));
+		assertThrows(UnsupportedOperationException.class, () -> loader.getCssExtToLoad().add("abc"));
+	}
+
+	@Test
+	public void test_enqueueResources_checkQueueGetters() {
+		enqueueResources();
+
+		assertEquals(makeSet("ScriptResourceToHead1", "ScriptResourceToHead2"),
+				loader.getScriptResourcesToLoadInHead());
+		assertEquals(makeSet("ScriptResourceToBodyAtTop1", "ScriptResourceToBodyAtTop2"),
+				loader.getScriptResourcesToLoadInBodyAtTop());
+		assertEquals(makeSet("ScriptExtToHead1", "ScriptExtToHead2"), loader.getScriptsExtToLoadInHead());
+		assertEquals(makeSet("ScriptExtToBodyAtTop1", "ScriptExtToBodyAtTop2"),
+				loader.getScriptsExtToLoadInBodyAtTop());
+		assertEquals(makeSet("CssResource1", "CssResource2"), loader.getCssResourcesToLoad());
+		assertEquals(makeSet("CssExt1", "CssExt2"), loader.getCssExtToLoad());
+	}
+
+	@Test
 	public void test_withoutEnqueuedResources_processEvent() {
-		assertThat(getComponentsInHead(), hasSize(0));
+		assertThat(getResourceComponentsFromHead(), hasSize(0));
 		assertThat(getComponentsInBody(), hasSize(0));
 
 		loader.processEvent(new PostAddToViewEvent(component));
 
-		assertThat(getComponentsInHead(), hasSize(0));
+		assertThat(getResourceComponentsFromHead(), hasSize(0));
 		assertThat(getComponentsInBody(), hasSize(0));
 	}
 
 	@Test
 	public void test_enqueueResources_processEventWithoutPostAddToViewEvent() {
 		enqueueResources();
-		assertThat(getComponentsInHead(), hasSize(0));
+		assertThat(getResourceComponentsFromHead(), hasSize(0));
 		assertThat(getComponentsInBody(), hasSize(0));
 
 		loader.processEvent(new PreRenderComponentEvent(component));
 
-		assertThat(getComponentsInHead(), hasSize(0));
+		assertThat(getResourceComponentsFromHead(), hasSize(0));
 		assertThat(getComponentsInBody(), hasSize(0));
 	}
 
 	@Test
 	public void test_enqueueResources_processEventWithPostAddToViewEvent_thenCheckResources() {
 		enqueueResources();
-		assertThat(getComponentsInHead(), hasSize(0));
+		assertThat(getResourceComponentsFromHead(), hasSize(0));
 
 		/*
 		 * Add some components to the body, so we can assert on the components' ordering
@@ -114,17 +154,17 @@ public class ResourceLoaderTest {
 		for (int i = 0; i < 5; i++) {
 			loader.processEvent(new PostAddToViewEvent(component));
 
-			List<UIComponent> componentsInHead = getComponentsInHead();
+			List<UIComponent> componentsInHead = getResourceComponentsFromHead();
 			assertThat(componentsInHead, hasSize(4));
-			assertThat(matchingComponentsInList(componentsInHead, javaScript, "ScriptResourceToHead1", libraryName), hasSize(1));
-			assertThat(matchingComponentsInList(componentsInHead, javaScript, "ScriptResourceToHead2", libraryName), hasSize(1));
-			assertThat(matchingComponentsInList(componentsInHead, stylesheet, "CssResource1", libraryName), hasSize(1));
-			assertThat(matchingComponentsInList(componentsInHead, stylesheet, "CssResource2", libraryName), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInHead, javaScript, "ScriptResourceToHead1", libraryName), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInHead, javaScript, "ScriptResourceToHead2", libraryName), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInHead, stylesheet, "CssResource1", libraryName), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInHead, stylesheet, "CssResource2", libraryName), hasSize(1));
 
 			List<UIComponent> componentsInBody = getComponentsInBody();
 			assertThat(componentsInBody, hasSize(4));
-			assertThat(matchingComponentsInList(componentsInBody, javaScript, "ScriptResourceToBodyAtTop1", libraryName), hasSize(1));
-			assertThat(matchingComponentsInList(componentsInBody, javaScript, "ScriptResourceToBodyAtTop2", libraryName), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInBody, javaScript, "ScriptResourceToBodyAtTop1", libraryName), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInBody, javaScript, "ScriptResourceToBodyAtTop2", libraryName), hasSize(1));
 			assertEquals(outputComponent, componentsInBody.get(2));
 			assertEquals(inputComponent, componentsInBody.get(3));
 		}
@@ -151,6 +191,14 @@ public class ResourceLoaderTest {
 		assertEquals(expected, result);
 	}
 
+	private static Set<String> makeSet(String... elements) {
+		Set<String> result = new HashSet<>();
+		for (String element : elements) {
+			result.add(element);
+		}
+		return result;
+	}
+
 	private void enqueueResources() {
 		loader.addScriptResourceToHead("ScriptResourceToHead1");
 		loader.addScriptResourceToHead("ScriptResourceToHead2");
@@ -164,22 +212,5 @@ public class ResourceLoaderTest {
 		loader.addCssResource("CssResource2");
 		loader.addCssExt("CssExt1");
 		loader.addCssExt("CssExt2");
-	}
-
-	private List<UIComponent> getComponentsInHead() {
-		return root.getComponentResources(context, "head");
-	}
-
-	private List<UIComponent> matchingComponentsInList(List<UIComponent> components, String rendererType, String name,
-			String library) {
-		return components.stream()
-				.filter(c -> c.getRendererType().equals(rendererType))
-				.filter(c -> c.getAttributes().get("name").equals(name))
-				.filter(c -> c.getAttributes().get("library").equals(library))
-				.collect(Collectors.toList());
-	}
-
-	private List<UIComponent> getComponentsInBody() {
-		return body.getChildren();
 	}
 }

@@ -18,6 +18,7 @@
 package de.ipb_halle.molecularfaces.util;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	/**
 	 * Resource library name.
 	 */
-	private static final String RESOURCES_LIBRARY_NAME = "molecularfaces";
+	public static final String RESOURCES_LIBRARY_NAME = "molecularfaces";
 
 	/*
 	 * Queue objects
@@ -85,6 +86,15 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	}
 
 	/**
+	 * @return An immutable {@link Set} of the JavaScript resources enqueued by
+	 *         {@link #addScriptResourceToHead(String)} and that have not been
+	 *         loaded via {{@link #processEvent(ComponentSystemEvent)} yet.
+	 */
+	public Set<String> getScriptResourcesToLoadInHead() {
+		return Collections.unmodifiableSet(scriptResourcesToLoadInHead);
+	}
+
+	/**
 	 * Enqueues loading of a JavaScript resource file that will be added via JSF's
 	 * resource mechanism to the top of &lt;body&gt;.
 	 * <p>
@@ -98,6 +108,15 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	}
 
 	/**
+	 * @return An immutable {@link Set} of the JavaScript resources enqueued by
+	 *         {@link #addScriptResourceToBodyAtTop(String)} and that have not been
+	 *         loaded via {{@link #processEvent(ComponentSystemEvent)} yet.
+	 */
+	public Set<String> getScriptResourcesToLoadInBodyAtTop() {
+		return Collections.unmodifiableSet(scriptResourcesToLoadInBodyAtTop);
+	}
+
+	/**
 	 * Enqueues loading of a JavaScript file that will be loaded in the &lt;head&gt;
 	 * via the JavaScript class {@code molecularfaces.ResourcesLoader}. The code
 	 * snippet can be requested via {@link #encodeLoadExtResources(String)}.
@@ -106,6 +125,14 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	 */
 	public void addScriptExtToHead(String src) {
 		scriptsExtToLoadInHead.add(src);
+	}
+
+	/**
+	 * @return An immutable {@link Set} of the JavaScript resources enqueued by
+	 *         {@link #addScriptExtToHead(String)}.
+	 */
+	public Set<String> getScriptsExtToLoadInHead() {
+		return Collections.unmodifiableSet(scriptsExtToLoadInHead);
 	}
 
 	/**
@@ -121,6 +148,14 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	}
 
 	/**
+	 * @return An immutable {@link Set} of the JavaScript resources enqueued by
+	 *         {@link #addScriptExtToBodyAtTop(String)}.
+	 */
+	public Set<String> getScriptsExtToLoadInBodyAtTop() {
+		return Collections.unmodifiableSet(scriptsExtToLoadInBodyAtTop);
+	}
+
+	/**
 	 * Enqueues loading of a stylesheet resource file that will be added via JSF's
 	 * resource mechanism.
 	 * 
@@ -128,6 +163,15 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	 */
 	public void addCssResource(String resource) {
 		cssResourcesToLoad.add(resource);
+	}
+
+	/**
+	 * @return An immutable {@link Set} of the stylesheet resources enqueued by
+	 *         {@link #addCssResource(String)} and that have not been loaded via
+	 *         {{@link #processEvent(ComponentSystemEvent)} yet.
+	 */
+	public Set<String> getCssResourcesToLoad() {
+		return Collections.unmodifiableSet(cssResourcesToLoad);
 	}
 
 	/**
@@ -139,6 +183,14 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	 */
 	public void addCssExt(String href) {
 		cssExtToLoad.add(href);
+	}
+
+	/**
+	 * @return An immutable {@link Set} of the stylesheet resources enqueued by
+	 *         {@link #addCssExt(String)}.
+	 */
+	public Set<String> getCssExtToLoad() {
+		return Collections.unmodifiableSet(cssExtToLoad);
 	}
 
 	private void loadScriptResources(FacesContext context) {

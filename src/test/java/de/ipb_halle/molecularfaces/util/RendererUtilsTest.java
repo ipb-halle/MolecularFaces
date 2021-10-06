@@ -29,6 +29,7 @@ import javax.faces.convert.BooleanConverter;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 
+import org.apache.myfaces.test.mock.MockHttpServletRequest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,8 +41,9 @@ import de.ipb_halle.molecularfaces.test.MockedJSFContainerRule;
  * @author flange
  */
 public class RendererUtilsTest {
-	FacesContext context;
-	Converter exceptionConverter = new Converter() {
+	private FacesContext context;
+	private MockHttpServletRequest servletRequest;
+	private Converter exceptionConverter = new Converter() {
 		@Override
 		public String getAsString(FacesContext context, UIComponent component, Object value) {
 			throw new ConverterException();
@@ -59,6 +61,7 @@ public class RendererUtilsTest {
 	@Before
 	public void init() {
 		context = rule.getContainer().getFacesContext();
+		servletRequest = rule.getContainer().getRequest();
 	}
 
 	/*
@@ -68,14 +71,14 @@ public class RendererUtilsTest {
 	public void test_decodeComponent_decodesSubmittelValueFromHttpRequest() {
 		UIInput component = new UIInput();
 		component.setId("IdOfThisComponent");
-		rule.getContainer().getRequest().addParameter("NotTheIdOfThisComponent", "some value");
+		servletRequest.addParameter("NotTheIdOfThisComponent", "some value");
 
 		assertNull(component.getSubmittedValue());
 
 		RendererUtils.decodeComponent(context, component);
 		assertNull(component.getSubmittedValue());
 
-		rule.getContainer().getRequest().addParameter("IdOfThisComponent", "some value");
+		servletRequest.addParameter("IdOfThisComponent", "some value");
 		RendererUtils.decodeComponent(context, component);
 		assertEquals("some value", component.getSubmittedValue());
 	}
