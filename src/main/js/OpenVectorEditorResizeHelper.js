@@ -42,7 +42,7 @@ molecularfaces.OpenVectorEditorResizeHelper = class {
 		let iframe = this._getIframe();
 		// These numbers were obtained via trial and error.
         iframe.width  = iframe.contentWindow.document.body.scrollWidth + 20;
-        iframe.height = iframe.contentWindow.document.body.scrollHeight + 34;
+        iframe.height = iframe.contentWindow.document.body.scrollHeight + 20;
 	}
 
 	_iframeToFullscreen() {

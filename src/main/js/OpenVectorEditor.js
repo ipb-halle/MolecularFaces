@@ -87,7 +87,11 @@ molecularfaces.OpenVectorEditor = class {
 			 */
 			//domNode.innerHTML = '';
 
-			this._editor = window.createVectorEditor(domNode, this._editorProps);
+			if (!this._iframeId) {
+				this._editor = window.createVectorEditor(domNode, this._editorProps);
+			} else {
+				this._editor = document.getElementById(this._iframeId).contentWindow.createVectorEditor(domNode, this._editorProps);
+			}
 
 			this.setSequence(this._sequence);
 

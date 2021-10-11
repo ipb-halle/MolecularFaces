@@ -17,12 +17,20 @@
  */
 package de.ipb_halle.molecularfaces.component.openvectoreditor;
 
+import static de.ipb_halle.molecularfaces.util.ResourceLoader.JAVASCRIPT;
+import static de.ipb_halle.molecularfaces.util.ResourceLoader.JAVASCRIPT_FACET_NAME;
+import static de.ipb_halle.molecularfaces.util.ResourceLoader.STYLESHEET;
+import static de.ipb_halle.molecularfaces.util.ResourceLoader.STYLESHEET_FACET_NAME;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Formatter;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
+import javax.faces.application.Resource;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
@@ -31,7 +39,6 @@ import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
 import de.ipb_halle.molecularfaces.util.RendererUtils;
-import de.ipb_halle.molecularfaces.util.ResourceLoader;
 
 /**
  * This {@link javax.faces.render.Renderer} renders the HTML and JavaScript code
@@ -43,6 +50,8 @@ import de.ipb_halle.molecularfaces.util.ResourceLoader;
  */
 @FacesRenderer(rendererType = OpenVectorEditorRenderer.RENDERER_TYPE, componentFamily = OpenVectorEditorCore.COMPONENT_FAMILY)
 public class OpenVectorEditorRenderer extends Renderer {
+	private static final Logger LOGGER = Logger.getLogger(OpenVectorEditorRenderer.class.getName());
+
 	public static final String RENDERER_TYPE = "molecularfaces.OpenVectorEditorRenderer";
 
 	/**
@@ -108,10 +117,11 @@ public class OpenVectorEditorRenderer extends Renderer {
 		StringBuilder sb = new StringBuilder(256);
 
 		sb.append("<html><head>");
-		sb.append(renderResourceComponentsFromResourcesFacet(context, plugin));
+		sb.append(renderCssResourcesFromFacet(context, plugin));
 		sb.append("</head><body>");
+		sb.append(renderScriptResourcesFromFacet(context,plugin));
 
-		// inner <div> is used for the plugin rendering (aka the JavaScript target)
+		// <div> is used for the plugin rendering
 		sb.append("<div id=\"").append(editorTargetDivId).append("\"></div>");
 
 		sb.append("</body></html>");
@@ -119,30 +129,12 @@ public class OpenVectorEditorRenderer extends Renderer {
 		return sb.toString();
 	}
 
-	private String renderResourceComponentsFromResourcesFacet(FacesContext context, OpenVectorEditorCore plugin) throws IOException {
-		List<UIComponent> childrenFromFacet = getChildrenFromFacet(ResourceLoader.FACET_NAME, plugin);
-		if (childrenFromFacet.isEmpty()) {
-			return "";
-		}
+	private String renderCssResourcesFromFacet(FacesContext context, OpenVectorEditorCore plugin) throws IOException {
+		return encodeComponents(context, getChildrenFromFacet(STYLESHEET_FACET_NAME, plugin));
+	}
 
-		ResponseWriter originalResponseWriter = context.getResponseWriter();
-		StringWriter stringWriter = new StringWriter();
-		/*
-		 * Where to get a ResponseWriter implementation without inclusion of a specific
-		 * JSF implementation? I think, someone anticipated my weird use case. THIS IS
-		 * GREAT!
-		 */
-		ResponseWriter newWriter = originalResponseWriter.cloneWithWriter(stringWriter);
-
-		// Exchange ResponseWriter while encoding the children.
-		context.setResponseWriter(newWriter);
-
-		renderChildren(context, childrenFromFacet);
-
-		// Switch back to original ResponseWriter.
-		context.setResponseWriter(originalResponseWriter);
-
-		return stringWriter.toString();
+	private String renderScriptResourcesFromFacet(FacesContext context, OpenVectorEditorCore plugin) throws IOException {
+		return encodeComponents(context, getChildrenFromFacet(JAVASCRIPT_FACET_NAME, plugin));
 	}
 
 	private List<UIComponent> getChildrenFromFacet(String facetName, UIComponent component) {
@@ -154,9 +146,60 @@ public class OpenVectorEditorRenderer extends Renderer {
 		}
 	}
 
-	private void renderChildren(FacesContext context, List<UIComponent> children) throws IOException {
-		for (UIComponent comp : children) {
-			comp.encodeAll(context);
+	private String encodeComponents(FacesContext context, List<UIComponent> components) throws IOException {
+		if (components.isEmpty()) {
+			return "";
+		}
+
+		StringWriter stringWriter = new StringWriter();
+		/*
+		 * Where to get a ResponseWriter implementation without inclusion of a specific
+		 * JSF implementation? I think, someone anticipated my weird use case. THIS IS
+		 * GREAT!
+		 */
+		ResponseWriter newWriter = context.getResponseWriter().cloneWithWriter(stringWriter);
+
+		for (UIComponent comp : components) {
+			encodeResourceComponent(context, newWriter, comp);
+		}
+
+		return stringWriter.toString();
+	}
+
+	/*
+	 * This is a bit tricky: The JSF implementations optimize resource rendering by
+	 * rendering a specific resource (library name + resource name) only once. Thus,
+	 * we cannot render via the standard renderers for scripts or stylesheets.
+	 * Instead, this implementation builds the HTML tag itself.
+	 */
+	private void encodeResourceComponent(FacesContext context, ResponseWriter writer, UIComponent component) throws IOException {
+		Map<String, Object> attributes = component.getAttributes();
+		String resourceName = (String) attributes.get("name");
+		String library = (String) attributes.get("library");
+
+		if ((resourceName == null) || resourceName.isEmpty()) {
+			return;
+		}
+
+		Resource resource = context.getApplication().getResourceHandler().createResource(resourceName, library);
+		if (resource == null) {
+			LOGGER.warning("Resource not found: resourceName=" + resourceName
+					+ (library != null ? ", library=" + library : ""));
+			return;
+		}
+		String path = resource.getRequestPath();
+
+		if (component.getRendererType().equals(JAVASCRIPT)) {
+			writer.startElement("script", component);
+			writer.writeAttribute("type", "text/javascript", null);
+			writer.writeURIAttribute("src", context.getExternalContext().encodeResourceURL(path), null);
+			writer.endElement("script");
+		} else if (component.getRendererType().equals(STYLESHEET)) {
+			writer.startElement("link", component);
+			writer.writeAttribute("rel", "stylesheet", null);
+			writer.writeAttribute("type", "text/css", null);
+			writer.writeURIAttribute("href", context.getExternalContext().encodeResourceURL(path), null);
+			writer.endElement("link");
 		}
 	}
 

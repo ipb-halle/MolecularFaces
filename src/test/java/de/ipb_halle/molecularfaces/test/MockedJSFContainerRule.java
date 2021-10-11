@@ -17,9 +17,6 @@
  */
 package de.ipb_halle.molecularfaces.test;
 
-import javax.faces.component.UIOutput;
-
-import org.apache.myfaces.renderkit.html.HtmlStylesheetRenderer;
 import org.apache.myfaces.test.mock.MockedJsfTestContainer;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -55,9 +52,11 @@ public class MockedJSFContainerRule implements TestRule {
 		container.getApplication().addComponent("javax.faces.ComponentResourceContainer",
 				"org.apache.myfaces.component.ComponentResourceContainer");
 
-		// Register a renderer from myfaces-impl for stylesheets.
+		// Register renderers from myfaces-impl for JavaScript and stylesheets.
+		/*container.getFacesContext().getRenderKit().addRenderer(UIOutput.COMPONENT_FAMILY,
+				"javax.faces.resource.Script", new HtmlScriptRenderer());
 		container.getFacesContext().getRenderKit().addRenderer(UIOutput.COMPONENT_FAMILY,
-				"javax.faces.resource.Stylesheet", new HtmlStylesheetRenderer());
+				"javax.faces.resource.Stylesheet", new HtmlStylesheetRenderer());*/
 	}
 
 	private void after() {

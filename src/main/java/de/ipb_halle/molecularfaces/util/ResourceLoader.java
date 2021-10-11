@@ -43,17 +43,32 @@ import javax.faces.event.PostAddToViewEvent;
 public class ResourceLoader implements ComponentSystemEventListener, Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private final UIComponent component;
-
 	/**
 	 * Resource library name.
 	 */
 	public static final String RESOURCES_LIBRARY_NAME = "molecularfaces";
 
 	/**
-	 * Name of the facet that is used when adding resources as facet components.
+	 * Name of the facet that is used when adding JavaScript resources as facet components.
 	 */
-	public static final String FACET_NAME = "molecularfaces.resourceloader.FACET_NAME";
+	public static final String JAVASCRIPT_FACET_NAME = "molecularfaces.resourceloader.javascript";
+
+	/**
+	 * Name of the facet that is used when adding stylesheet resources as facet components.
+	 */
+	public static final String STYLESHEET_FACET_NAME = "molecularfaces.resourceloader.stylesheet";
+
+	/**
+	 * Renderer type for JavaScript resources.
+	 */
+	public static final String JAVASCRIPT = "javax.faces.resource.Script";
+
+	/**
+	 * Renderer type for stylesheet resources.
+	 */
+	public static final String STYLESHEET = "javax.faces.resource.Stylesheet";
+
+	private final UIComponent component;
 
 	/*
 	 * Queue objects
@@ -185,14 +200,25 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	}
 
 	/**
+	 * Adds a JavaScript resource component as facet to the wrapped component. The
+	 * wrapped component is responsible for rendering its facets.
+	 * 
+	 * @param resource name of the file in the web project's resource library
+	 */
+	public void addScriptResourceAsFacetComponent(String resource) {
+		UIComponent resourceComponent = createResourceComponent(resource, JAVASCRIPT);
+		addComponentToResourceContainerInFacet(resourceComponent, JAVASCRIPT_FACET_NAME, component.getFacets());
+	}
+
+	/**
 	 * Adds a stylesheet resource component as facet to the wrapped component. The
 	 * wrapped component is responsible for rendering its facets.
 	 * 
 	 * @param resource name of the file in the web project's resource library
 	 */
 	public void addCssResourceAsFacetComponent(String resource) {
-		UIComponent resourceComponent = createResourceComponent(resource, "javax.faces.resource.Stylesheet");
-		addComponentToResourceContainerInFacet(resourceComponent, FACET_NAME, component.getFacets());
+		UIComponent resourceComponent = createResourceComponent(resource, STYLESHEET);
+		addComponentToResourceContainerInFacet(resourceComponent, STYLESHEET_FACET_NAME, component.getFacets());
 	}
 
 	/**
@@ -216,13 +242,13 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 
 	private void loadScriptResources(FacesContext context) {
 		for (String resource : scriptResourcesToLoadInHead) {
-			UIComponent component = createResourceComponent(resource, "javax.faces.resource.Script");
+			UIComponent component = createResourceComponent(resource, JAVASCRIPT);
 			addComponentToHead(component, context);
 		}
 		scriptResourcesToLoadInHead.clear();
 
 		for (String resource : scriptResourcesToLoadInBodyAtTop) {
-			UIComponent component = createResourceComponent(resource, "javax.faces.resource.Script");
+			UIComponent component = createResourceComponent(resource, JAVASCRIPT);
 			addComponentToBodyAtTop(component, context);
 		}
 		/*
@@ -236,7 +262,7 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 
 	private void loadCssResources(FacesContext context) {
 		for (String resource : cssResourcesToLoad) {
-			UIComponent component = createResourceComponent(resource, "javax.faces.resource.Stylesheet");
+			UIComponent component = createResourceComponent(resource, STYLESHEET);
 			addComponentToHead(component, context);
 		}
 		cssResourcesToLoad.clear();

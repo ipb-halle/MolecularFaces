@@ -20,6 +20,8 @@ package de.ipb_halle.molecularfaces.util;
 import static de.ipb_halle.molecularfaces.test.TestUtils.getComponentsInBody;
 import static de.ipb_halle.molecularfaces.test.TestUtils.getResourceComponentsFromHead;
 import static de.ipb_halle.molecularfaces.test.TestUtils.matchingResourceComponentsInList;
+import static de.ipb_halle.molecularfaces.util.ResourceLoader.JAVASCRIPT;
+import static de.ipb_halle.molecularfaces.util.ResourceLoader.STYLESHEET;
 import static java.util.Collections.EMPTY_SET;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -56,8 +58,6 @@ public class ResourceLoaderTest {
 	private UIComponent component;
 	private ResourceLoader loader;
 
-	private static final String JAVASCRIPT = "javax.faces.resource.Script";
-	private static final String STYLESHEET = "javax.faces.resource.Stylesheet";
 	private static final String LIBRARY_NAME = ResourceLoader.RESOURCES_LIBRARY_NAME;
 
 	@Rule
@@ -193,6 +193,22 @@ public class ResourceLoaderTest {
 	}
 
 	@Test
+	public void test_addScriptResourceAsFacetComponent() {
+		assertThat(component.getFacets().size(), is(0));
+
+		loader.addScriptResourceAsFacetComponent("ScriptResourceAsFacetComponent1");
+		loader.addScriptResourceAsFacetComponent("ScriptResourceAsFacetComponent2");
+
+		assertThat(component.getFacets().size(), is(1));
+		UIComponent facet = component.getFacet(ResourceLoader.JAVASCRIPT_FACET_NAME);
+		assertNotNull(facet);
+		List<UIComponent> children = facet.getChildren();
+		assertThat(children, hasSize(2));
+		assertThat(matchingResourceComponentsInList(children, JAVASCRIPT, "ScriptResourceAsFacetComponent1", LIBRARY_NAME), hasSize(1));
+		assertThat(matchingResourceComponentsInList(children, JAVASCRIPT, "ScriptResourceAsFacetComponent2", LIBRARY_NAME), hasSize(1));
+	}
+
+	@Test
 	public void test_addCssResourceAsFacetComponent() {
 		assertThat(component.getFacets().size(), is(0));
 
@@ -200,7 +216,7 @@ public class ResourceLoaderTest {
 		loader.addCssResourceAsFacetComponent("CssResourceAsFacetComponent2");
 
 		assertThat(component.getFacets().size(), is(1));
-		UIComponent facet = component.getFacet(ResourceLoader.FACET_NAME);
+		UIComponent facet = component.getFacet(ResourceLoader.STYLESHEET_FACET_NAME);
 		assertNotNull(facet);
 		List<UIComponent> children = facet.getChildren();
 		assertThat(children, hasSize(2));
