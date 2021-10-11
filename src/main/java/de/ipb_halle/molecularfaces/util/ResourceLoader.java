@@ -21,10 +21,12 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Formatter;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
+import javax.faces.component.UIPanel;
 import javax.faces.component.html.HtmlBody;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
@@ -41,10 +43,17 @@ import javax.faces.event.PostAddToViewEvent;
 public class ResourceLoader implements ComponentSystemEventListener, Serializable {
 	private static final long serialVersionUID = 1L;
 
+	private final UIComponent component;
+
 	/**
 	 * Resource library name.
 	 */
 	public static final String RESOURCES_LIBRARY_NAME = "molecularfaces";
+
+	/**
+	 * Name of the facet that is used when adding resources as facet components.
+	 */
+	public static final String FACET_NAME = "molecularfaces.resourceloader.FACET_NAME";
 
 	/*
 	 * Queue objects
@@ -57,12 +66,13 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	private Set<String> cssExtToLoad = new HashSet<>();
 
 	/**
-	 * Registers a PostAddToView event to the given component, in which this
-	 * instance will attach its enqueued resources to the component tree.
+	 * Wraps the given component and registers a PostAddToView event to it, in which
+	 * this instance will attach its enqueued resources to the component tree.
 	 * 
 	 * @param component UI component
 	 */
 	public ResourceLoader(UIComponent component) {
+		this.component = component;
 		component.subscribeToEvent(PostAddToViewEvent.class, this);
 	}
 
@@ -175,6 +185,17 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	}
 
 	/**
+	 * Adds a stylesheet resource component as facet to the wrapped component. The
+	 * wrapped component is responsible for rendering its facets.
+	 * 
+	 * @param resource name of the file in the web project's resource library
+	 */
+	public void addCssResourceAsFacetComponent(String resource) {
+		UIComponent resourceComponent = createResourceComponent(resource, "javax.faces.resource.Stylesheet");
+		addComponentToResourceContainerInFacet(resourceComponent, FACET_NAME, component.getFacets());
+	}
+
+	/**
 	 * Enqueues loading of a stylesheet file that will be loaded via the JavaScript
 	 * class {@code molecularfaces.ResourcesLoader}. The code snippet can be
 	 * requested via {@link #encodeLoadExtResources(String)}.
@@ -252,6 +273,17 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 		}
 
 		return null;
+	}
+
+	private void addComponentToResourceContainerInFacet(UIComponent component, String facetName, Map<String, UIComponent> facets) {
+		/*
+		 * Use UIPanel as container for all added child components. JSF does this via
+		 * ComponentResourceContainer, but this component is only available in the
+		 * specific implementations.
+		 */
+		UIComponent container = facets.computeIfAbsent(facetName, k -> new UIPanel());
+
+		container.getChildren().add(component);
 	}
 
 	/**

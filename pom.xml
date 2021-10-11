@@ -260,6 +260,7 @@
 								<include>MarvinJSEditor.js</include>
 								<include>MarvinJSNamespaceLoader.js</include>
 								<include>MarvinJSViewer.js</include>
+								<include>OpenVectorEditorResizeHelper.js</include>
 								<include>OpenVectorEditor.js</include>
 							</includes>
 							<outputFilename>MolecularFaces.min.js</outputFilename>

@@ -18,7 +18,11 @@
 package de.ipb_halle.molecularfaces.component.openvectoreditor;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Collections;
 import java.util.Formatter;
+import java.util.List;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
@@ -27,6 +31,7 @@ import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
 import de.ipb_halle.molecularfaces.util.RendererUtils;
+import de.ipb_halle.molecularfaces.util.ResourceLoader;
 
 /**
  * This {@link javax.faces.render.Renderer} renders the HTML and JavaScript code
@@ -72,7 +77,8 @@ public class OpenVectorEditorRenderer extends Renderer {
 		
 		String clientId = plugin.getClientId();
 		String hiddenInputId = clientId + "_Input";
-		String divId = clientId + "_OpenVectorEditor";
+		String iframeId = clientId + "_Iframe";
+		String editorTargetDivId = clientId + "_OpenVectorEditor";
 
 		ResponseWriter writer = context.getResponseWriter();
 
@@ -80,23 +86,84 @@ public class OpenVectorEditorRenderer extends Renderer {
 		writer.startElement("div", plugin);
 		writer.writeAttribute("id", clientId, null);
 
-		encodeHTML(context, writer, plugin, divId, hiddenInputId);
-		encodeJS(writer, plugin, divId, hiddenInputId);
+		encodeHiddenInput(context, writer, plugin, hiddenInputId);
+		encodeIframe(context, writer, plugin, editorTargetDivId, iframeId, hiddenInputId);
 
 		// end of surrounding <div>
 		writer.endElement("div");
 	}
-	
-	private void encodeHTML(FacesContext context, ResponseWriter writer, OpenVectorEditorCore plugin, String divId,
-			String hiddenInputId) throws IOException {
-		// inner <div> is used for the plugin rendering (aka the JavaScript target)
-		writer.startElement("div", plugin);
-		writer.writeAttribute("id", divId, null);
-		writer.endElement("div");
 
+	private void encodeIframe(FacesContext context, ResponseWriter writer, OpenVectorEditorCore plugin, String editorTargetDivId,
+			String iframeId, String hiddenInputId) throws IOException {
+		writer.startElement("iframe", plugin);
+		writer.writeAttribute("id", iframeId, null);
+		writer.writeAttribute("style", "border:none;", null);
+		writer.writeAttribute("onload", generateOnloadJSCode(plugin, editorTargetDivId, iframeId, hiddenInputId), null);
+		writer.writeAttribute("srcdoc", generateIframeSrcdocHTML(context, plugin, editorTargetDivId), null);
+		writer.writeText("Your browser does not support iframes.", null);
+		writer.endElement("iframe");
+	}
+
+	private String generateIframeSrcdocHTML(FacesContext context, OpenVectorEditorCore plugin, String editorTargetDivId) throws IOException {
+		StringBuilder sb = new StringBuilder(256);
+
+		sb.append("<html><head>");
+		sb.append(renderResourceComponentsFromResourcesFacet(context, plugin));
+		sb.append("</head><body>");
+
+		// inner <div> is used for the plugin rendering (aka the JavaScript target)
+		sb.append("<div id=\"").append(editorTargetDivId).append("\"></div>");
+
+		sb.append("</body></html>");
+
+		return sb.toString();
+	}
+
+	private String renderResourceComponentsFromResourcesFacet(FacesContext context, OpenVectorEditorCore plugin) throws IOException {
+		List<UIComponent> childrenFromFacet = getChildrenFromFacet(ResourceLoader.FACET_NAME, plugin);
+		if (childrenFromFacet.isEmpty()) {
+			return "";
+		}
+
+		ResponseWriter originalResponseWriter = context.getResponseWriter();
+		StringWriter stringWriter = new StringWriter();
+		/*
+		 * Where to get a ResponseWriter implementation without inclusion of a specific
+		 * JSF implementation? I think, someone anticipated my weird use case. THIS IS
+		 * GREAT!
+		 */
+		ResponseWriter newWriter = originalResponseWriter.cloneWithWriter(stringWriter);
+
+		// Exchange ResponseWriter while encoding the children.
+		context.setResponseWriter(newWriter);
+
+		renderChildren(context, childrenFromFacet);
+
+		// Switch back to original ResponseWriter.
+		context.setResponseWriter(originalResponseWriter);
+
+		return stringWriter.toString();
+	}
+
+	private List<UIComponent> getChildrenFromFacet(String facetName, UIComponent component) {
+		UIComponent facet = component.getFacet(facetName);
+		if (facet == null) {
+			return Collections.emptyList();
+		} else {
+			return facet.getChildren();
+		}
+	}
+
+	private void renderChildren(FacesContext context, List<UIComponent> children) throws IOException {
+		for (UIComponent comp : children) {
+			comp.encodeAll(context);
+		}
+	}
+
+	private void encodeHiddenInput(FacesContext context, ResponseWriter writer, OpenVectorEditorCore plugin,
+			String hiddenInputId) throws IOException {
 		String value = RendererUtils.convertValueToString(context, plugin, plugin.getValue());
 
-		// hidden <input>
 		writer.startElement("input", plugin);
 		writer.writeAttribute("type", "hidden", null);
 		writer.writeAttribute("id", hiddenInputId, null);
@@ -111,19 +178,7 @@ public class OpenVectorEditorRenderer extends Renderer {
 		writer.endElement("input");
 	}
 
-	private void encodeJS(ResponseWriter writer, OpenVectorEditorCore plugin, String divId, String hiddenInputId) throws IOException {
-		String jsCode = generateJSCode(plugin, divId, hiddenInputId);
-		writeScriptTag(jsCode, plugin, writer);
-	}
-	
-	private void writeScriptTag(String jsCode, OpenVectorEditorCore plugin, ResponseWriter writer) throws IOException {
-		writer.startElement("script", plugin);
-		writer.writeAttribute("type", "text/javascript", null);
-		writer.writeText(jsCode, null);
-		writer.endElement("script");
-	}
-
-	private String generateJSCode(OpenVectorEditorCore plugin, String divId, String hiddenInputId) {
+	private String generateOnloadJSCode(OpenVectorEditorCore plugin, String editorTargetDivId, String iframeId, String hiddenInputId) {
 		StringBuilder sb = new StringBuilder(512);
 
 		// resource loading
@@ -151,8 +206,8 @@ public class OpenVectorEditorRenderer extends Renderer {
 		fmt.format("catch(e) { console.error(\"%s\" + e); }", "Could not parse JSON input: ");
 		fmt.format("}");
 		fmt.format("let editorPromise = molecularfaces.OpenVectorEditor"
-				+ ".newEditor(\"%s\", valueAsJSON, %b);",
-				divId, plugin.isReadonly());
+				+ ".newEditor(\"%s\", \"%s\", valueAsJSON, %b);",
+				editorTargetDivId, iframeId, plugin.isReadonly());
 
 		/*
 		 * Register an on-change callback to fill the value of the hidden <input>

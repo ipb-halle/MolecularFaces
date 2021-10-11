@@ -17,6 +17,9 @@
  */
 package de.ipb_halle.molecularfaces.test;
 
+import javax.faces.component.UIOutput;
+
+import org.apache.myfaces.renderkit.html.HtmlStylesheetRenderer;
 import org.apache.myfaces.test.mock.MockedJsfTestContainer;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -51,6 +54,10 @@ public class MockedJSFContainerRule implements TestRule {
 		// This allows the use of UIViewRoot.addComponentResource(...).
 		container.getApplication().addComponent("javax.faces.ComponentResourceContainer",
 				"org.apache.myfaces.component.ComponentResourceContainer");
+
+		// Register a renderer from myfaces-impl for stylesheets.
+		container.getFacesContext().getRenderKit().addRenderer(UIOutput.COMPONENT_FAMILY,
+				"javax.faces.resource.Stylesheet", new HtmlStylesheetRenderer());
 	}
 
 	private void after() {

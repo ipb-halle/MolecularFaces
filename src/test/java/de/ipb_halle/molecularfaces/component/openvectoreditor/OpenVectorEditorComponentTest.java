@@ -137,20 +137,20 @@ public class OpenVectorEditorComponentTest {
 		assertThat(loader.getScriptResourcesToLoadInBodyAtTop(), hasSize(1));
 		assertThat(loader.getScriptsExtToLoadInHead(), hasSize(0));
 		assertThat(loader.getScriptsExtToLoadInBodyAtTop(), hasSize(0));
-		assertThat(loader.getCssResourcesToLoad(), hasSize(1));
+		assertThat(loader.getCssResourcesToLoad(), hasSize(0));
 		assertThat(loader.getCssExtToLoad(), hasSize(0));
 		assertTrue(loader.getScriptResourcesToLoadInHead().contains("js/MolecularFaces.min.js"));
 		assertTrue(loader.getScriptResourcesToLoadInBodyAtTop().contains("plugins/openVectorEditor/open-vector-editor.min.js"));
-		assertTrue(loader.getCssResourcesToLoad().contains("plugins/openVectorEditor/main.css"));
+		assertThat(matchingResourceComponentsInList(comp.getFacet(ResourceLoader.FACET_NAME).getChildren(), stylesheet, "plugins/openVectorEditor/main.css", libraryName), hasSize(1));
 
 		// Also test adding resources via the JSF event mechanism.
 		rule.getContainer().getApplication().publishEvent(context, PostAddToViewEvent.class, comp);
 
 		List<UIComponent> componentsInHead = getResourceComponentsFromHead();
 		List<UIComponent> componentsInBody = getComponentsInBody();
-		assertThat(componentsInHead, hasSize(2));
+		assertThat(componentsInHead, hasSize(1));
 		assertThat(matchingResourceComponentsInList(componentsInHead, javaScript, "js/MolecularFaces.min.js", libraryName), hasSize(1));
-		assertThat(matchingResourceComponentsInList(componentsInHead, stylesheet, "plugins/openVectorEditor/main.css", libraryName), hasSize(1));
+		assertThat(matchingResourceComponentsInList(comp.getFacet(ResourceLoader.FACET_NAME).getChildren(), stylesheet, "plugins/openVectorEditor/main.css", libraryName), hasSize(1));
 		assertThat(componentsInBody, hasSize(1));
 		assertThat(matchingResourceComponentsInList(componentsInBody, javaScript, "plugins/openVectorEditor/open-vector-editor.min.js", libraryName), hasSize(1));
 	}

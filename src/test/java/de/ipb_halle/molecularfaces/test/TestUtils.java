@@ -17,12 +17,15 @@
  */
 package de.ipb_halle.molecularfaces.test;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIOutput;
 import javax.faces.component.html.HtmlBody;
 import javax.faces.context.FacesContext;
+import javax.faces.render.Renderer;
 
 /**
  * Utility methods for testing.
@@ -51,8 +54,17 @@ public class TestUtils {
 
 	public static List<UIComponent> matchingResourceComponentsInList(List<UIComponent> components, String rendererType,
 			String name, String library) {
-		return components.stream().filter(c -> c.getRendererType().equals(rendererType))
+		return components.stream().filter(c -> c.getClass().equals(UIOutput.class))
+				.filter(c -> c.getRendererType().equals(rendererType))
 				.filter(c -> c.getAttributes().get("name").equals(name))
 				.filter(c -> c.getAttributes().get("library").equals(library)).collect(Collectors.toList());
+	}
+
+	public static void encodeRenderer(Renderer renderer, FacesContext context, UIComponent component) throws IOException {
+		renderer.encodeBegin(context, component);
+		if (renderer.getRendersChildren()) {
+			renderer.encodeChildren(context, component);
+		}
+		renderer.encodeEnd(context, component);
 	}
 }

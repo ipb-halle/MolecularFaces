@@ -25,6 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
 import java.util.HashSet;
@@ -55,9 +56,9 @@ public class ResourceLoaderTest {
 	private UIComponent component;
 	private ResourceLoader loader;
 
-	private String javaScript = "javax.faces.resource.Script";
-	private String stylesheet = "javax.faces.resource.Stylesheet";
-	private String libraryName = ResourceLoader.RESOURCES_LIBRARY_NAME;
+	private static final String JAVASCRIPT = "javax.faces.resource.Script";
+	private static final String STYLESHEET = "javax.faces.resource.Stylesheet";
+	private static final String LIBRARY_NAME = ResourceLoader.RESOURCES_LIBRARY_NAME;
 
 	@Rule
 	public MockedJSFContainerRule rule = new MockedJSFContainerRule();
@@ -156,15 +157,15 @@ public class ResourceLoaderTest {
 
 			List<UIComponent> componentsInHead = getResourceComponentsFromHead();
 			assertThat(componentsInHead, hasSize(4));
-			assertThat(matchingResourceComponentsInList(componentsInHead, javaScript, "ScriptResourceToHead1", libraryName), hasSize(1));
-			assertThat(matchingResourceComponentsInList(componentsInHead, javaScript, "ScriptResourceToHead2", libraryName), hasSize(1));
-			assertThat(matchingResourceComponentsInList(componentsInHead, stylesheet, "CssResource1", libraryName), hasSize(1));
-			assertThat(matchingResourceComponentsInList(componentsInHead, stylesheet, "CssResource2", libraryName), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInHead, JAVASCRIPT, "ScriptResourceToHead1", LIBRARY_NAME), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInHead, JAVASCRIPT, "ScriptResourceToHead2", LIBRARY_NAME), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInHead, STYLESHEET, "CssResource1", LIBRARY_NAME), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInHead, STYLESHEET, "CssResource2", LIBRARY_NAME), hasSize(1));
 
 			List<UIComponent> componentsInBody = getComponentsInBody();
 			assertThat(componentsInBody, hasSize(4));
-			assertThat(matchingResourceComponentsInList(componentsInBody, javaScript, "ScriptResourceToBodyAtTop1", libraryName), hasSize(1));
-			assertThat(matchingResourceComponentsInList(componentsInBody, javaScript, "ScriptResourceToBodyAtTop2", libraryName), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInBody, JAVASCRIPT, "ScriptResourceToBodyAtTop1", LIBRARY_NAME), hasSize(1));
+			assertThat(matchingResourceComponentsInList(componentsInBody, JAVASCRIPT, "ScriptResourceToBodyAtTop2", LIBRARY_NAME), hasSize(1));
 			assertEquals(outputComponent, componentsInBody.get(2));
 			assertEquals(inputComponent, componentsInBody.get(3));
 		}
@@ -189,6 +190,22 @@ public class ResourceLoaderTest {
 				+ ".addCssToHead(\"CssExt1\");";
 
 		assertEquals(expected, result);
+	}
+
+	@Test
+	public void test_addCssResourceAsFacetComponent() {
+		assertThat(component.getFacets().size(), is(0));
+
+		loader.addCssResourceAsFacetComponent("CssResourceAsFacetComponent1");
+		loader.addCssResourceAsFacetComponent("CssResourceAsFacetComponent2");
+
+		assertThat(component.getFacets().size(), is(1));
+		UIComponent facet = component.getFacet(ResourceLoader.FACET_NAME);
+		assertNotNull(facet);
+		List<UIComponent> children = facet.getChildren();
+		assertThat(children, hasSize(2));
+		assertThat(matchingResourceComponentsInList(children, STYLESHEET, "CssResourceAsFacetComponent1", LIBRARY_NAME), hasSize(1));
+		assertThat(matchingResourceComponentsInList(children, STYLESHEET, "CssResourceAsFacetComponent2", LIBRARY_NAME), hasSize(1));
 	}
 
 	private static Set<String> makeSet(String... elements) {

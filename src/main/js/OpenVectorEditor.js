@@ -28,8 +28,9 @@ molecularfaces.OpenVectorEditor = class {
 	 * This constructor should not be used directly to receive an instance of
 	 * this class. Use the static factory method "newEditor" instead. 
 	 */
-	constructor(divId, sequence, readonly) {
+	constructor(divId, iframeId, sequence, readonly) {
 		this._divId = divId;
+		this._iframeId = iframeId;
 		this._sequence = sequence;
 		this._readonly = readonly;
 		this._editor = null;
@@ -60,19 +61,25 @@ molecularfaces.OpenVectorEditor = class {
 	/**
 	 * Returns an initialized OpenVectorEditor editor instance embedded inside a
 	 * Promise. The editor is rendered in a <div> container with the id given by
-	 * the parameter "divId", a sequence according to the "sequence" parameter and
-	 * is in read-only mode depending on the "readonly" parameter.
+	 * the parameter "divId", which can be embedded inside an <iframe> with an id
+	 * given by the parameter "iframeId", a sequence according to the "sequence"
+	 * parameter and is in read-only mode depending on the "readonly" parameter.
 	 */
-	static newEditor(divId, sequence, readonly) {
+	static newEditor(divId, iframeId, sequence, readonly) {
 		return new Promise((resolve, reject) => {
-			let obj = new molecularfaces.OpenVectorEditor(divId, sequence, readonly);
+			let obj = new molecularfaces.OpenVectorEditor(divId, iframeId, sequence, readonly);
 			obj.init().then(resolve(obj));
 		});
 	}
 
 	init() {
 		return new Promise((resolve, reject) => {
-			let domNode = document.getElementById(this._divId);
+			let domNode;
+			if (!this._iframeId) {
+				domNode = document.getElementById(this._divId);
+			} else {
+				domNode = document.getElementById(this._iframeId).contentWindow.document.getElementById(this._divId);
+			}
 
 			/*
 			 * OpenVectorEditor does not tolerate clearing its <div> when calling
@@ -83,6 +90,10 @@ molecularfaces.OpenVectorEditor = class {
 			this._editor = window.createVectorEditor(domNode, this._editorProps);
 
 			this.setSequence(this._sequence);
+
+			if (this._iframeId) {
+				new molecularfaces.OpenVectorEditorResizeHelper(this._iframeId);
+			}
 
 			resolve(this);
 		});

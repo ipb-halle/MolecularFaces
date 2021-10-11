@@ -35,6 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.ipb_halle.molecularfaces.test.MockedJSFContainerRule;
+import de.ipb_halle.molecularfaces.test.TestUtils;
 
 /**
  * 
@@ -57,8 +58,8 @@ public class OpenVectorEditorRendererTest {
 		writer = new StringWriter();
 
 		/*
-		 * We use the implementation of MyFaces here, because MockResponseWriter escapes
-		 * JavaScript code.
+		 * We use the implementation of MyFaces here, because MockResponseWriter
+		 * HTML-escapes JavaScript code in <script> tags.
 		 */
 		context.setResponseWriter(new HtmlResponseWriterImpl(writer, "text/html", "UTF-8", false));
 
@@ -119,7 +120,7 @@ public class OpenVectorEditorRendererTest {
 	}
 
 	/*
-	 * Tests for encodeBegin(FacesContext, UIComponent)
+	 * Tests for encoding methods
 	 */
 	@Test
 	public void test_encodeBegin_withWrongComponentClass_throwsClassCastException() throws IOException {
@@ -127,9 +128,9 @@ public class OpenVectorEditorRendererTest {
 	}
 
 	@Test
-	public void test_encodeBegin_componentNotRendered() throws IOException {
+	public void test_encode_componentNotRendered() throws IOException {
 		comp.setRendered(false);
-		renderer.encodeBegin(context, comp);
+		TestUtils.encodeRenderer(renderer, context, comp);
 		assertEquals("", writer.toString());
 	}
 }

@@ -52,7 +52,7 @@ public class OpenVectorEditorComponent extends OpenVectorEditorCore {
 			getResourceLoader().addCssExt(resourceBaseUrl + "/main.css");
 		} else {
 			getResourceLoader().addScriptResourceToBodyAtTop("plugins/openVectorEditor/open-vector-editor.min.js");
-			getResourceLoader().addCssResource("plugins/openVectorEditor/main.css");
+			getResourceLoader().addCssResourceAsFacetComponent("plugins/openVectorEditor/main.css");
 		}
 		getResourceLoader().addScriptResourceToHead("js/MolecularFaces.min.js");
 
