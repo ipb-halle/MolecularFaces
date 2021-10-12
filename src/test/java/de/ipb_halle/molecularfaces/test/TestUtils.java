@@ -27,6 +27,8 @@ import javax.faces.component.html.HtmlBody;
 import javax.faces.context.FacesContext;
 import javax.faces.render.Renderer;
 
+import org.apache.commons.io.IOUtils;
+
 /**
  * Utility methods for testing.
  * 
@@ -60,11 +62,16 @@ public class TestUtils {
 				.filter(c -> c.getAttributes().get("library").equals(library)).collect(Collectors.toList());
 	}
 
-	public static void encodeRenderer(Renderer renderer, FacesContext context, UIComponent component) throws IOException {
+	public static void encodeRenderer(Renderer renderer, FacesContext context, UIComponent component)
+			throws IOException {
 		renderer.encodeBegin(context, component);
 		if (renderer.getRendersChildren()) {
 			renderer.encodeChildren(context, component);
 		}
 		renderer.encodeEnd(context, component);
+	}
+
+	public static <T> String readResourceFile(Class<T> clazz, String fileName) throws IOException {
+		return IOUtils.toString(clazz.getResourceAsStream(fileName), "UTF-8");
 	}
 }

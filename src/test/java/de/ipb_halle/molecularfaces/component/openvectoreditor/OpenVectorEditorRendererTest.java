@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.molecularfaces.component.openvectoreditor;
 
+import static de.ipb_halle.molecularfaces.component.openvectoreditor.OpenVectorEditorComponent.WEBXML_CUSTOM_RESOURCE_BASE_URL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
@@ -30,6 +31,7 @@ import javax.faces.convert.BooleanConverter;
 
 import org.apache.myfaces.shared.renderkit.html.HtmlResponseWriterImpl;
 import org.apache.myfaces.test.mock.MockHttpServletRequest;
+import org.apache.myfaces.test.mock.MockServletContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +45,7 @@ import de.ipb_halle.molecularfaces.test.TestUtils;
  */
 public class OpenVectorEditorRendererTest {
 	private FacesContext context;
+	private MockServletContext servletContext;
 	private MockHttpServletRequest servletRequest;
 	private StringWriter writer;
 	private OpenVectorEditorComponent comp;
@@ -54,6 +57,7 @@ public class OpenVectorEditorRendererTest {
 	@Before
 	public void init() {
 		context = rule.getContainer().getFacesContext();
+		servletContext = rule.getContainer().getServletContext();
 		servletRequest = rule.getContainer().getRequest();
 		writer = new StringWriter();
 
@@ -132,5 +136,31 @@ public class OpenVectorEditorRendererTest {
 		comp.setRendered(false);
 		TestUtils.encodeRenderer(renderer, context, comp);
 		assertEquals("", writer.toString());
+	}
+
+	@Test
+	public void test_encode_withoutWidgetVar() throws IOException {
+		comp.setId("myId");
+		TestUtils.encodeRenderer(renderer, context, comp);
+		String expected = TestUtils.readResourceFile(OpenVectorEditorComponentTest.class, "encode_withoutWidgetVar.txt");
+		assertEquals(expected, writer.toString());
+	}
+
+	@Test
+	public void test_encode_withWidgetVar() throws IOException {
+		comp.setId("myId");
+		comp.setWidgetVar("myEditor");
+		TestUtils.encodeRenderer(renderer, context, comp);
+		String expected = TestUtils.readResourceFile(OpenVectorEditorComponentTest.class, "encode_withWidgetVar.txt");
+		assertEquals(expected, writer.toString());
+	}
+
+	@Test
+	public void test_encode_withCustomResourceBaseUrl() throws IOException {
+		servletContext.addInitParameter(WEBXML_CUSTOM_RESOURCE_BASE_URL, "baseUrl");
+		comp = new OpenVectorEditorComponent();
+		comp.setId("myId");
+		TestUtils.encodeRenderer(renderer, context, comp);
+		// TODO: do asserts
 	}
 }
