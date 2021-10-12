@@ -96,10 +96,41 @@ public class OpenVectorEditorRenderer extends Renderer {
 		writer.writeAttribute("id", clientId, null);
 
 		encodeHiddenInput(context, writer, plugin, hiddenInputId);
+		encodeJS(writer, plugin, editorTargetDivId, iframeId, hiddenInputId);
 		encodeIframe(context, writer, plugin, editorTargetDivId, iframeId, hiddenInputId);
 
 		// end of surrounding <div>
 		writer.endElement("div");
+	}
+
+	private void encodeHiddenInput(FacesContext context, ResponseWriter writer, OpenVectorEditorCore plugin,
+			String hiddenInputId) throws IOException {
+		String value = RendererUtils.convertValueToString(context, plugin, plugin.getValue());
+
+		writer.startElement("input", plugin);
+		writer.writeAttribute("type", "hidden", null);
+		writer.writeAttribute("id", hiddenInputId, null);
+
+		if (plugin.isReadonly()) {
+			// "name" attribute is not rendered (prevents submission).
+		} else {
+			writer.writeAttribute("name", plugin.getClientId(), null);
+		}
+
+		writer.writeAttribute("value", value, "value");
+		writer.endElement("input");
+	}
+
+	private void encodeJS(ResponseWriter writer, OpenVectorEditorCore plugin, String editorTargetDivId, String iframeId, String hiddenInputId) throws IOException {
+		String jsCode = generateJSCode(plugin, editorTargetDivId, iframeId, hiddenInputId);
+		writeScriptTag(jsCode, plugin, writer);
+	}
+
+	private void writeScriptTag(String jsCode, OpenVectorEditorCore plugin, ResponseWriter writer) throws IOException {
+		writer.startElement("script", plugin);
+		writer.writeAttribute("type", "text/javascript", null);
+		writer.writeText(jsCode, null);
+		writer.endElement("script");
 	}
 
 	private void encodeIframe(FacesContext context, ResponseWriter writer, OpenVectorEditorCore plugin, String editorTargetDivId,
@@ -107,7 +138,6 @@ public class OpenVectorEditorRenderer extends Renderer {
 		writer.startElement("iframe", plugin);
 		writer.writeAttribute("id", iframeId, null);
 		writer.writeAttribute("style", "border:none;", null);
-		writer.writeAttribute("onload", generateOnloadJSCode(plugin, editorTargetDivId, iframeId, hiddenInputId), null);
 		writer.writeAttribute("srcdoc", generateIframeSrcdocHTML(context, plugin, editorTargetDivId), null);
 		writer.writeText("Your browser does not support iframes.", null);
 		writer.endElement("iframe");
@@ -130,11 +160,11 @@ public class OpenVectorEditorRenderer extends Renderer {
 	}
 
 	private String renderCssResourcesFromFacet(FacesContext context, OpenVectorEditorCore plugin) throws IOException {
-		return encodeComponents(context, getChildrenFromFacet(STYLESHEET_FACET_NAME, plugin));
+		return encodeResourceComponents(context, getChildrenFromFacet(STYLESHEET_FACET_NAME, plugin));
 	}
 
 	private String renderScriptResourcesFromFacet(FacesContext context, OpenVectorEditorCore plugin) throws IOException {
-		return encodeComponents(context, getChildrenFromFacet(JAVASCRIPT_FACET_NAME, plugin));
+		return encodeResourceComponents(context, getChildrenFromFacet(JAVASCRIPT_FACET_NAME, plugin));
 	}
 
 	private List<UIComponent> getChildrenFromFacet(String facetName, UIComponent component) {
@@ -146,7 +176,7 @@ public class OpenVectorEditorRenderer extends Renderer {
 		}
 	}
 
-	private String encodeComponents(FacesContext context, List<UIComponent> components) throws IOException {
+	private String encodeResourceComponents(FacesContext context, List<UIComponent> components) throws IOException {
 		if (components.isEmpty()) {
 			return "";
 		}
@@ -203,25 +233,7 @@ public class OpenVectorEditorRenderer extends Renderer {
 		}
 	}
 
-	private void encodeHiddenInput(FacesContext context, ResponseWriter writer, OpenVectorEditorCore plugin,
-			String hiddenInputId) throws IOException {
-		String value = RendererUtils.convertValueToString(context, plugin, plugin.getValue());
-
-		writer.startElement("input", plugin);
-		writer.writeAttribute("type", "hidden", null);
-		writer.writeAttribute("id", hiddenInputId, null);
-
-		if (plugin.isReadonly()) {
-			// "name" attribute is not rendered (prevents submission).
-		} else {
-			writer.writeAttribute("name", plugin.getClientId(), null);
-		}
-
-		writer.writeAttribute("value", value, "value");
-		writer.endElement("input");
-	}
-
-	private String generateOnloadJSCode(OpenVectorEditorCore plugin, String editorTargetDivId, String iframeId, String hiddenInputId) {
+	private String generateJSCode(OpenVectorEditorCore plugin, String editorTargetDivId, String iframeId, String hiddenInputId) {
 		StringBuilder sb = new StringBuilder(512);
 
 		// resource loading

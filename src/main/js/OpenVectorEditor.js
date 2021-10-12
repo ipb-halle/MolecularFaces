@@ -36,6 +36,7 @@ molecularfaces.OpenVectorEditor = class {
 		this._editor = null;
 		this._onChangeSubject = new molecularfaces.OnChangeSubject();
 		this._editorProps = null;
+		this._frameOnloadPromise = null;
 
 		this._buildEditorProps();
 	}
@@ -66,41 +67,42 @@ molecularfaces.OpenVectorEditor = class {
 	 * parameter and is in read-only mode depending on the "readonly" parameter.
 	 */
 	static newEditor(divId, iframeId, sequence, readonly) {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			let obj = new molecularfaces.OpenVectorEditor(divId, iframeId, sequence, readonly);
 			obj.init().then(resolve(obj));
 		});
 	}
 
 	init() {
-		return new Promise((resolve, reject) => {
-			let domNode;
-			if (!this._iframeId) {
-				domNode = document.getElementById(this._divId);
-			} else {
-				domNode = document.getElementById(this._iframeId).contentWindow.document.getElementById(this._divId);
-			}
+		return molecularfaces._onDocumentReadyPromise.then(() => {
+			return this._getIframeOnloadPromise().then((resolve) => {
+				let domNode = this._getIframeElement().contentWindow.document.getElementById(this._divId);
 
-			/*
-			 * OpenVectorEditor does not tolerate clearing its <div> when calling
-			 * init() more than once.
-			 */
-			//domNode.innerHTML = '';
+				/*
+			 	* OpenVectorEditor does not tolerate clearing its <div> when calling
+			 	* init() more than once.
+			 	*/
+				//domNode.innerHTML = '';
 
-			if (!this._iframeId) {
-				this._editor = window.createVectorEditor(domNode, this._editorProps);
-			} else {
-				this._editor = document.getElementById(this._iframeId).contentWindow.createVectorEditor(domNode, this._editorProps);
-			}
-
-			this.setSequence(this._sequence);
-
-			if (this._iframeId) {
+				this._editor = this._getIframeElement().contentWindow.createVectorEditor(domNode, this._editorProps);
+				this.setSequence(this._sequence);
 				new molecularfaces.OpenVectorEditorResizeHelper(this._iframeId);
-			}
-
-			resolve(this);
+			});
 		});
+	}
+
+	_getIframeElement() {
+		return document.getElementById(this._iframeId);
+	}
+
+	_getIframeOnloadPromise() {
+		if (this._frameOnloadPromise == null) {
+			return new Promise((resolve) => {
+				this._getIframeElement().onload = resolve;
+			});
+		} else {
+			return this._frameOnloadPromise;
+		}
 	}
 
 	/**
@@ -117,7 +119,7 @@ molecularfaces.OpenVectorEditor = class {
 	 * data change process.
 	 */
 	setSequence(sequence) {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			if (typeof sequence !== "undefined") {
 				this._sequence = sequence;
 				let isCircular = sequence.circular;

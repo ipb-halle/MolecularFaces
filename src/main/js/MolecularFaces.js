@@ -32,14 +32,14 @@ molecularfaces.openVectorEditorLoaderInstance = new molecularfaces.ResourcesLoad
 /**
  * Promise that resolves upon on-document-ready.
  */
-molecularfaces._onDocumentReadyPromise = new Promise((resolve, reject) => {
+molecularfaces._onDocumentReadyPromise = new Promise((resolve) => {
 	/**
 	  * Vanilla JavaScript on-document-ready.
 	  * See https://stackoverflow.com/a/9899701.
 	  */
 	if (document.readyState === "complete" || document.readyState === "interactive") {
-		setTimeout(resolve(), 1);
+		setTimeout(() => resolve(), 1);
 	} else {
-		document.addEventListener("DOMContentLoaded", resolve());
+		document.addEventListener("DOMContentLoaded", () => resolve());
 	}
 });
