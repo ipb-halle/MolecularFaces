@@ -48,8 +48,8 @@ public class OpenVectorEditorComponent extends OpenVectorEditorCore {
 
 		String resourceBaseUrl = webXml.getContextParam(WEBXML_CUSTOM_RESOURCE_BASE_URL, getFacesContext(), null);
 		if ((resourceBaseUrl != null) && (!resourceBaseUrl.isEmpty())) {
-			getResourceLoader().addScriptExtToBodyAtTop(resourceBaseUrl + "/open-vector-editor.min.js");
-			getResourceLoader().addCssExt(resourceBaseUrl + "/main.css");
+			getResourceLoader().addScriptExtAsFacetComponent(resourceBaseUrl + "/open-vector-editor.min.js");
+			getResourceLoader().addCssExtAsFacetComponent(resourceBaseUrl + "/main.css");
 		} else {
 			getResourceLoader().addScriptResourceAsFacetComponent("plugins/openVectorEditor/open-vector-editor.min.js");
 			getResourceLoader().addCssResourceAsFacetComponent("plugins/openVectorEditor/main.css");

@@ -30,8 +30,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
@@ -41,6 +43,7 @@ import javax.faces.component.html.HtmlBody;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PreRenderComponentEvent;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -194,6 +197,9 @@ public class ResourceLoaderTest {
 
 	@Test
 	public void test_addScriptResourceAsFacetComponent() {
+		Map<String, Object> expectedAttributes = new HashMap<>();
+		expectedAttributes.put("external", Boolean.FALSE);
+
 		assertThat(component.getFacets().size(), is(0));
 
 		loader.addScriptResourceAsFacetComponent("ScriptResourceAsFacetComponent1");
@@ -204,12 +210,34 @@ public class ResourceLoaderTest {
 		assertNotNull(facet);
 		List<UIComponent> children = facet.getChildren();
 		assertThat(children, hasSize(2));
-		assertThat(matchingResourceComponentsInList(children, JAVASCRIPT, "ScriptResourceAsFacetComponent1", LIBRARY_NAME), hasSize(1));
-		assertThat(matchingResourceComponentsInList(children, JAVASCRIPT, "ScriptResourceAsFacetComponent2", LIBRARY_NAME), hasSize(1));
+		assertThat(matchingResourceComponentsInList(children, JAVASCRIPT, "ScriptResourceAsFacetComponent1", LIBRARY_NAME, expectedAttributes), hasSize(1));
+		assertThat(matchingResourceComponentsInList(children, JAVASCRIPT, "ScriptResourceAsFacetComponent2", LIBRARY_NAME, expectedAttributes), hasSize(1));
+	}
+
+	@Test
+	public void test_addScriptExtAsFacetComponent() {
+		Map<String, Object> expectedAttributes = new HashMap<>();
+		expectedAttributes.put("external", Boolean.TRUE);
+
+		assertThat(component.getFacets().size(), is(0));
+
+		loader.addScriptExtAsFacetComponent("ScriptExtAsFacetComponent1");
+		loader.addScriptExtAsFacetComponent("ScriptExtAsFacetComponent2");
+
+		assertThat(component.getFacets().size(), is(1));
+		UIComponent facet = component.getFacet(ResourceLoader.JAVASCRIPT_FACET_NAME);
+		assertNotNull(facet);
+		List<UIComponent> children = facet.getChildren();
+		assertThat(children, hasSize(2));
+		assertThat(matchingResourceComponentsInList(children, JAVASCRIPT, "ScriptExtAsFacetComponent1", LIBRARY_NAME, expectedAttributes), hasSize(1));
+		assertThat(matchingResourceComponentsInList(children, JAVASCRIPT, "ScriptExtAsFacetComponent2", LIBRARY_NAME, expectedAttributes), hasSize(1));
 	}
 
 	@Test
 	public void test_addCssResourceAsFacetComponent() {
+		Map<String, Object> expectedAttributes = new HashMap<>();
+		expectedAttributes.put("external", Boolean.FALSE);
+
 		assertThat(component.getFacets().size(), is(0));
 
 		loader.addCssResourceAsFacetComponent("CssResourceAsFacetComponent1");
@@ -220,8 +248,27 @@ public class ResourceLoaderTest {
 		assertNotNull(facet);
 		List<UIComponent> children = facet.getChildren();
 		assertThat(children, hasSize(2));
-		assertThat(matchingResourceComponentsInList(children, STYLESHEET, "CssResourceAsFacetComponent1", LIBRARY_NAME), hasSize(1));
-		assertThat(matchingResourceComponentsInList(children, STYLESHEET, "CssResourceAsFacetComponent2", LIBRARY_NAME), hasSize(1));
+		assertThat(matchingResourceComponentsInList(children, STYLESHEET, "CssResourceAsFacetComponent1", LIBRARY_NAME, expectedAttributes), hasSize(1));
+		assertThat(matchingResourceComponentsInList(children, STYLESHEET, "CssResourceAsFacetComponent2", LIBRARY_NAME, expectedAttributes), hasSize(1));
+	}
+
+	@Test
+	public void test_addCssExtAsFacetComponent() {
+		Map<String, Object> expectedAttributes = new HashMap<>();
+		expectedAttributes.put("external", Boolean.TRUE);
+
+		assertThat(component.getFacets().size(), is(0));
+
+		loader.addCssExtAsFacetComponent("CssExtAsFacetComponent1");
+		loader.addCssExtAsFacetComponent("CssExtAsFacetComponent2");
+
+		assertThat(component.getFacets().size(), is(1));
+		UIComponent facet = component.getFacet(ResourceLoader.STYLESHEET_FACET_NAME);
+		assertNotNull(facet);
+		List<UIComponent> children = facet.getChildren();
+		assertThat(children, hasSize(2));
+		assertThat(matchingResourceComponentsInList(children, STYLESHEET, "CssExtAsFacetComponent1", LIBRARY_NAME, expectedAttributes), hasSize(1));
+		assertThat(matchingResourceComponentsInList(children, STYLESHEET, "CssExtAsFacetComponent2", LIBRARY_NAME, expectedAttributes), hasSize(1));
 	}
 
 	private static Set<String> makeSet(String... elements) {

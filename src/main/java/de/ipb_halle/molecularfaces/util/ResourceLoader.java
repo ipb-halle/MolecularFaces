@@ -200,28 +200,6 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	}
 
 	/**
-	 * Adds a JavaScript resource component as facet to the wrapped component. The
-	 * wrapped component is responsible for rendering its facets.
-	 * 
-	 * @param resource name of the file in the web project's resource library
-	 */
-	public void addScriptResourceAsFacetComponent(String resource) {
-		UIComponent resourceComponent = createResourceComponent(resource, JAVASCRIPT);
-		addComponentToResourceContainerInFacet(resourceComponent, JAVASCRIPT_FACET_NAME, component.getFacets());
-	}
-
-	/**
-	 * Adds a stylesheet resource component as facet to the wrapped component. The
-	 * wrapped component is responsible for rendering its facets.
-	 * 
-	 * @param resource name of the file in the web project's resource library
-	 */
-	public void addCssResourceAsFacetComponent(String resource) {
-		UIComponent resourceComponent = createResourceComponent(resource, STYLESHEET);
-		addComponentToResourceContainerInFacet(resourceComponent, STYLESHEET_FACET_NAME, component.getFacets());
-	}
-
-	/**
 	 * Enqueues loading of a stylesheet file that will be loaded via the JavaScript
 	 * class {@code molecularfaces.ResourcesLoader}. The code snippet can be
 	 * requested via {@link #encodeLoadExtResources(String)}.
@@ -238,6 +216,54 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	 */
 	public Set<String> getCssExtToLoad() {
 		return Collections.unmodifiableSet(cssExtToLoad);
+	}
+
+	/**
+	 * Adds a JavaScript resource component as facet to the wrapped component. The
+	 * wrapped component is responsible for rendering its facets.
+	 * 
+	 * @param resource name of the file in the web project's resource library
+	 */
+	public void addScriptResourceAsFacetComponent(String resource) {
+		UIComponent resourceComponent = createResourceComponent(resource, JAVASCRIPT);
+		resourceComponent.getAttributes().put("external", Boolean.FALSE);
+		addComponentToResourceContainerInFacet(resourceComponent, JAVASCRIPT_FACET_NAME, component.getFacets());
+	}
+
+	/**
+	 * Adds a JavaScript file as facet resource component to the wrapped component.
+	 * The wrapped component is responsible for rendering its facets.
+	 * 
+	 * @param src path of the file
+	 */
+	public void addScriptExtAsFacetComponent(String src) {
+		UIComponent resourceComponent = createResourceComponent(src, JAVASCRIPT);
+		resourceComponent.getAttributes().put("external", Boolean.TRUE);
+		addComponentToResourceContainerInFacet(resourceComponent, JAVASCRIPT_FACET_NAME, component.getFacets());
+	}
+
+	/**
+	 * Adds a stylesheet resource component as facet to the wrapped component. The
+	 * wrapped component is responsible for rendering its facets.
+	 * 
+	 * @param resource name of the file in the web project's resource library
+	 */
+	public void addCssResourceAsFacetComponent(String resource) {
+		UIComponent resourceComponent = createResourceComponent(resource, STYLESHEET);
+		resourceComponent.getAttributes().put("external", Boolean.FALSE);
+		addComponentToResourceContainerInFacet(resourceComponent, STYLESHEET_FACET_NAME, component.getFacets());
+	}
+
+	/**
+	 * Adds a stylesheet file as facet resource component to the wrapped component.
+	 * The wrapped component is responsible for rendering its facets.
+	 * 
+	 * @param href path of the file
+	 */
+	public void addCssExtAsFacetComponent(String href) {
+		UIComponent resourceComponent = createResourceComponent(href, STYLESHEET);
+		resourceComponent.getAttributes().put("external", Boolean.TRUE);
+		addComponentToResourceContainerInFacet(resourceComponent, STYLESHEET_FACET_NAME, component.getFacets());
 	}
 
 	private void loadScriptResources(FacesContext context) {

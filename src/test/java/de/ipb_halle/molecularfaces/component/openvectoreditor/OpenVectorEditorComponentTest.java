@@ -30,7 +30,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.component.html.HtmlBody;
@@ -91,6 +94,9 @@ public class OpenVectorEditorComponentTest {
 
 	@Test
 	public void test_enqueuedResources_withContextParam() {
+		Map<String, Object> expectedAttributes = new HashMap<>();
+		expectedAttributes.put("external", Boolean.TRUE);
+
 		servletContext.addInitParameter(WEBXML_CUSTOM_RESOURCE_BASE_URL, "baseUrl");
 
 		comp = new OpenVectorEditorComponent();
@@ -99,21 +105,25 @@ public class OpenVectorEditorComponentTest {
 		assertThat(loader.getScriptResourcesToLoadInHead(), hasSize(1));
 		assertThat(loader.getScriptResourcesToLoadInBodyAtTop(), hasSize(0));
 		assertThat(loader.getScriptsExtToLoadInHead(), hasSize(0));
-		assertThat(loader.getScriptsExtToLoadInBodyAtTop(), hasSize(1));
+		assertThat(loader.getScriptsExtToLoadInBodyAtTop(), hasSize(0));
 		assertThat(loader.getCssResourcesToLoad(), hasSize(0));
-		assertThat(loader.getCssExtToLoad(), hasSize(1));
+		assertThat(loader.getCssExtToLoad(), hasSize(0));
 		assertTrue(loader.getScriptResourcesToLoadInHead().contains("js/MolecularFaces.min.js"));
-		assertTrue(loader.getScriptsExtToLoadInBodyAtTop().contains("baseUrl/open-vector-editor.min.js"));
-		assertTrue(loader.getCssExtToLoad().contains("baseUrl/main.css"));
 
 		// Also test adding resources via the JSF event mechanism.
 		rule.getContainer().getApplication().publishEvent(context, PostAddToViewEvent.class, comp);
 
 		List<UIComponent> componentsInHead = getResourceComponentsFromHead();
 		List<UIComponent> componentsInBody = getComponentsInBody();
+		List<UIComponent> cssFacetChildren = comp.getFacet(ResourceLoader.STYLESHEET_FACET_NAME).getChildren();
+		List<UIComponent> jsFacetChildren = comp.getFacet(ResourceLoader.JAVASCRIPT_FACET_NAME).getChildren();
 		assertThat(componentsInHead, hasSize(1));
 		assertThat(matchingResourceComponentsInList(componentsInHead, JAVASCRIPT, "js/MolecularFaces.min.js", LIBRARY_NAME), hasSize(1));
 		assertThat(componentsInBody, hasSize(0));
+		assertThat(cssFacetChildren, hasSize(1));
+		assertThat(matchingResourceComponentsInList(cssFacetChildren, STYLESHEET, "baseUrl/main.css", LIBRARY_NAME, expectedAttributes), hasSize(1));
+		assertThat(jsFacetChildren, hasSize(1));
+		assertThat(matchingResourceComponentsInList(jsFacetChildren, JAVASCRIPT, "baseUrl/open-vector-editor.min.js", LIBRARY_NAME, expectedAttributes), hasSize(1));
 	}
 
 	@Test
@@ -130,6 +140,8 @@ public class OpenVectorEditorComponentTest {
 	}
 
 	private void checkResourceLoadingViaResourceLoaderAndViaJSF() {
+		Map<String, Object> expectedAttributes = new HashMap<>();
+		expectedAttributes.put("external", Boolean.FALSE);
 		comp = new OpenVectorEditorComponent();
 		ResourceLoader loader = comp.getResourceLoader();
 
@@ -144,9 +156,9 @@ public class OpenVectorEditorComponentTest {
 		List<UIComponent> cssFacetChildren = comp.getFacet(ResourceLoader.STYLESHEET_FACET_NAME).getChildren();
 		List<UIComponent> jsFacetChildren = comp.getFacet(ResourceLoader.JAVASCRIPT_FACET_NAME).getChildren();
 		assertThat(cssFacetChildren, hasSize(1));
-		assertThat(matchingResourceComponentsInList(cssFacetChildren, STYLESHEET, "plugins/openVectorEditor/main.css", LIBRARY_NAME), hasSize(1));
+		assertThat(matchingResourceComponentsInList(cssFacetChildren, STYLESHEET, "plugins/openVectorEditor/main.css", LIBRARY_NAME, expectedAttributes), hasSize(1));
 		assertThat(jsFacetChildren, hasSize(1));
-		assertThat(matchingResourceComponentsInList(jsFacetChildren, JAVASCRIPT, "plugins/openVectorEditor/open-vector-editor.min.js", LIBRARY_NAME), hasSize(1));
+		assertThat(matchingResourceComponentsInList(jsFacetChildren, JAVASCRIPT, "plugins/openVectorEditor/open-vector-editor.min.js", LIBRARY_NAME, expectedAttributes), hasSize(1));
 
 		// Also test adding resources via the JSF event mechanism.
 		rule.getContainer().getApplication().publishEvent(context, PostAddToViewEvent.class, comp);
@@ -160,8 +172,8 @@ public class OpenVectorEditorComponentTest {
 		cssFacetChildren = comp.getFacet(ResourceLoader.STYLESHEET_FACET_NAME).getChildren();
 		jsFacetChildren = comp.getFacet(ResourceLoader.JAVASCRIPT_FACET_NAME).getChildren();
 		assertThat(cssFacetChildren, hasSize(1));
-		assertThat(matchingResourceComponentsInList(cssFacetChildren, STYLESHEET, "plugins/openVectorEditor/main.css", LIBRARY_NAME), hasSize(1));
+		assertThat(matchingResourceComponentsInList(cssFacetChildren, STYLESHEET, "plugins/openVectorEditor/main.css", LIBRARY_NAME, expectedAttributes), hasSize(1));
 		assertThat(jsFacetChildren, hasSize(1));
-		assertThat(matchingResourceComponentsInList(jsFacetChildren, JAVASCRIPT, "plugins/openVectorEditor/open-vector-editor.min.js", LIBRARY_NAME), hasSize(1));
+		assertThat(matchingResourceComponentsInList(jsFacetChildren, JAVASCRIPT, "plugins/openVectorEditor/open-vector-editor.min.js", LIBRARY_NAME, expectedAttributes), hasSize(1));
 	}
 }

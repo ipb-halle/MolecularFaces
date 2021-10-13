@@ -17,9 +17,13 @@
  */
 package de.ipb_halle.molecularfaces.test;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
@@ -59,7 +63,18 @@ public class TestUtils {
 		return components.stream().filter(c -> c.getClass().equals(UIOutput.class))
 				.filter(c -> c.getRendererType().equals(rendererType))
 				.filter(c -> c.getAttributes().get("name").equals(name))
-				.filter(c -> c.getAttributes().get("library").equals(library)).collect(Collectors.toList());
+				.filter(c -> c.getAttributes().get("library").equals(library)).collect(toList());
+	}
+
+	public static List<UIComponent> matchingResourceComponentsInList(List<UIComponent> components, String rendererType,
+			String name, String library, Map<String, Object> attributesToFilter) {
+		Stream<UIComponent> stream = matchingResourceComponentsInList(components, rendererType, name, library).stream();
+
+		for (Entry<String, Object> entry : attributesToFilter.entrySet()) {
+			stream = stream.filter(c -> c.getAttributes().get(entry.getKey()).equals(entry.getValue()));
+		}
+
+		return stream.collect(toList());
 	}
 
 	public static void encodeRenderer(Renderer renderer, FacesContext context, UIComponent component)
@@ -73,5 +88,9 @@ public class TestUtils {
 
 	public static <T> String readResourceFile(Class<T> clazz, String fileName) throws IOException {
 		return IOUtils.toString(clazz.getResourceAsStream(fileName), "UTF-8");
+	}
+
+	public static <T> String readResourceFileIgnoreNewlinesAndTabs(Class<T> clazz, String fileName) throws IOException {
+		return readResourceFile(clazz, fileName).replace("\n", "").replace("\t", "");
 	}
 }

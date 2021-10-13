@@ -1,14 +1,14 @@
 <div id="myId">
-	<input type="hidden" id="myId_Input" name="myId" value="" />
+	<input type="hidden" id="myId_Input" value="" />
 	<script type="text/javascript">
-		var myEditor = molecularfaces.openVectorEditorLoaderInstance.status().then(() => {
+		molecularfaces.openVectorEditorLoaderInstance.status().then(() => {
 			let valueAsText = document.getElementById("myId_Input").getAttribute("value");
 			let valueAsJSON = {};
 			if (!(!valueAsText || valueAsText.length === 0)) {
 				try { valueAsJSON = JSON.parse(valueAsText); }
 				catch(e) { console.error("Could not parse JSON input: " + e); }
 			}
-			let editorPromise = molecularfaces.OpenVectorEditor.newEditor("myId_OpenVectorEditor", "myId_Iframe", valueAsJSON, false);
+			let editorPromise = molecularfaces.OpenVectorEditor.newEditor("myId_OpenVectorEditor", "myId_Iframe", valueAsJSON, true);
 			editorPromise.then(editor => editor.getOnChangeSubject().addChangeCallback((sequence) => { 
 				document.getElementById("myId_Input").setAttribute("value", JSON.stringify(sequence)); 
 			}));

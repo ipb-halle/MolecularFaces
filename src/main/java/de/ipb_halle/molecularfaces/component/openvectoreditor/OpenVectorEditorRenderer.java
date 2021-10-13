@@ -190,7 +190,11 @@ public class OpenVectorEditorRenderer extends Renderer {
 		ResponseWriter newWriter = context.getResponseWriter().cloneWithWriter(stringWriter);
 
 		for (UIComponent comp : components) {
-			encodeResourceComponent(context, newWriter, comp);
+			if (Boolean.FALSE.equals(comp.getAttributes().get("external"))) {
+				encodeResourceFromJSFResourceLibrary(context, newWriter, comp);
+			} else {
+				encodeResourceFromExt(context, newWriter, comp);
+			}
 		}
 
 		return stringWriter.toString();
@@ -202,7 +206,7 @@ public class OpenVectorEditorRenderer extends Renderer {
 	 * we cannot render via the standard renderers for scripts or stylesheets.
 	 * Instead, this implementation builds the HTML tag itself.
 	 */
-	private void encodeResourceComponent(FacesContext context, ResponseWriter writer, UIComponent component) throws IOException {
+	private void encodeResourceFromJSFResourceLibrary(FacesContext context, ResponseWriter writer, UIComponent component) throws IOException {
 		Map<String, Object> attributes = component.getAttributes();
 		String resourceName = (String) attributes.get("name");
 		String library = (String) attributes.get("library");
@@ -218,19 +222,38 @@ public class OpenVectorEditorRenderer extends Renderer {
 			return;
 		}
 		String path = resource.getRequestPath();
+		String url = context.getExternalContext().encodeResourceURL(path);
 
+		encodeResource(writer, component, url);
+	}
+
+	private void encodeResourceFromExt(FacesContext context, ResponseWriter writer, UIComponent component) throws IOException {
+		String url = (String) component.getAttributes().get("name");
+		encodeResource(writer, component, url);
+	}
+
+	private void encodeResource(ResponseWriter writer, UIComponent component, String url) throws IOException {
 		if (component.getRendererType().equals(JAVASCRIPT)) {
-			writer.startElement("script", component);
-			writer.writeAttribute("type", "text/javascript", null);
-			writer.writeURIAttribute("src", context.getExternalContext().encodeResourceURL(path), null);
-			writer.endElement("script");
+			encodeScriptInclude(writer, component, url);
 		} else if (component.getRendererType().equals(STYLESHEET)) {
-			writer.startElement("link", component);
-			writer.writeAttribute("rel", "stylesheet", null);
-			writer.writeAttribute("type", "text/css", null);
-			writer.writeURIAttribute("href", context.getExternalContext().encodeResourceURL(path), null);
-			writer.endElement("link");
+			encodeStylesheetInclude(writer, component, url);
 		}
+	}
+
+	private void encodeScriptInclude(ResponseWriter writer, UIComponent component, String url)
+			throws IOException {
+		writer.startElement("script", component);
+		writer.writeAttribute("type", "text/javascript", null);
+		writer.writeURIAttribute("src", url, null);
+		writer.endElement("script");
+	}
+
+	private void encodeStylesheetInclude(ResponseWriter writer, UIComponent component, String url) throws IOException {
+		writer.startElement("link", component);
+		writer.writeAttribute("rel", "stylesheet", null);
+		writer.writeAttribute("type", "text/css", null);
+		writer.writeURIAttribute("href", url, null);
+		writer.endElement("link");
 	}
 
 	private String generateJSCode(OpenVectorEditorCore plugin, String editorTargetDivId, String iframeId, String hiddenInputId) {
