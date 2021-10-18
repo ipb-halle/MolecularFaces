@@ -26,7 +26,6 @@ import java.util.Set;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
-import javax.faces.component.UIPanel;
 import javax.faces.component.html.HtmlBody;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
@@ -327,14 +326,10 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 		return null;
 	}
 
-	private void addComponentToResourceContainerInFacet(UIComponent component, String facetName, Map<String, UIComponent> facets) {
-		/*
-		 * Use UIPanel as container for all added child components. JSF does this via
-		 * ComponentResourceContainer, but this component is only available in the
-		 * specific implementations.
-		 */
-		UIComponent container = facets.computeIfAbsent(facetName, k -> new UIPanel());
-
+	private void addComponentToResourceContainerInFacet(UIComponent component, String facetName,
+			Map<String, UIComponent> facets) {
+		UIComponent container = facets.computeIfAbsent(facetName, k -> FacesContext.getCurrentInstance()
+				.getApplication().createComponent("javax.faces.ComponentResourceContainer"));
 		container.getChildren().add(component);
 	}
 

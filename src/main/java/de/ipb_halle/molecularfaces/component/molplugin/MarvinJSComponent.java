@@ -106,9 +106,4 @@ public class MarvinJSComponent extends MolPluginCore implements ComponentSystemE
 			getResourceLoader().addScriptExtToHead(baseDir + "/js/webservices.js");
 		}
 	}
-
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
-	}
 }

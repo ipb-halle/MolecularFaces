@@ -17,13 +17,21 @@
  */
 package de.ipb_halle.molecularfaces.test;
 
+import javax.faces.component.html.HtmlBody;
+
 import org.apache.myfaces.test.mock.MockedJsfTestContainer;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+/**
+ * JUnit 4 rule that brings up a mocked JSF environment before the test run and
+ * tears it down after the test.
+ * 
+ * @author flange
+ */
 public class MockedJSFContainerRule implements TestRule {
-	MockedJsfTestContainer container;
+	private MockedJsfTestContainer container;
 
 	public MockedJsfTestContainer getContainer() {
 		return container;
@@ -52,11 +60,14 @@ public class MockedJSFContainerRule implements TestRule {
 		container.getApplication().addComponent("javax.faces.ComponentResourceContainer",
 				"org.apache.myfaces.component.ComponentResourceContainer");
 
+		// Body component is needed when adding resources there. 
+		container.getFacesContext().getViewRoot().getChildren().add(new HtmlBody());
+
 		// Register renderers from myfaces-impl for JavaScript and stylesheets.
-		/*container.getFacesContext().getRenderKit().addRenderer(UIOutput.COMPONENT_FAMILY,
-				"javax.faces.resource.Script", new HtmlScriptRenderer());
-		container.getFacesContext().getRenderKit().addRenderer(UIOutput.COMPONENT_FAMILY,
-				"javax.faces.resource.Stylesheet", new HtmlStylesheetRenderer());*/
+//		container.getFacesContext().getRenderKit().addRenderer(UIOutput.COMPONENT_FAMILY,
+//				"javax.faces.resource.Script", new HtmlScriptRenderer());
+//		container.getFacesContext().getRenderKit().addRenderer(UIOutput.COMPONENT_FAMILY,
+//				"javax.faces.resource.Stylesheet", new HtmlStylesheetRenderer());
 	}
 
 	private void after() {

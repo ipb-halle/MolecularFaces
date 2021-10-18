@@ -55,9 +55,4 @@ public class OpenChemLibJSComponent extends MolPluginCore {
 
 		setRendererType(DEFAULT_RENDERER);
 	}
-
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
-	}
 }

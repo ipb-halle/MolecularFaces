@@ -17,6 +17,7 @@
  */
 package de.ipb_halle.molecularfaces.test;
 
+import static de.ipb_halle.molecularfaces.util.ResourceLoader.RESOURCES_LIBRARY_NAME;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
@@ -59,16 +60,16 @@ public class TestUtils {
 	}
 
 	public static List<UIComponent> matchingResourceComponentsInList(List<UIComponent> components, String rendererType,
-			String name, String library) {
+			String name) {
 		return components.stream().filter(c -> c.getClass().equals(UIOutput.class))
 				.filter(c -> c.getRendererType().equals(rendererType))
 				.filter(c -> c.getAttributes().get("name").equals(name))
-				.filter(c -> c.getAttributes().get("library").equals(library)).collect(toList());
+				.filter(c -> c.getAttributes().get("library").equals(RESOURCES_LIBRARY_NAME)).collect(toList());
 	}
 
 	public static List<UIComponent> matchingResourceComponentsInList(List<UIComponent> components, String rendererType,
-			String name, String library, Map<String, Object> attributesToFilter) {
-		Stream<UIComponent> stream = matchingResourceComponentsInList(components, rendererType, name, library).stream();
+			String name, Map<String, Object> attributesToFilter) {
+		Stream<UIComponent> stream = matchingResourceComponentsInList(components, rendererType, name).stream();
 
 		for (Entry<String, Object> entry : attributesToFilter.entrySet()) {
 			stream = stream.filter(c -> c.getAttributes().get(entry.getKey()).equals(entry.getValue()));

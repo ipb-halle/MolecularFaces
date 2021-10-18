@@ -15,25 +15,20 @@
  * limitations under the License.
  * 
  */
-package de.ipb_halle.molecularfaces.component.openvectoreditor;
+package de.ipb_halle.molecularfaces.component.molplugin;
 
-import static de.ipb_halle.molecularfaces.component.openvectoreditor.OpenVectorEditorComponent.WEBXML_CUSTOM_RESOURCE_BASE_URL;
+import static de.ipb_halle.molecularfaces.component.molplugin.OpenChemLibJSComponent.WEBXML_CUSTOM_RESOURCE_URL;
 import static de.ipb_halle.molecularfaces.test.TestUtils.getComponentsInBody;
 import static de.ipb_halle.molecularfaces.test.TestUtils.getResourceComponentsFromHead;
 import static de.ipb_halle.molecularfaces.test.TestUtils.matchingResourceComponentsInList;
 import static de.ipb_halle.molecularfaces.util.ResourceLoader.JAVASCRIPT;
-import static de.ipb_halle.molecularfaces.util.ResourceLoader.STYLESHEET;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PostAddToViewEvent;
@@ -51,10 +46,10 @@ import de.ipb_halle.molecularfaces.util.WebXmlImpl;
  * 
  * @author flange
  */
-public class OpenVectorEditorComponentTest {
+public class OpenChemLibJSComponentTest {
 	private FacesContext context;
 	private MockServletContext servletContext;
-	private OpenVectorEditorComponent comp;
+	private OpenChemLibJSComponent comp;
 
 	@Rule
 	public MockedJSFContainerRule rule = new MockedJSFContainerRule();
@@ -63,112 +58,74 @@ public class OpenVectorEditorComponentTest {
 	public void init() {
 		context = rule.getContainer().getFacesContext();
 		servletContext = rule.getContainer().getServletContext();
-		comp = new OpenVectorEditorComponent();
-	}
-
-	@Test
-	public void test_componentFamily() {
-		assertEquals(OpenVectorEditorCore.COMPONENT_FAMILY, comp.getFamily());
+		comp = new OpenChemLibJSComponent();
 	}
 
 	@Test
 	public void test_rendererType() {
-		assertEquals(OpenVectorEditorComponent.DEFAULT_RENDERER, comp.getRendererType());
-	}
-
-	@Test
-	public void test_gettersAndSettersAndDefaults() {
-		assertFalse(comp.isReadonly());
-		comp.setReadonly(true);
-		assertTrue(comp.isReadonly());
-
-		assertNull(comp.getWidgetVar());
-		comp.setWidgetVar("myWidgetVar");
-		assertEquals("myWidgetVar", comp.getWidgetVar());
+		assertEquals(OpenChemLibJSComponent.DEFAULT_RENDERER, comp.getRendererType());
 	}
 
 	@Test
 	public void test_enqueuedResources_withContextParam() {
-		Map<String, Object> expectedAttributes = new HashMap<>();
-		expectedAttributes.put("external", Boolean.TRUE);
+		servletContext.addInitParameter(WEBXML_CUSTOM_RESOURCE_URL, "baseUrl/openchemlib-full.js");
 
-		servletContext.addInitParameter(WEBXML_CUSTOM_RESOURCE_BASE_URL, "baseUrl");
-
-		comp = new OpenVectorEditorComponent();
+		comp = new OpenChemLibJSComponent();
 		ResourceLoader loader = comp.getResourceLoader();
 
 		assertThat(loader.getScriptResourcesToLoadInHead(), hasSize(1));
 		assertThat(loader.getScriptResourcesToLoadInBodyAtTop(), hasSize(0));
-		assertThat(loader.getScriptsExtToLoadInHead(), hasSize(0));
+		assertThat(loader.getScriptsExtToLoadInHead(), hasSize(1));
 		assertThat(loader.getScriptsExtToLoadInBodyAtTop(), hasSize(0));
 		assertThat(loader.getCssResourcesToLoad(), hasSize(0));
 		assertThat(loader.getCssExtToLoad(), hasSize(0));
 		assertTrue(loader.getScriptResourcesToLoadInHead().contains("js/MolecularFaces.min.js"));
+		assertTrue(loader.getScriptsExtToLoadInHead().contains("baseUrl/openchemlib-full.js"));
 
 		// Also test adding resources via the JSF event mechanism.
 		rule.getContainer().getApplication().publishEvent(context, PostAddToViewEvent.class, comp);
 
 		List<UIComponent> componentsInHead = getResourceComponentsFromHead();
 		List<UIComponent> componentsInBody = getComponentsInBody();
-		List<UIComponent> cssFacetChildren = comp.getFacet(ResourceLoader.STYLESHEET_FACET_NAME).getChildren();
-		List<UIComponent> jsFacetChildren = comp.getFacet(ResourceLoader.JAVASCRIPT_FACET_NAME).getChildren();
 		assertThat(componentsInHead, hasSize(1));
 		assertThat(matchingResourceComponentsInList(componentsInHead, JAVASCRIPT, "js/MolecularFaces.min.js"), hasSize(1));
 		assertThat(componentsInBody, hasSize(0));
-		assertThat(cssFacetChildren, hasSize(1));
-		assertThat(matchingResourceComponentsInList(cssFacetChildren, STYLESHEET, "baseUrl/main.css", expectedAttributes), hasSize(1));
-		assertThat(jsFacetChildren, hasSize(1));
-		assertThat(matchingResourceComponentsInList(jsFacetChildren, JAVASCRIPT, "baseUrl/open-vector-editor.min.js", expectedAttributes), hasSize(1));
 	}
 
 	@Test
 	public void test_enqueuedResources_withoutContextParam() {
-		assertNull(new WebXmlImpl().getContextParam(WEBXML_CUSTOM_RESOURCE_BASE_URL, context, null));
+		assertNull(new WebXmlImpl().getContextParam(WEBXML_CUSTOM_RESOURCE_URL, context, null));
 		checkResourceLoadingViaResourceLoaderAndViaJSF();
 	}
 
 	@Test
 	public void test_enqueuedResources_withEmptyContextParam() {
-		servletContext.addInitParameter(WEBXML_CUSTOM_RESOURCE_BASE_URL, "");
-		assertEquals("", new WebXmlImpl().getContextParam(WEBXML_CUSTOM_RESOURCE_BASE_URL, context, null));
+		servletContext.addInitParameter(WEBXML_CUSTOM_RESOURCE_URL, "");
+		assertEquals("", new WebXmlImpl().getContextParam(WEBXML_CUSTOM_RESOURCE_URL, context, null));
 		checkResourceLoadingViaResourceLoaderAndViaJSF();
 	}
 
 	private void checkResourceLoadingViaResourceLoaderAndViaJSF() {
-		Map<String, Object> expectedAttributes = new HashMap<>();
-		expectedAttributes.put("external", Boolean.FALSE);
-		comp = new OpenVectorEditorComponent();
+		comp = new OpenChemLibJSComponent();
 		ResourceLoader loader = comp.getResourceLoader();
 
-		assertThat(loader.getScriptResourcesToLoadInHead(), hasSize(1));
+		assertThat(loader.getScriptResourcesToLoadInHead(), hasSize(2));
 		assertThat(loader.getScriptResourcesToLoadInBodyAtTop(), hasSize(0));
 		assertThat(loader.getScriptsExtToLoadInHead(), hasSize(0));
 		assertThat(loader.getScriptsExtToLoadInBodyAtTop(), hasSize(0));
 		assertThat(loader.getCssResourcesToLoad(), hasSize(0));
 		assertThat(loader.getCssExtToLoad(), hasSize(0));
 		assertTrue(loader.getScriptResourcesToLoadInHead().contains("js/MolecularFaces.min.js"));
-
-		List<UIComponent> cssFacetChildren = comp.getFacet(ResourceLoader.STYLESHEET_FACET_NAME).getChildren();
-		List<UIComponent> jsFacetChildren = comp.getFacet(ResourceLoader.JAVASCRIPT_FACET_NAME).getChildren();
-		assertThat(cssFacetChildren, hasSize(1));
-		assertThat(matchingResourceComponentsInList(cssFacetChildren, STYLESHEET, "plugins/openVectorEditor/main.css", expectedAttributes), hasSize(1));
-		assertThat(jsFacetChildren, hasSize(1));
-		assertThat(matchingResourceComponentsInList(jsFacetChildren, JAVASCRIPT, "plugins/openVectorEditor/open-vector-editor.min.js", expectedAttributes), hasSize(1));
+		assertTrue(loader.getScriptResourcesToLoadInHead().contains("plugins/openchemlibjs/openchemlib-full.js"));
 
 		// Also test adding resources via the JSF event mechanism.
 		rule.getContainer().getApplication().publishEvent(context, PostAddToViewEvent.class, comp);
 
 		List<UIComponent> componentsInHead = getResourceComponentsFromHead();
 		List<UIComponent> componentsInBody = getComponentsInBody();
-		assertThat(componentsInHead, hasSize(1));
+		assertThat(componentsInHead, hasSize(2));
 		assertThat(matchingResourceComponentsInList(componentsInHead, JAVASCRIPT, "js/MolecularFaces.min.js"), hasSize(1));
+		assertThat(matchingResourceComponentsInList(componentsInHead, JAVASCRIPT, "plugins/openchemlibjs/openchemlib-full.js"), hasSize(1));
 		assertThat(componentsInBody, hasSize(0));
-
-		cssFacetChildren = comp.getFacet(ResourceLoader.STYLESHEET_FACET_NAME).getChildren();
-		jsFacetChildren = comp.getFacet(ResourceLoader.JAVASCRIPT_FACET_NAME).getChildren();
-		assertThat(cssFacetChildren, hasSize(1));
-		assertThat(matchingResourceComponentsInList(cssFacetChildren, STYLESHEET, "plugins/openVectorEditor/main.css", expectedAttributes), hasSize(1));
-		assertThat(jsFacetChildren, hasSize(1));
-		assertThat(matchingResourceComponentsInList(jsFacetChildren, JAVASCRIPT, "plugins/openVectorEditor/open-vector-editor.min.js", expectedAttributes), hasSize(1));
 	}
 }
