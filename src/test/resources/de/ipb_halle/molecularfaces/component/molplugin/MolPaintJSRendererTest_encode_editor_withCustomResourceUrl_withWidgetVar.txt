@@ -1,0 +1,14 @@
+<div id="myId">
+	<div id="myId_MolPaintJSEditor" style="width:400px;height:400px;"></div>
+	<input type="hidden" id="myId_Input" name="myId" value="molfile" />
+	<script type="text/javascript">
+		molecularfaces.molPaintJSLoaderInstance.addScriptToHead("/plugins/molpaint.js");
+		var editor1 = molecularfaces.molPaintJSLoaderInstance.status().then(() => {
+			let editorPromise = molecularfaces.MolPaintJSEditor.newEditor("myId_MolPaintJSEditor", document.getElementById("myId_Input").getAttribute("value"), 400, 400, "MDLV2000");
+			editorPromise.then(editor => editor.getOnChangeSubject().addChangeCallback((mol) => { 
+				document.getElementById("myId_Input").setAttribute("value", mol); 
+			}));
+			return editorPromise;
+		});
+	</script>
+</div>

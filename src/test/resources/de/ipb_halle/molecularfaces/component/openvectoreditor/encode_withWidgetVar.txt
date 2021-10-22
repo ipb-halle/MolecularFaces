@@ -1,5 +1,5 @@
 <div id="myId">
-	<input type="hidden" id="myId_Input" name="myId" value="" />
+	<input type="hidden" id="myId_Input" name="myId" value="some data" />
 	<script type="text/javascript">
 		var myEditor = molecularfaces.openVectorEditorLoaderInstance.status().then(() => {
 			let valueAsText = document.getElementById("myId_Input").getAttribute("value");

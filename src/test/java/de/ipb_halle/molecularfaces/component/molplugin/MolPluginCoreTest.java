@@ -55,8 +55,7 @@ public class MolPluginCoreTest {
 	@Before
 	public void init() {
 		context = rule.getContainer().getFacesContext();
-		comp = new MolPluginCore() {
-		};
+		comp = new MolPluginCore() {};
 	}
 
 	@Test

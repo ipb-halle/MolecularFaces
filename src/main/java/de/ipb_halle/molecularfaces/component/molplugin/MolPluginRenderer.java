@@ -53,7 +53,7 @@ public abstract class MolPluginRenderer extends Renderer {
 	 * @param plugin component of the molecular structure plugin
 	 * @return inline css style
 	 */
-	protected static String generateDivStyle(MolPluginCore plugin) {
+	protected String generateDivStyle(MolPluginCore plugin) {
 		StringBuilder sb = new StringBuilder(128);
 
 		// width attribute

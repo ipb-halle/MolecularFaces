@@ -1,0 +1,14 @@
+<div id="myId" style="width:400px;height:400px;">
+	<iframe id="myId_MarvinJSEditor" src="baseUrl/editor.html" style="height:400px;width:400px;"></iframe>
+	<input type="hidden" id="myId_Input" name="myId" value="molfile" />
+	<script type="text/javascript">
+		molecularfaces.marvinJSLoaderInstance.addScriptToHead("baseUrl/js/marvinjslauncher.js").addScriptToHead("baseUrl/gui/lib/promise-1.0.0.min.js");
+		molecularfaces.marvinJSLoaderInstance.status().then(() => {
+			let editorPromise = molecularfaces.MarvinJSEditor.newEditor("myId_MarvinJSEditor", document.getElementById("myId_Input").getAttribute("value"), "baseUrl", "marvin4js-license.cxl", 400, 400, "MDLV2000");
+			editorPromise.then(editor => editor.getOnChangeSubject().addChangeCallback((mol) => { 
+				document.getElementById("myId_Input").setAttribute("value", mol); 
+			}));
+			return editorPromise;
+		});
+	</script>
+</div>

@@ -1,0 +1,10 @@
+<div id="myId">
+	<div id="myId_OpenChemLibJSViewer" style="width:400px;height:400px;"></div>
+	<input type="hidden" id="myId_Input" value="molfile" />
+	<script type="text/javascript">
+		molecularfaces.openChemLibJSLoaderInstance.addScriptToHead("/plugins/openchemlib-full.js");
+		var viewer1 = molecularfaces.openChemLibJSLoaderInstance.status().then(() => {
+			return molecularfaces.OpenChemLibJSViewer.newViewer("myId_OpenChemLibJSViewer", document.getElementById("myId_Input").getAttribute("value"), 400, 400);
+		});
+	</script>
+</div>

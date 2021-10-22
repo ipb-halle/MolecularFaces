@@ -141,26 +141,29 @@ public class OpenVectorEditorRendererTest {
 	@Test
 	public void test_encode_withReadonlyComponent() throws IOException {
 		comp.setId("myId");
-		comp.setReadonly(true);;
+		comp.setValue("some data");
+		comp.setReadonly(true);
 		TestUtils.encodeRenderer(renderer, context, comp);
-		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenVectorEditorComponentTest.class, "encode_withReadonlyComponent.txt");
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenVectorEditorRendererTest.class, "encode_withReadonlyComponent.txt");
 		assertEquals(expected, writer.toString());
 	}
 
 	@Test
 	public void test_encode_withoutWidgetVar() throws IOException {
 		comp.setId("myId");
+		comp.setValue("some data");
 		TestUtils.encodeRenderer(renderer, context, comp);
-		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenVectorEditorComponentTest.class, "encode_withoutWidgetVar.txt");
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenVectorEditorRendererTest.class, "encode_withoutWidgetVar.txt");
 		assertEquals(expected, writer.toString());
 	}
 
 	@Test
 	public void test_encode_withWidgetVar() throws IOException {
 		comp.setId("myId");
+		comp.setValue("some data");
 		comp.setWidgetVar("myEditor");
 		TestUtils.encodeRenderer(renderer, context, comp);
-		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenVectorEditorComponentTest.class, "encode_withWidgetVar.txt");
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenVectorEditorRendererTest.class, "encode_withWidgetVar.txt");
 		assertEquals(expected, writer.toString());
 	}
 
@@ -169,8 +172,9 @@ public class OpenVectorEditorRendererTest {
 		servletContext.addInitParameter(WEBXML_CUSTOM_RESOURCE_BASE_URL, "baseUrl");
 		comp = new OpenVectorEditorComponent();
 		comp.setId("myId");
+		comp.setValue("some data");
 		TestUtils.encodeRenderer(renderer, context, comp);
-		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenVectorEditorComponentTest.class, "encode_withCustomResourceBaseUrl.txt");
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenVectorEditorRendererTest.class, "encode_withCustomResourceBaseUrl.txt");
 		assertEquals(expected, writer.toString());
 	}
 }

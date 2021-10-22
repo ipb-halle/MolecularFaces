@@ -1,0 +1,9 @@
+<div id="myId">
+	<div id="myId_MolPaintJSViewer" style="width:400px;height:400px;"></div>
+	<input type="hidden" id="myId_Input" value="molfile" />
+	<script type="text/javascript">
+		var viewer1 = molecularfaces.molPaintJSLoaderInstance.status().then(() => {
+			return molecularfaces.MolPaintJSViewer.newViewer("myId_MolPaintJSViewer", document.getElementById("myId_Input").getAttribute("value"), 400, 400);
+		});
+	</script>
+</div>
