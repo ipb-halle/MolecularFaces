@@ -146,6 +146,19 @@ public class OpenChemLibJSRendererTest {
 		assertEquals(expected, writer.toString());
 	}
 
+	@Test
+	public void test_encode_viewer_withPassthroughAttribute() throws IOException {
+		comp.setId("myId");
+		comp.setValue("molfile");
+		comp.setReadonly(true);
+		comp.getPassThroughAttributes().put("myattribute", "the value");
+
+		TestUtils.encodeRenderer(renderer, context, comp);
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenChemLibJSRendererTest.class,
+				"OpenChemLibJSRendererTest_encode_viewer_withPassthroughAttribute.txt");
+		assertEquals(expected, writer.toString());
+	}
+
 	/*
 	 * Editor
 	 */
@@ -207,6 +220,18 @@ public class OpenChemLibJSRendererTest {
 		TestUtils.encodeRenderer(renderer, context, comp);
 		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenChemLibJSRendererTest.class,
 				"OpenChemLibJSRendererTest_encode_editor_withCustomResourceUrl_withWidgetVar.txt");
+		assertEquals(expected, writer.toString());
+	}
+
+	@Test
+	public void test_encode_editor_withPassthroughAttribute() throws IOException {
+		comp.setId("myId");
+		comp.setValue("molfile");
+		comp.getPassThroughAttributes().put("myattribute", "the value");
+
+		TestUtils.encodeRenderer(renderer, context, comp);
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenChemLibJSRendererTest.class,
+				"OpenChemLibJSRendererTest_encode_editor_withPassthroughAttribute.txt");
 		assertEquals(expected, writer.toString());
 	}
 }

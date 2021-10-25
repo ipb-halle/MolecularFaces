@@ -177,4 +177,14 @@ public class OpenVectorEditorRendererTest {
 		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenVectorEditorRendererTest.class, "encode_withCustomResourceBaseUrl.txt");
 		assertEquals(expected, writer.toString());
 	}
+
+	@Test
+	public void test_encode_withPassthroughAttribute() throws IOException {
+		comp.setId("myId");
+		comp.setValue("some data");
+		comp.getPassThroughAttributes().put("myattribute", "the value");
+		TestUtils.encodeRenderer(renderer, context, comp);
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(OpenVectorEditorRendererTest.class, "encode_withPassthroughAttribute.txt");
+		assertEquals(expected, writer.toString());
+	}
 }

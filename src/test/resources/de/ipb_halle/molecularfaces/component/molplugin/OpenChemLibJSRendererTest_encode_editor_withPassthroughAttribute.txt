@@ -1,0 +1,13 @@
+<div id="myId" myattribute="the value">
+	<div id="myId_OpenChemLibJSEditor" style="width:400px;height:400px;" myattribute="the value"></div>
+	<input type="hidden" id="myId_Input" name="myId" value="molfile" myattribute="the value" />
+	<script type="text/javascript" myattribute="the value">
+		molecularfaces.openChemLibJSLoaderInstance.status().then(() => {
+			let editorPromise = molecularfaces.OpenChemLibJSEditor.newEditor("myId_OpenChemLibJSEditor", document.getElementById("myId_Input").getAttribute("value"), "MDLV2000");
+			editorPromise.then(editor => editor.getOnChangeSubject().addChangeCallback((mol) => { 
+				document.getElementById("myId_Input").setAttribute("value", mol); 
+			}));
+			return editorPromise;
+		});
+	</script>
+</div>

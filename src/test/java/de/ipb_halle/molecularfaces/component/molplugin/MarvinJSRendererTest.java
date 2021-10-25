@@ -153,6 +153,19 @@ public class MarvinJSRendererTest {
 		assertEquals(expected, writer.toString());
 	}
 
+	@Test
+	public void test_encode_viewer_withPassthroughAttribute() throws IOException {
+		comp.setId("myId");
+		comp.setValue("molfile");
+		comp.setReadonly(true);
+		comp.getPassThroughAttributes().put("myattribute", "the value");
+
+		TestUtils.encodeRenderer(renderer, context, comp);
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(MarvinJSRendererTest.class,
+				"MarvinJSRendererTest_encode_viewer_withPassthroughAttribute.txt");
+		assertEquals(expected, writer.toString());
+	}
+
 	/*
 	 * Editor
 	 */
@@ -213,6 +226,18 @@ public class MarvinJSRendererTest {
 		TestUtils.encodeRenderer(renderer, context, comp);
 		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(MarvinJSRendererTest.class,
 				"MarvinJSRendererTest_encode_editor_withWebservices.txt");
+		assertEquals(expected, writer.toString());
+	}
+
+	@Test
+	public void test_encode_editor_withPassthroughAttribute() throws IOException {
+		comp.setId("myId");
+		comp.setValue("molfile");
+		comp.getPassThroughAttributes().put("myattribute", "the value");
+
+		TestUtils.encodeRenderer(renderer, context, comp);
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(MarvinJSRendererTest.class,
+				"MarvinJSRendererTest_encode_editor_withPassthroughAttribute.txt");
 		assertEquals(expected, writer.toString());
 	}
 }

@@ -1,0 +1,10 @@
+<div id="myId" style="width:400px;height:400px;" myattribute="the value">
+	<div id="myId_MarvinJSViewer" style="width:400px;height:400px;" myattribute="the value"></div>
+	<input type="hidden" id="myId_Input" value="molfile" myattribute="the value" />
+	<script type="text/javascript" myattribute="the value">
+		molecularfaces.marvinJSLoaderInstance.addScriptToHead("baseUrl/js/marvinjslauncher.js").addScriptToHead("baseUrl/gui/lib/promise-1.0.0.min.js");
+		molecularfaces.marvinJSLoaderInstance.status().then(() => {
+			return molecularfaces.MarvinJSViewer.newViewer("myId_MarvinJSViewer", document.getElementById("myId_Input").getAttribute("value"), "baseUrl", 400, 400, "MDLV2000");
+		});
+	</script>
+</div>

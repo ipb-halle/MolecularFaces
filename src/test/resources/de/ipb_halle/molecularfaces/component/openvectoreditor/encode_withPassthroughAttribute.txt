@@ -1,0 +1,34 @@
+<div id="myId" myattribute="the value">
+	<input type="hidden" id="myId_Input" name="myId" value="some data" myattribute="the value" />
+	<script type="text/javascript" myattribute="the value">
+		molecularfaces.openVectorEditorLoaderInstance.status().then(() => {
+			let valueAsText = document.getElementById("myId_Input").getAttribute("value");
+			let valueAsJSON = {};
+			if (!(!valueAsText || valueAsText.length === 0)) {
+				try { 
+					valueAsJSON = JSON.parse(valueAsText); 
+				}
+				catch(e) { 
+					console.error("Could not parse JSON input: " + e); 
+				}
+			}
+			let editorPromise = molecularfaces.OpenVectorEditor.newEditor("myId_OpenVectorEditor", "myId_Iframe", valueAsJSON, false);
+			editorPromise.then(editor => editor.getOnChangeSubject().addChangeCallback((sequence) => { 
+				document.getElementById("myId_Input").setAttribute("value", JSON.stringify(sequence)); 
+			}));
+			return editorPromise;
+		});
+	</script>
+	<iframe id="myId_Iframe" style="border:none;" srcdoc="
+		&lt;html&gt;
+			&lt;head&gt;
+				&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/javax.faces.resource/plugins/openVectorEditor/main.css.jsf&quot; /&gt;
+			&lt;/head&gt;
+			&lt;body&gt;
+				&lt;script type=&quot;text/javascript&quot; src=&quot;/javax.faces.resource/plugins/openVectorEditor/open-vector-editor.min.js.jsf&quot;&gt;&lt;/script&gt;
+				&lt;div id=&quot;myId_OpenVectorEditor&quot;&gt;&lt;/div&gt;
+			&lt;/body&gt;
+		&lt;/html&gt;" myattribute="the value">
+		Your browser does not support iframes.
+	</iframe>
+</div>

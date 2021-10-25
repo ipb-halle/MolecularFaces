@@ -143,6 +143,19 @@ public class MolPaintJSRendererTest {
 		assertEquals(expected, writer.toString());
 	}
 
+	@Test
+	public void test_encode_viewer_withPassthroughAttribute() throws IOException {
+		comp.setId("myId");
+		comp.setValue("molfile");
+		comp.setReadonly(true);
+		comp.getPassThroughAttributes().put("myattribute", "the value");
+
+		TestUtils.encodeRenderer(renderer, context, comp);
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(MolPaintJSRendererTest.class,
+				"MolPaintJSRendererTest_encode_viewer_withPassthroughAttribute.txt");
+		assertEquals(expected, writer.toString());
+	}
+
 	/*
 	 * Editor
 	 */
@@ -204,6 +217,18 @@ public class MolPaintJSRendererTest {
 		TestUtils.encodeRenderer(renderer, context, comp);
 		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(MolPaintJSRendererTest.class,
 				"MolPaintJSRendererTest_encode_editor_withCustomResourceUrl_withWidgetVar.txt");
+		assertEquals(expected, writer.toString());
+	}
+
+	@Test
+	public void test_encode_editor_withPassthroughAttribute() throws IOException {
+		comp.setId("myId");
+		comp.setValue("molfile");
+		comp.getPassThroughAttributes().put("myattribute", "the value");
+
+		TestUtils.encodeRenderer(renderer, context, comp);
+		String expected = TestUtils.readResourceFileIgnoreNewlinesAndTabs(MolPaintJSRendererTest.class,
+				"MolPaintJSRendererTest_encode_editor_withPassthroughAttribute.txt");
 		assertEquals(expected, writer.toString());
 	}
 }
