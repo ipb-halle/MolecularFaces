@@ -3,6 +3,7 @@
 [![Javadoc](https://javadoc.io/badge2/de.ipb-halle/molecularfaces/javadoc.svg)](https://javadoc.io/doc/de.ipb-halle/molecularfaces)
 [![Maven Central](https://img.shields.io/maven-central/v/de.ipb-halle/molecularfaces)](https://mvnrepository.com/artifact/de.ipb-halle/molecularfaces/latest)
 [![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/de.ipb-halle/molecularfaces?server=https%3A%2F%2Fs01.oss.sonatype.org)](https://s01.oss.sonatype.org/content/repositories/snapshots/de/ipb-halle/molecularfaces/)
+[![Maven Build](https://github.com/ipb-halle/MolecularFaces/actions/workflows/maven-deploy-to-ossrh.yml/badge.svg)](https://github.com/ipb-halle/MolecularFaces/actions/workflows/maven-deploy-to-ossrh.yml)
 
 MolecularFaces is a collection of reusable UI components for Java Server Faces (JSF) featuring input and output plugins, validators and converters for chemistry and biochemistry data. It is a spin-off project of [CRIMSy (Cloud Resource & Information Management System)](https://github.com/ipb-halle/CRIMSy).
 
