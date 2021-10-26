@@ -22,6 +22,7 @@
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+	xmlns:jsf="http://xmlns.jcp.org/jsf"
 	xmlns:mol="http://github.com/ipb-halle/MolecularFaces">
 <h:head />
 <h:body>
@@ -40,13 +41,15 @@
 	</composite:interface>
 
 	<composite:implementation>
-		<div id="#{cc.clientId}">
+		<div jsf:id="#{cc.clientId}">
+			<f:passThroughAttributes value="#{cc.passThroughAttributes}" />
 			<c:if test="#{cc.attrs.pluginType eq 'OpenChemLibJS'}">
 				<mol:openChemLibJSPlugin value="#{cc.attrs.value}"
 					border="#{cc.attrs.border}" format="#{cc.attrs.format}"
 					height="#{cc.attrs.height}" readonly="#{cc.attrs.readonly}"
 					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}">
 					<f:converter converterId="#{cc.attrs.converter}" />
+					<f:passThroughAttributes value="#{cc.passThroughAttributes}" />
 				</mol:openChemLibJSPlugin>
 			</c:if>
 			<c:if test="#{cc.attrs.pluginType eq 'MolPaintJS'}">
@@ -55,6 +58,7 @@
 					height="#{cc.attrs.height}" readonly="#{cc.attrs.readonly}"
 					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}">
 					<f:converter converterId="#{cc.attrs.converter}" />
+					<f:passThroughAttributes value="#{cc.passThroughAttributes}" />
 				</mol:molPaintJSPlugin>
 			</c:if>
 			<c:if test="#{cc.attrs.pluginType eq 'MarvinJS'}">
@@ -63,6 +67,7 @@
 					height="#{cc.attrs.height}" readonly="#{cc.attrs.readonly}"
 					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}">
 					<f:converter converterId="#{cc.attrs.converter}" />
+					<f:passThroughAttributes value="#{cc.passThroughAttributes}" />
 				</mol:marvinJSPlugin>
 			</c:if>
 		</div>

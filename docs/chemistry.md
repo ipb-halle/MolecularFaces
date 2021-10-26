@@ -2,15 +2,15 @@
 
 ## Components
 
-### Chemical structure editor and viewer: `<mol:molecule>`
+### Chemical structure editor and viewer
 
 Supported plugins:
 
-Plugin | Version | License | Editor | Viewer | Molfile V2000 support | Molfile V3000 support
------- | ------- | ------- | ------ | ------ | --------------------- | ---------------------
-[OpenChemLib JS](https://github.com/cheminfo/openchemlib-js) | [v7.4.1](https://github.com/cheminfo/openchemlib-js/releases/tag/v7.4.1) | [BSD-3-Clause](https://github.com/cheminfo/openchemlib-js/blob/master/LICENSE) | [x] | [x] | [x] | [x]
-[MolPaintJS](https://github.com/ipb-halle/MolPaintJS) | [v0.3.5-alpha](https://github.com/ipb-halle/MolPaintJS/releases/tag/v0.3.5-alpha) | [Apache License 2.0](https://github.com/ipb-halle/MolPaintJS/blob/master/LICENSE) | [x] | [x] | [x] | [x]
-[Marvin JS](https://chemaxon.com/products/marvin-js) | 21.1.0 | proprietary | [x] | [x] | [x] | requires web services
+Plugin | Version | License | Editor | Viewer | Molfile V2000 support | Molfile V3000 support | JSF Component
+------ | ------- | ------- | ------ | ------ | --------------------- | --------------------- | ---------
+[OpenChemLib JS](https://github.com/cheminfo/openchemlib-js) | [v7.4.1](https://github.com/cheminfo/openchemlib-js/releases/tag/v7.4.1) | [BSD-3-Clause](https://github.com/cheminfo/openchemlib-js/blob/master/LICENSE) | [x] | [x] | [x] | [x] | `<mol:openChemLibJSPlugin>`
+[MolPaintJS](https://github.com/ipb-halle/MolPaintJS) | [v0.3.5-alpha](https://github.com/ipb-halle/MolPaintJS/releases/tag/v0.3.5-alpha) | [Apache License 2.0](https://github.com/ipb-halle/MolPaintJS/blob/master/LICENSE) | [x] | [x] | [x] | [x] | `<mol:molPaintJSPlugin>`
+[Marvin JS](https://chemaxon.com/products/marvin-js) | 21.1.0 | proprietary | [x] | [x] | [x] | requires web services | `<mol:marvinJSPlugin>`
 
 #### Supported attributes
 
@@ -18,14 +18,26 @@ Plugin | Version | License | Editor | Viewer | Molfile V2000 support | Molfile V
 * `converter` (java.faces.convert.Converter, no default): FacesConverter for the component
 * `format` (String, default: "MDLV2000"): chemical file format used by the component; possible values: "MDLV2000" and "MDLV3000"
 * `height` (int, default: 400): height of the plugin in pixels
-* `pluginType` (String, default: "OpenChemLibJS"): type of the plugin; possible values: "OpenChemLibJS", "MolPaintJS" and "MarvinJS"
 * `readonly` (boolean, default: false): render in view-only mode or as structure editor; do not decode the submitted component value if set to true
 * `widgetVar` (String, no default): client-side variable name of a Promise object that embeds the plugin's JavaScript instance
 * `width` (int, default: 400): width of the plugin in pixels
 
-#### Use in iterations
+#### Composite components `<mol:molecule>` and `<mol:moleculeRepeatable>`
 
-The component `<mol:molecule>` uses the JSTL tag `<c:if test="...">` internally for switching the plugin type. Thus, it shall [not be used inside iterating JSF components](https://stackoverflow.com/a/3343681) like `<h:dataTable>` or `<ui:repeat>` if they iterate the `pluginType` attribute. The functionally identical component `<mol:moleculeRepeatable>` is available for this case, which uses `<ui:fragment rendered="...">` internally. Note: This component adds all possible plugins to the component tree (including JS and CSS resources), but renders only one of them.
+In case you want to switch between the plugin types dynamically, you can use these two composite components. They pass all the attributes mentioned above to the chosen component.
+
+##### Additional attribute: #####
+
+* `pluginType` (String, default: "OpenChemLibJS"): type of the plugin; possible values: "OpenChemLibJS", "MolPaintJS" and "MarvinJS"
+
+##### Use in iterations: #####
+
+The component `<mol:molecule>` uses the JSTL tag `<c:if test="...">` internally for switching the plugin type. Thus, it shall [not be used inside iterating JSF components](https://stackoverflow.com/a/3343681) like `<h:dataTable>` or `<ui:repeat>` if they iterate the `pluginType` attribute. The functionally identical component `<mol:moleculeRepeatable>` is available for this case, which uses `<ui:fragment rendered="...">` internally. Note: This component adds all possible plugin components to the component tree (including JS and CSS resources rendered via JSF), but renders only one of them.
+
+##### Known issues: #####
+
+* Passthrough attributes added via the component attribute `pt:myattribute="value"` and the XML namespace `xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"` are not applied to composite components. You can use [`<f:passThroughAttribute name="myattribute" value="value">`](https://docs.oracle.com/javaee/7/javaserver-faces-2-2/vdldocs-facelets/f/passThroughAttribute.html) instead.
+* (Mojarra only, tested with Glassfish 5.0) When using other composite components on the same facelet page, you will receive an error like `javax.faces.view.facelets.FaceletException: components/molecule.xhtml @0,0 <> Cannot create composite component tag handler for composite-source element in taglib.xml file`.
 
 #### Use in modals
 
