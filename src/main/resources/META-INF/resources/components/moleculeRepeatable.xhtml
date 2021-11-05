@@ -41,31 +41,42 @@
 	</composite:interface>
 
 	<composite:implementation>
-		<div jsf:id="#{cc.clientId}">
-			<f:passThroughAttributes value="#{cc.passThroughAttributes}" />
+		<div id="#{cc.clientId}">
 			<ui:fragment rendered="#{cc.attrs.pluginType eq 'OpenChemLibJS'}">
-				<mol:openChemLibJSPlugin value="#{cc.attrs.value}"
-					border="#{cc.attrs.border}" format="#{cc.attrs.format}"
-					height="#{cc.attrs.height}" readonly="#{cc.attrs.readonly}"
-					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}">
+				<mol:openChemLibJSPlugin
+					value="#{cc.attrs.value}"
+					border="#{cc.attrs.border}"
+					format="#{cc.attrs.format}"
+					height="#{cc.attrs.height}"
+					readonly="#{cc.attrs.readonly}"
+					widgetVar="#{cc.attrs.widgetVar}"
+					width="#{cc.attrs.width}">
 					<f:converter converterId="#{cc.attrs.converter}" />
 					<f:passThroughAttributes value="#{cc.passThroughAttributes}" />
 				</mol:openChemLibJSPlugin>
 			</ui:fragment>
 			<ui:fragment rendered="#{cc.attrs.pluginType eq 'MolPaintJS'}">
-				<mol:molPaintJSPlugin value="#{cc.attrs.value}"
-					border="#{cc.attrs.border}" format="#{cc.attrs.format}"
-					height="#{cc.attrs.height}" readonly="#{cc.attrs.readonly}"
-					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}">
+				<mol:molPaintJSPlugin
+					value="#{cc.attrs.value}"
+					border="#{cc.attrs.border}"
+					format="#{cc.attrs.format}"
+					height="#{cc.attrs.height}"
+					readonly="#{cc.attrs.readonly}"
+					widgetVar="#{cc.attrs.widgetVar}"
+					width="#{cc.attrs.width}">
 					<f:converter converterId="#{cc.attrs.converter}" />
 					<f:passThroughAttributes value="#{cc.passThroughAttributes}" />
 				</mol:molPaintJSPlugin>
 			</ui:fragment>
 			<ui:fragment rendered="#{cc.attrs.pluginType eq 'MarvinJS'}">
-				<mol:marvinJSPlugin value="#{cc.attrs.value}"
-					border="#{cc.attrs.border}" format="#{cc.attrs.format}"
-					height="#{cc.attrs.height}" readonly="#{cc.attrs.readonly}"
-					widgetVar="#{cc.attrs.widgetVar}" width="#{cc.attrs.width}">
+				<mol:marvinJSPlugin
+					value="#{cc.attrs.value}"
+					border="#{cc.attrs.border}"
+					format="#{cc.attrs.format}"
+					height="#{cc.attrs.height}"
+					readonly="#{cc.attrs.readonly}"
+					widgetVar="#{cc.attrs.widgetVar}"
+					width="#{cc.attrs.width}">
 					<f:converter converterId="#{cc.attrs.converter}" />
 					<f:passThroughAttributes value="#{cc.passThroughAttributes}" />
 				</mol:marvinJSPlugin>
