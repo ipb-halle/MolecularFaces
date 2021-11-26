@@ -22,7 +22,6 @@
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
-	xmlns:jsf="http://xmlns.jcp.org/jsf"
 	xmlns:mol="http://github.com/ipb-halle/MolecularFaces">
 <h:head />
 <h:body>
@@ -35,6 +34,7 @@
 			default="molecularfaces.DummyConverter" />
 		<composite:attribute name="format" default="MDLV2000" />
 		<composite:attribute name="height" default="400" />
+		<composite:attribute name="label" />
 		<composite:attribute name="readonly" default="false" />
 		<composite:attribute name="widgetVar" />
 		<composite:attribute name="width" default="400" />
@@ -48,6 +48,7 @@
 					border="#{cc.attrs.border}"
 					format="#{cc.attrs.format}"
 					height="#{cc.attrs.height}"
+					label="#{cc.attrs.label}"
 					readonly="#{cc.attrs.readonly}"
 					widgetVar="#{cc.attrs.widgetVar}"
 					width="#{cc.attrs.width}">
@@ -61,6 +62,7 @@
 					border="#{cc.attrs.border}"
 					format="#{cc.attrs.format}"
 					height="#{cc.attrs.height}"
+					label="#{cc.attrs.label}"
 					readonly="#{cc.attrs.readonly}"
 					widgetVar="#{cc.attrs.widgetVar}"
 					width="#{cc.attrs.width}">
@@ -74,6 +76,7 @@
 					border="#{cc.attrs.border}"
 					format="#{cc.attrs.format}"
 					height="#{cc.attrs.height}"
+					label="#{cc.attrs.label}"
 					readonly="#{cc.attrs.readonly}"
 					widgetVar="#{cc.attrs.widgetVar}"
 					width="#{cc.attrs.width}">

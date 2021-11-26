@@ -51,6 +51,12 @@
 			<type>java.lang.Integer</type>
 		</attribute>
 		<attribute>
+			<description><![CDATA[User presentable name for this component.]]></description>
+			<name>label</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
 			<description><![CDATA[Type of the plugin. Available plugin types: OpenChemLibJS, MolPaintJS, MarvinJS.]]></description>
 			<name>pluginType</name>
 			<required>false</required>
@@ -103,6 +109,12 @@
 			<name>height</name>
 			<required>false</required>
 			<type>java.lang.Integer</type>
+		</attribute>
+		<attribute>
+			<description><![CDATA[User presentable name for this component.]]></description>
+			<name>label</name>
+			<required>false</required>
+			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
 			<description><![CDATA[Type of the plugin. Available plugin types: OpenChemLibJS, MolPaintJS, MarvinJS.]]></description>
