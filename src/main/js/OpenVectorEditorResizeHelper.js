@@ -21,11 +21,12 @@
 var molecularfaces = molecularfaces || {};
 
 /**
- * 
+ * This class ensures proper resizing of the OpenVectorEditor iframe along the
+ * whole lifecycle from preview mode to fullscreen mode and back.
  */
 molecularfaces.OpenVectorEditorResizeHelper = class {
 	/**
-	 * 
+	 * Initialize this class to work with given iframe.
 	 */
 	constructor(iframeId) {
 		this._iframeId = iframeId;
@@ -41,8 +42,8 @@ molecularfaces.OpenVectorEditorResizeHelper = class {
 	_initialResize() {
 		let iframe = this._getIframe();
 		// These numbers were obtained via trial and error.
-        iframe.width  = iframe.contentWindow.document.body.scrollWidth + 20;
-        iframe.height = iframe.contentWindow.document.body.scrollHeight + 20;
+        iframe.width  = iframe.contentWindow.document.body.scrollWidth + 16;
+        iframe.height = iframe.contentWindow.document.body.scrollHeight + 21;
 	}
 
 	_iframeToFullscreen() {
