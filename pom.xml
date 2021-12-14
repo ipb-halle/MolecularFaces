@@ -40,6 +40,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<cdk.version>2.6</cdk.version>
 
 		<!-- OpenChemLib JS -->
 		<openchemlibjs.version>7.4.1</openchemlibjs.version>
@@ -347,17 +348,17 @@
 		<dependency>
 			<groupId>org.openscience.cdk</groupId>
 			<artifactId>cdk-core</artifactId>
-			<version>2.3</version>
+			<version>${cdk.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openscience.cdk</groupId>
 			<artifactId>cdk-ctab</artifactId>
-			<version>2.3</version>
+			<version>${cdk.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openscience.cdk</groupId>
 			<artifactId>cdk-data</artifactId>
-			<version>2.3</version>
+			<version>${cdk.version}</version>
 		</dependency>
 
 		<!--
@@ -422,19 +423,19 @@
 		<dependency>
 			<groupId>org.openscience.cdk</groupId>
 			<artifactId>cdk-formula</artifactId>
-			<version>2.3</version>
+			<version>${cdk.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.openscience.cdk</groupId>
 			<artifactId>cdk-valencycheck</artifactId>
-			<version>2.3</version>
+			<version>${cdk.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.openscience.cdk</groupId>
 			<artifactId>cdk-io</artifactId>
-			<version>2.3</version>
+			<version>${cdk.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
