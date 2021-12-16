@@ -1,0 +1,22 @@
+name: Maven dependencies security check
+on:
+  schedule:
+    - cron:  '0 8 * * *'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+    - id: dependency-check
+      name: Check maven dependencies
+      run: |
+        mvn \
+          -V \
+          --no-transfer-progress \
+          --batch-mode \
+          clean verify -P dependencyCheck
