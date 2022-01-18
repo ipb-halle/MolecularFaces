@@ -14,13 +14,13 @@ MolecularFaces is a collection of reusable UI components for Java Server Faces (
 
 ## Maven coordinates
 
-The artifacts are available on Maven Central. To include MolecularFaces into your JSF project, include the following dependency into your project's pom.xml:
+The artifacts are available on Maven Central. To include MolecularFaces into your JSF project, add the following dependency to your project's pom.xml:
 
 ```xml
 <dependency>
   <groupId>de.ipb-halle</groupId>
   <artifactId>molecularfaces</artifactId>
-  <version>0.3.0</version>
+  <version>0.4.0</version>
 </dependency>
 ```
 
@@ -37,7 +37,7 @@ Snapshots can be included via
 <dependency>
   <groupId>de.ipb-halle</groupId>
   <artifactId>molecularfaces</artifactId>
-  <version>0.4.0-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
 </dependency>
 ```
 
