@@ -27,4 +27,4 @@ Context-params:
 
 #### Known issues
 
-* Blueprint, a dependency of OVE, declares global CSS (see [OVE issue #604](https://github.com/TeselaGen/openVectorEditor/issues/604)). This will for instance override some CSS declarations of BootsFaces. No workaround available at the moment.
+* Blueprint, a dependency of OVE, declares global CSS (see [OVE issue #604](https://github.com/TeselaGen/openVectorEditor/issues/604)). This will for instance override some CSS declarations of BootsFaces. At the moment the workaround embeds OVE into an `<iframe>` and a too restrictive content security policy (CSP) may block some of OVE's functionalities.

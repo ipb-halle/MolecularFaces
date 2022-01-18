@@ -40,7 +40,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cdk.version>2.6</cdk.version>
+		<cdk.version>2.7.1</cdk.version>
 
 		<!-- OpenChemLib JS -->
 		<openchemlibjs.version>7.4.1</openchemlibjs.version>
@@ -477,7 +477,7 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>6.5.0</version>
+						<version>6.5.3</version>
 						<configuration>
 							<failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
 						</configuration>
