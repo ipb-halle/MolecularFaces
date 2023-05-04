@@ -19,8 +19,8 @@ package de.ipb_halle.molecularfaces.validator;
 
 import java.io.StringReader;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.io.IChemObjectReader.Mode;

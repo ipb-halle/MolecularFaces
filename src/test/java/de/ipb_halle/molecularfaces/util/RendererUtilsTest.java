@@ -21,13 +21,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIInput;
-import javax.faces.component.UIOutput;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.BooleanConverter;
-import javax.faces.convert.Converter;
-import javax.faces.convert.ConverterException;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.component.UIOutput;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.BooleanConverter;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.ConverterException;
 
 import org.apache.myfaces.test.mock.MockHttpServletRequest;
 import org.junit.Before;

@@ -24,14 +24,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
-import javax.faces.component.html.HtmlBody;
-import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.ComponentSystemEventListener;
-import javax.faces.event.PostAddToViewEvent;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIOutput;
+import jakarta.faces.component.html.HtmlBody;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.AbortProcessingException;
+import jakarta.faces.event.ComponentSystemEvent;
+import jakarta.faces.event.ComponentSystemEventListener;
+import jakarta.faces.event.PostAddToViewEvent;
 
 /**
  * This class enqueues resources and loads them either automatically or upon
@@ -60,12 +60,12 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	/**
 	 * Renderer type for JavaScript resources.
 	 */
-	public static final String JAVASCRIPT = "javax.faces.resource.Script";
+	public static final String JAVASCRIPT = "jakarta.faces.resource.Script";
 
 	/**
 	 * Renderer type for stylesheet resources.
 	 */
-	public static final String STYLESHEET = "javax.faces.resource.Stylesheet";
+	public static final String STYLESHEET = "jakarta.faces.resource.Stylesheet";
 
 	private final UIComponent component;
 
@@ -329,7 +329,7 @@ public class ResourceLoader implements ComponentSystemEventListener, Serializabl
 	private void addComponentToResourceContainerInFacet(UIComponent component, String facetName,
 			Map<String, UIComponent> facets) {
 		UIComponent container = facets.computeIfAbsent(facetName, k -> FacesContext.getCurrentInstance()
-				.getApplication().createComponent("javax.faces.ComponentResourceContainer"));
+				.getApplication().createComponent("jakarta.faces.ComponentResourceContainer"));
 		container.getChildren().add(component);
 	}
 

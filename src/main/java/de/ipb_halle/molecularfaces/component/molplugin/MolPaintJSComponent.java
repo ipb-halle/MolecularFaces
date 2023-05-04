@@ -17,13 +17,13 @@
  */
 package de.ipb_halle.molecularfaces.component.molplugin;
 
-import javax.faces.component.FacesComponent;
+import jakarta.faces.component.FacesComponent;
 
 import de.ipb_halle.molecularfaces.util.WebXml;
 import de.ipb_halle.molecularfaces.util.WebXmlImpl;
 
 /**
- * This {@link javax.faces.component.UIComponent} renders a chemical structure
+ * This {@link jakarta.faces.component.UIComponent} renders a chemical structure
  * editor or viewer using the
  * <a href="https://github.com/ipb-halle/MolPaintJS">MolPaintJS</a> JavaScript
  * plugin.

@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
-import javax.faces.component.html.HtmlBody;
-import javax.faces.context.FacesContext;
-import javax.faces.render.Renderer;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIOutput;
+import jakarta.faces.component.html.HtmlBody;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.render.Renderer;
 
 import org.apache.commons.io.IOUtils;
 

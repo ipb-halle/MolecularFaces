@@ -17,7 +17,7 @@
  */
 package de.ipb_halle.molecularfaces.component.molplugin;
 
-import javax.faces.component.UIInput;
+import jakarta.faces.component.UIInput;
 import de.ipb_halle.molecularfaces.util.ResourceLoader;
 
 /**

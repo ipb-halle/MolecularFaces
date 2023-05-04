@@ -20,12 +20,12 @@ package de.ipb_halle.molecularfaces.util;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIInput;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.ConverterException;
-import javax.faces.render.Renderer;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.ConverterException;
+import jakarta.faces.render.Renderer;
 
 /**
  * Utility class that supplies convenient functionalities to be used by
