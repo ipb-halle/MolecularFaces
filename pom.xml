@@ -6,7 +6,7 @@
 
 	<groupId>de.ipb-halle</groupId>
 	<artifactId>molecularfaces</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>MolecularFaces</name>
@@ -26,6 +26,7 @@
 		</developer>
                 <developer>
                         <name>Frank Broda</name>
+                        <email>fbroda@ipb-halle.de</email>
                         <organization>Leibniz Institute of Plant Biochemistry (IPB), Halle (Saale), Germany</organization>
                         <organizationUrl>https://www.ipb-halle.de</organizationUrl>
                 </developer>
@@ -48,22 +49,22 @@
 		<cdk.version>2.7.1</cdk.version>
 
 		<!-- OpenChemLib JS -->
-		<openchemlibjs.version>7.4.1</openchemlibjs.version>
+		<openchemlibjs.version>8.9.0</openchemlibjs.version>
+		<openchemlibjs.baseURL>https://cdn.jsdelivr.net/npm</openchemlibjs.baseURL>
 		<!-- This is the checksum from the package distributed via npm. -->
-		<openchemlibjs.sha256>e37439f6f4f397bdadaf0091109516916216db16ca8aa1bcbee3b7bfbad8869d</openchemlibjs.sha256>
+		<openchemlibjs.sha256>b596307ef53ac44f01e799a9ea2f7b790b7d4fbcc6f0ce47891cb4a994f250e8</openchemlibjs.sha256>
 
 		<!-- MolPaintJS -->
-		<molpaintjs.version>v0.3.5-alpha</molpaintjs.version>
-		<molpaintjs.sha256>580893aa3ad25abc2a78d3bee8ff14d2a9a4486e6d8df9291149f471e2c16791</molpaintjs.sha256>
+		<molpaintjs.version>v0.4.0</molpaintjs.version>
+		<molpaintjs.sha256>adfd98648b17e13614358dede520bf8bbf4a6095865b9af8fb003ea2514f50b7</molpaintjs.sha256>
 
 		<!-- openVectorEditor -->
-		<openVectorEditor.version>16.3.18</openVectorEditor.version>
+		<!-- 18.3.6 -->
+		<openVectorEditor.version>18.3.6</openVectorEditor.version>
+		<openVectorEditor.baseURL>https://cdn.jsdelivr.net/npm</openVectorEditor.baseURL>
 		<!-- These are the checksums from the package distributed via npm. -->
-		<openVectorEditor.min.js.sha256>88ec80b623069665051cca04bc29764df508656792e23acee7ca0060318edb78</openVectorEditor.min.js.sha256>
-		<openVectorEditor.main.css.sha256>7cc916424bf20811b989b6329acf2453c07be24d2a5477775282e72846beb604</openVectorEditor.main.css.sha256>
-		<!--<openVectorEditor.icons-16.1645f50f.woff.sha256>9700ae986c3357a771c7276c8eb30d1adc0c7b270bfd0bd56f6ea2df568cb88b</openVectorEditor.icons-16.1645f50f.woff.sha256>
-		<openVectorEditor.icons-16.2368f88a.eot.sha256>a8ef9e585479427f5f7fa35e4201caf851a748c5cdf7d89ecf5ba3bd84179eda</openVectorEditor.icons-16.2368f88a.eot.sha256>
-		<openVectorEditor.icons-16.13933033.ttf.sha256>3159a9b5dbf9c28ea27e925b24a468fc51298a49e16be06341fdf672efa19605</openVectorEditor.icons-16.13933033.ttf.sha256>-->
+		<openVectorEditor.min.js.sha256>f857f279e6719b8d960780facca0865228c7b6de747b938a054555ddc1a28b05</openVectorEditor.min.js.sha256>
+		<openVectorEditor.main.css.sha256>44e62c651698afa64bcaf36c65f500b3e25a10d70297c28bd1bbd51fb02d0d22</openVectorEditor.main.css.sha256>
 	</properties>
 
 	<distributionManagement>
@@ -143,7 +144,7 @@
 						</goals>
 						<configuration>
 							<!-- See https://github.com/cheminfo/openchemlib-js/issues/110#issuecomment-802697504 -->
-							<url>https://unpkg.com/openchemlib@${openchemlibjs.version}/dist/openchemlib-full.js</url>
+							<url>${openchemlibjs.baseURL}/openchemlib@${openchemlibjs.version}/dist/openchemlib-full.js</url>
 							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openchemlibjs/</outputDirectory>
 							<sha256>${openchemlibjs.sha256}</sha256>
 							<checkSignature>true</checkSignature>
@@ -173,7 +174,7 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>https://unpkg.com/open-vector-editor@${openVectorEditor.version}/umd/open-vector-editor.min.js</url>
+							<url>${openVectorEditor.baseURL}/open-vector-editor@${openVectorEditor.version}/umd/open-vector-editor.min.js</url>
 							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openVectorEditor/</outputDirectory>
 							<sha256>${openVectorEditor.min.js.sha256}</sha256>
 							<checkSignature>true</checkSignature>
@@ -186,51 +187,12 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>https://unpkg.com/open-vector-editor@${openVectorEditor.version}/umd/main.css</url>
+							<url>${openVectorEditor.baseURL}/open-vector-editor@${openVectorEditor.version}/umd/main.css</url>
 							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openVectorEditor/</outputDirectory>
 							<sha256>${openVectorEditor.main.css.sha256}</sha256>
 							<checkSignature>true</checkSignature>
 						</configuration>
 					</execution>
-					<!--<execution>
-						<id>download-openVectorEditor-icons-16.1645f50f.woff</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>wget</goal>
-						</goals>
-						<configuration>
-							<url>https://unpkg.com/open-vector-editor@${openVectorEditor.version}/umd/icons-16.1645f50f.woff</url>
-							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openVectorEditor/</outputDirectory>
-							<sha256>${openVectorEditor.icons-16.1645f50f.woff.sha256}</sha256>
-							<checkSignature>true</checkSignature>
-						</configuration>
-					</execution>
-					<execution>
-						<id>download-openVectorEditor-icons-16.2368f88a.eot</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>wget</goal>
-						</goals>
-						<configuration>
-							<url>https://unpkg.com/open-vector-editor@${openVectorEditor.version}/umd/icons-16.2368f88a.eot</url>
-							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openVectorEditor/</outputDirectory>
-							<sha256>${openVectorEditor.icons-16.2368f88a.eot.sha256}</sha256>
-							<checkSignature>true</checkSignature>
-						</configuration>
-					</execution>
-					<execution>
-						<id>download-openVectorEditor-icons-16.13933033.ttf</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>wget</goal>
-						</goals>
-						<configuration>
-							<url>https://unpkg.com/open-vector-editor@${openVectorEditor.version}/umd/icons-16.13933033.ttf</url>
-							<outputDirectory>${project.build.directory}/downloaded-resources/plugins/openVectorEditor/</outputDirectory>
-							<sha256>${openVectorEditor.icons-16.13933033.ttf.sha256}</sha256>
-							<checkSignature>true</checkSignature>
-						</configuration>
-					</execution>-->
 				</executions>
 			</plugin>
 			<plugin>
@@ -384,7 +346,7 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.11.0</version>
+			<version>2.16.1</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- mocks for JSF classes -->
