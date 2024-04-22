@@ -98,6 +98,7 @@ public class RendererUtils {
 	 * @throws NullPointerException if {@code context} or {@code component} are
 	 *                              {@code null}
 	 */
+        @SuppressWarnings("unchecked")
 	public static String convertValueToString(FacesContext context, UIInput component, Object value)
 			throws ConverterException {
 		Objects.requireNonNull(context);

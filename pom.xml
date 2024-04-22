@@ -120,6 +120,12 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.2.0</version>
+                                <configuration>
+                                    <author>Frank Lange</author>
+                                    <encoding>UTF-8</encoding>
+                                    <nohelp>true</nohelp>
+                                    <show>private</show>
+                                </configuration>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -129,6 +135,21 @@
 					</execution>
 				</executions>
 			</plugin>
+
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-project-info-reports-plugin</artifactId>
+                            <version>3.5.0</version>
+                        </plugin>
+
+
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-site-plugin</artifactId>
+                            <version>3.12.1</version>
+                        </plugin>
+
+
 			<!-- 3rd party plugin downloads -->
 			<plugin>
 				<groupId>com.googlecode.maven-download-plugin</groupId>
@@ -375,7 +396,7 @@
 			 during runtime, but not during tests. Note: We are using JavaEE 7
 			 with bean validation 1.1, thus the ancient version. -->
 		<dependency>
-			<groupId>org.hibernate</groupId>
+			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>8.0.0.Final</version>
 			<scope>provided</scope>
