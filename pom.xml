@@ -46,7 +46,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-                <gpg.keyname>fbroda@ipb-halle.de<gpg.keyname>
+                <gpg.keyname>fbroda@ipb-halle.de</gpg.keyname>
 		<cdk.version>2.7.1</cdk.version>
 
 		<!-- OpenChemLib JS -->
