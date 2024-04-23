@@ -17,10 +17,10 @@
  */
 package de.ipb_halle.molecularfaces.component.molplugin;
 
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.ConverterException;
-import javax.faces.render.Renderer;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.ConverterException;
+import jakarta.faces.render.Renderer;
 
 import de.ipb_halle.molecularfaces.util.RendererUtils;
 

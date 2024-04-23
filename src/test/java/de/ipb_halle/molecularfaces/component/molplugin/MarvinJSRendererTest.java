@@ -26,11 +26,11 @@ import static org.junit.Assert.assertThrows;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import javax.faces.component.UIOutput;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PostAddToViewEvent;
+import jakarta.faces.component.UIOutput;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PostAddToViewEvent;
 
-import org.apache.myfaces.shared.renderkit.html.HtmlResponseWriterImpl;
+import org.apache.myfaces.renderkit.html.HtmlResponseWriterImpl;
 import org.apache.myfaces.test.mock.MockServletContext;
 import org.junit.Before;
 import org.junit.Rule;

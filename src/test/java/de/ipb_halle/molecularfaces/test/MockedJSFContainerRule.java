@@ -17,7 +17,8 @@
  */
 package de.ipb_halle.molecularfaces.test;
 
-import javax.faces.component.html.HtmlBody;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.html.HtmlBody;
 
 import org.apache.myfaces.test.mock.MockedJsfTestContainer;
 import org.junit.rules.TestRule;
@@ -57,17 +58,24 @@ public class MockedJSFContainerRule implements TestRule {
 		container.setUpAll();
 
 		// This allows the use of UIViewRoot.addComponentResource(...).
-		container.getApplication().addComponent("javax.faces.ComponentResourceContainer",
+		container.getApplication().addComponent("jakarta.faces.ComponentResourceContainer",
 				"org.apache.myfaces.component.ComponentResourceContainer");
+
+                // add head facet, otherwise MockedJsfTestContainer will throw a NullPointerException
+                // when head facet is added automatically in UIViewRoot without Renderer
+                UIComponent component = container.getApplication()
+                        .createComponent("jakarta.faces.ComponentResourceContainer");
+                component.setId("jakarta_faces_location_head");
+                container.getFacesContext().getViewRoot().getFacets().put("head", component);
 
 		// Body component is needed when adding resources there. 
 		container.getFacesContext().getViewRoot().getChildren().add(new HtmlBody());
 
 		// Register renderers from myfaces-impl for JavaScript and stylesheets.
 //		container.getFacesContext().getRenderKit().addRenderer(UIOutput.COMPONENT_FAMILY,
-//				"javax.faces.resource.Script", new HtmlScriptRenderer());
+//				"jakarta.faces.resource.Script", new HtmlScriptRenderer());
 //		container.getFacesContext().getRenderKit().addRenderer(UIOutput.COMPONENT_FAMILY,
-//				"javax.faces.resource.Stylesheet", new HtmlStylesheetRenderer());
+//				"jakarta.faces.resource.Stylesheet", new HtmlStylesheetRenderer());
 	}
 
 	private void after() {

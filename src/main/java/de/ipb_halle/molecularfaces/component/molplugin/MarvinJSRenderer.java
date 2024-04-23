@@ -19,17 +19,17 @@ package de.ipb_halle.molecularfaces.component.molplugin;
 
 import java.io.IOException;
 import java.util.Formatter;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
-import javax.faces.render.FacesRenderer;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.render.FacesRenderer;
 
 import de.ipb_halle.molecularfaces.util.RendererUtils;
 import de.ipb_halle.molecularfaces.util.WebXml;
 import de.ipb_halle.molecularfaces.util.WebXmlImpl;
 
 /**
- * This {@link javax.faces.render.Renderer} renders a chemical structure editor or viewer using the
+ * This {@link jakarta.faces.render.Renderer} renders a chemical structure editor or viewer using the
  * <a href="https://chemaxon.com/products/marvin-js">Marvin JS</a> Javascript
  * plugin.
  * 

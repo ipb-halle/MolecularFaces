@@ -30,18 +30,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.faces.application.Resource;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
-import javax.faces.convert.ConverterException;
-import javax.faces.render.FacesRenderer;
-import javax.faces.render.Renderer;
+import jakarta.faces.application.Resource;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.convert.ConverterException;
+import jakarta.faces.render.FacesRenderer;
+import jakarta.faces.render.Renderer;
 
 import de.ipb_halle.molecularfaces.util.RendererUtils;
 
 /**
- * This {@link javax.faces.render.Renderer} renders the HTML and JavaScript code
+ * This {@link jakarta.faces.render.Renderer} renders the HTML and JavaScript code
  * of a {@link OpenVectorEditorComponent} using the
  * <a href="https://github.com/TeselaGen/openVectorEditor">Teselagen's Open
  * Source Vector/Plasmid Editor Component</a>.

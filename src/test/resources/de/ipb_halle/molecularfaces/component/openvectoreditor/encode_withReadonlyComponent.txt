@@ -18,10 +18,10 @@
 	<iframe id="myId_Iframe" style="border:none;" srcdoc="
 		&lt;html&gt;
 			&lt;head&gt;
-				&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/javax.faces.resource/plugins/openVectorEditor/main.css.jsf&quot; /&gt;
+				&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/jakarta.faces.resource/plugins/openVectorEditor/main.css.jsf&quot; /&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script type=&quot;text/javascript&quot; src=&quot;/javax.faces.resource/plugins/openVectorEditor/open-vector-editor.min.js.jsf&quot;&gt;&lt;/script&gt;
+				&lt;script type=&quot;text/javascript&quot; src=&quot;/jakarta.faces.resource/plugins/openVectorEditor/open-vector-editor.min.js.jsf&quot;&gt;&lt;/script&gt;
 				&lt;div id=&quot;myId_OpenVectorEditor&quot;&gt;&lt;/div&gt;
 			&lt;/body&gt;
 		&lt;/html&gt;
