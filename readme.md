@@ -24,7 +24,7 @@ The artifacts are available on Maven Central. To include MolecularFaces into you
 </dependency>
 ```
 
-Snapshots can be included via
+Version 1.0.0 and above require JakartaEE. Use versions 0.x.y for JavaEE 7 projects. Snapshots can be included via
 
 ```xml
 <repository>
